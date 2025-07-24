@@ -9,11 +9,18 @@
     <!-- Google Fonts - Inter for a clean, modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Color Palette (inspired by the image):
+           - Primary Background: #1A1A2E (Dark Blue/Purple)
+           - Accent 1 (Lighter Blue/Purple): #3B3B54
+           - Accent 2 (Soft Blue/Cyan): #6A8EAE
+           - Text/Highlight: #E0E0E0 (Light Gray)
+           - Border/Glow: #8C9EFF (Light Purple/Blue)
+        */
         body {
             font-family: 'Inter', sans-serif;
             overflow: hidden; /* Prevent scrollbars when cards appear or modal is open */
-            background-color: #F0F4F8; /* Light Grayish Blue */
-            color: #334155; /* Dark Slate Blue for main text */
+            background-color: #1A1A2E; /* Dark Blue/Purple */
+            color: #E0E0E0; /* Light Gray for main text */
         }
         /* Custom styles for the elegant effect on hover */
         .card-container {
@@ -40,41 +47,41 @@
             pointer-events: auto; /* Allows interaction when visible */
         }
         .card {
-            background-color: rgba(255, 255, 255, 0.95); /* Almost opaque white for cards */
+            background-color: rgba(59, 59, 84, 0.7); /* Accent 1 with transparency */
             backdrop-filter: blur(10px); /* Glassmorphism effect */
-            border: 1px solid rgba(74, 144, 226, 0.15); /* Soft blue border */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(140, 158, 255, 0.2); /* Light Purple/Blue with transparency */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer; /* Indicate clickable cards */
             flex-shrink: 0; /* Prevent cards from shrinking */
             width: 280px; /* Fixed width for cards in scrollable row */
             margin-right: 24px; /* gap-6 equivalent */
-            color: #475569; /* Slate-600 text for cards */
+            color: #E0E0E0; /* Light Gray text for cards */
         }
         .card:last-child {
             margin-right: 0; /* No margin on the last card */
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(74, 144, 226, 0.3); /* Soft blue glow on hover */
+            box-shadow: 0 8px 12px rgba(140, 158, 255, 0.4); /* Light Purple/Blue glow on hover */
         }
         .glow-text {
-            text-shadow: 0 0 15px rgba(74, 144, 226, 0.6); /* Subtle soft blue glow for main text */
+            text-shadow: 0 0 15px rgba(140, 158, 255, 0.8); /* Stronger Light Purple/Blue glow for main text */
         }
         .landing-page {
-            background: linear-gradient(135deg, #EBF5F9 0%, #D6EAF8 100%); /* Softer blues gradient background */
+            background: linear-gradient(135deg, #1A1A2E 0%, #3B3B54 100%); /* Dark Blue/Purple gradient background */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #334155; /* Dark Slate Blue for contrast on light background */
+            color: #E0E0E0; /* Light Gray for contrast on dark background */
             position: relative;
             z-index: 10; /* Ensure landing page is behind cards initially */
         }
         .loading-spinner {
-            border: 4px solid rgba(74, 144, 226, 0.3);
-            border-top: 4px solid #4A90E2; /* Soft Blue color */
+            border: 4px solid rgba(140, 158, 255, 0.3);
+            border-top: 4px solid #8C9EFF; /* Light Purple/Blue color */
             border-radius: 50%;
             width: 24px;
             height: 24px;
@@ -92,7 +99,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.3); /* Lighter, more subtle overlay */
+            background-color: rgba(0, 0, 0, 0.6); /* Darker, more subtle overlay */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -106,7 +113,7 @@
             visibility: visible;
         }
         .modal-content {
-            background-color: #FFFFFF; /* White background for modal */
+            background-color: #2C2C40; /* Slightly lighter than main background for modal */
             border-radius: 0.75rem; /* rounded-xl */
             padding: 1.5rem; /* p-6 */
             max-width: 800px;
@@ -114,12 +121,12 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            border: 1px solid rgba(74, 144, 226, 0.2); /* Soft blue border */
-            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3); /* Soft blue shadow */
+            border: 1px solid rgba(140, 158, 255, 0.3); /* Light Purple/Blue border */
+            box-shadow: 0 0 20px rgba(140, 158, 255, 0.4); /* Light Purple/Blue shadow */
             transform: translateY(20px);
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
-            color: #334155; /* Dark Slate Blue text for modal content */
+            color: #E0E0E0; /* Light Gray text for modal content */
         }
         .modal-overlay.visible .modal-content {
             transform: translateY(0);
@@ -132,7 +139,7 @@
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: #4A90E2; /* Soft Blue color */
+            color: #8C9EFF; /* Light Purple/Blue color */
             cursor: pointer;
             transition: transform 0.2s ease;
         }
@@ -148,37 +155,6 @@
             transform: rotate(180deg) translateX(50%); /* Rotate and adjust for center */
         }
 
-        /* Tabs for Projects Modal */
-        .tab-button {
-            padding: 0.75rem 1.25rem;
-            border-bottom: 2px solid transparent;
-            color: #64748B; /* Slate-500 */
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .tab-button.active {
-            border-color: #4A90E2; /* Soft Blue */
-            color: #4A90E2; /* Soft Blue */
-        }
-        .tab-button:hover {
-            color: #4A90E2; /* Soft Blue */
-        }
-
-        .generated-idea-output {
-            background-color: #F0F4F8; /* Light Grayish Blue */
-            border: 1px solid #D6EAF8; /* Softer blue border */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-top: 1rem;
-            color: #334155;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
-            word-wrap: break-word; /* Break long words */
-        }
-        .generated-idea-output h3 {
-            color: #4A90E2; /* Soft Blue */
-        }
-
         /* Welcome Overlay styles */
         #welcomeOverlay {
             position: fixed;
@@ -186,7 +162,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #EBF5F9 0%, #D6EAF8 100%); /* Matches landing page background */
+            background: linear-gradient(135deg, #1A1A2E 0%, #3B3B54 100%); /* Matches landing page background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -197,7 +173,7 @@
         }
 
         #helloSvgText {
-            fill: #4A90E2; /* Solid fill color */
+            fill: #8C9EFF; /* Solid fill color */
             font-size: 80px; /* Adjust as needed */
             font-weight: bold;
             text-anchor: middle;
@@ -220,15 +196,15 @@
     <div id="landingPage" class="landing-page relative w-full h-screen flex flex-col items-center justify-center p-4">
         <!-- Profile Picture Placeholder -->
         <div class="mb-8">
-            <img src="https://placehold.co/150x150/4A90E2/FFFFFF?text=Profile" alt="Brian Kidiga Profile" class="rounded-full border-4 border-[#4A90E2] shadow-lg transform transition-transform duration-300 hover:scale-105">
+            <img src="https://avatars.githubusercontent.com/u/98683954?v=4" alt="Brian Kidiga Profile" class="rounded-full border-4 border-[#8C9EFF] shadow-lg transform transition-transform duration-300 hover:scale-105">
         </div>
         <h1 class="text-5xl md:text-7xl font-bold mb-4 glow-text text-center">Brian Kidiga</h1>
-        <p class="text-xl md:text-3xl text-gray-700 text-center">Android Developer | Backend Developer</p>
-        <p class="text-md md:text-lg text-gray-600 mt-2 text-center">BSc. Computer Science</p>
+        <p class="text-xl md:text-3xl text-gray-300 text-center">Android Developer | Backend Developer</p>
+        <p class="text-md md:text-lg text-gray-400 mt-2 text-center">BSc. Computer Science</p>
 
         <!-- Arrow to toggle cards -->
         <div id="toggleCardsArrow" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-30">
-            <svg class="w-10 h-10 text-[#4A90E2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <svg class="w-10 h-10 text-[#8C9EFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
     </div>
 
@@ -238,64 +214,64 @@
         <!-- About Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="about">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">About Me</h2>
-                <p class="text-gray-700 text-sm mb-3 line-clamp-4">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">About Me</h2>
+                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
                     As an Android Developer with a BSc in Computer Science, I am passionate about crafting robust and user-friendly mobile applications and building efficient backend solutions. My experience spans from integrating currency converters to delivering in-app translations and developing full-stack applications. I thrive on solving complex problems and continuously learning new technologies.
                 </p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Details</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
             <!-- Full content for modal -->
             <div class="full-content hidden">
-                <p class="text-gray-700 text-sm mb-3">
+                <p class="text-gray-300 text-sm mb-3">
                     As an Android Developer with a BSc in Computer Science, I am passionate about crafting robust and user-friendly mobile applications and building efficient backend solutions. My experience spans from integrating currency converters to delivering in-app translations and developing full-stack applications. I thrive on solving complex problems and continuously learning new technologies.
                 </p>
-                <div class="text-gray-600 text-xs mt-4">
+                <div class="text-gray-400 text-xs mt-4">
                     <p>Email: Kidigabrian@outlook.com</p>
                     <p>Phone: +(2547) 838 871 93</p>
                     <p>Location: Nairobi, Kenya</p>
-                    <p>LinkedIn: <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#4A90E2] hover:underline">Brian Kidiga</a></p>
+                    <p>LinkedIn: <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#8C9EFF] hover:underline">Brian Kidiga</a></p>
                 </div>
-                <a href="BrianKidiga_2YOE_Android_Backend_Developer_Resume.pdf" target="_blank" class="inline-block mt-4 bg-[#4A90E2] hover:bg-[#3B82F6] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">View Resume</a>
+                <a href="BrianKidiga_2YOE_Android_Backend_Developer_Resume.pdf" target="_blank" class="inline-block mt-4 bg-[#8C9EFF] hover:bg-[#6A8EAE] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">View Resume</a>
             </div>
         </div>
 
         <!-- Education Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="education">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">Education</h2>
-                <p class="text-gray-700 text-sm mb-2">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Education</h2>
+                <p class="text-gray-300 text-sm mb-2">
                     <strong>Karatina University</strong>
                 </p>
-                <p class="text-gray-600 text-xs line-clamp-2">BSc Computer Science</p>
+                <p class="text-gray-400 text-xs line-clamp-2">BSc Computer Science</p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Details</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
             <!-- Full content for modal -->
             <div class="full-content hidden">
-                <p class="text-gray-700 text-sm mb-2">
+                <p class="text-gray-300 text-sm mb-2">
                     <strong>Karatina University</strong>
                 </p>
-                <p class="text-gray-600 text-xs">BSc Computer Science</p>
-                <p class="text-gray-600 text-xs">2020 - 2024</p>
+                <p class="text-gray-400 text-xs">BSc Computer Science</p>
+                <p class="text-gray-400 text-xs">2020 - 2024</p>
             </div>
         </div>
 
         <!-- Work Experience Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="experience">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">Work Experience</h2>
-                <p class="text-gray-700 text-sm mb-2">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Work Experience</h2>
+                <p class="text-gray-300 text-sm mb-2">
                     <strong>Android Developer Intern - Graph Technologies</strong>
                 </p>
-                <p class="text-gray-600 text-xs mb-3 line-clamp-3">May '23 - Aug '23. Integrated a currency converter, collaborated on in-app translations, delivered bug reports and performance reports.</p>
+                <p class="text-gray-400 text-xs mb-3 line-clamp-3">May '23 - Aug '23. Integrated a currency converter, collaborated on in-app translations, delivered bug reports and performance reports.</p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Details</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
             <!-- Full content for modal -->
             <div class="full-content hidden">
-                <p class="text-gray-700 text-sm mb-2">
+                <p class="text-gray-300 text-sm mb-2">
                     <strong>Android Developer Intern - Graph Technologies</strong>
                 </p>
-                <p class="text-gray-600 text-xs mb-3">May '23 - Aug '23</p>
-                <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                <p class="text-gray-400 text-xs mb-3">May '23 - Aug '23</p>
+                <ul class="list-disc list-inside text-gray-300 text-sm space-y-1">
                     <li>Integrated a currency converter into the Netdoc android app.</li>
                     <li>Collaborated with the team to deliver in-app translations in the android app.</li>
                     <li>Delivered Bug reports, update recommendations and overall performance reports of the Netdoc App.</li>
@@ -307,25 +283,25 @@
         <!-- Skills Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="skills">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">Skills</h2>
-                <p class="text-gray-700 text-sm line-clamp-4">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Skills</h2>
+                <p class="text-gray-300 text-sm line-clamp-4">
                     Languages: Go, Java, Kotlin, Bash, SQL. Core Skills: Problem Solving, Data Structures and Algorithms, Backend, Computational Mathematics, System Programming, Trouble Shooting. Frameworks: Spring Boot, Android (Java, Kotlin, Hilt-DI, Firebase, Retrofit, Room), Go-Fiber, Gorm.
                 </p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Details</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
             <!-- Full content for modal -->
             <div class="full-content hidden">
                 <div class="mb-3">
-                    <h3 class="text-lg font-medium text-gray-700 mb-1">Languages:</h3>
-                    <p class="text-gray-700 text-sm">Go, Java, Kotlin, Bash, SQL</p>
+                    <h3 class="text-lg font-medium text-gray-300 mb-1">Languages:</h3>
+                    <p class="text-gray-300 text-sm">Go, Java, Kotlin, Bash, SQL</p>
                 </div>
                 <div class="mb-3">
-                    <h3 class="text-lg font-medium text-gray-700 mb-1">Core Skills:</h3>
-                    <p class="text-gray-700 text-sm">Problem Solving, Data Structures and Algorithms, Backend, Computational Mathematics, System Programming, Trouble Shooting</p>
+                    <h3 class="text-lg font-medium text-gray-300 mb-1">Core Skills:</h3>
+                    <p class="text-gray-300 text-sm">Problem Solving, Data Structures and Algorithms, Backend, Computational Mathematics, System Programming, Trouble Shooting</p>
                 </div>
                 <div>
-                    <h3 class="text-lg font-medium text-gray-700 mb-1">Frameworks:</h3>
-                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                    <h3 class="text-lg font-medium text-gray-300 mb-1">Frameworks:</h3>
+                    <ul class="list-disc list-inside text-gray-300 text-sm space-y-1">
                         <li>Spring Boot - Java, Graph QL, Security, Jpa, Rest API, Mongodb</li>
                         <li>Android - Java, Kotlin, Hilt-DI, Firebase, Retrofit, Room</li>
                         <li>Go-Fiber, Gorm</li>
@@ -337,23 +313,23 @@
         <!-- Projects Summary Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="projects-summary">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">My Projects</h2>
-                <p class="text-gray-700 text-sm mb-3 line-clamp-4">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">My Projects</h2>
+                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
                     Explore my past projects, including Android apps, backend solutions, and research initiatives. See my GitHub contribution streak.
                 </p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Projects</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Projects</button>
         </div>
 
         <!-- Contact Summary Card -->
         <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="contact-summary">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">Contact Me</h2>
-                <p class="text-gray-700 text-sm mb-3 line-clamp-4">
+                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Contact Me</h2>
+                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
                     Interested in collaborating or have a question? Reach out to me via email, phone, or LinkedIn. I'm always open to new opportunities!
                 </p>
             </div>
-            <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">Get in Touch</button>
+            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">Get in Touch</button>
         </div>
 
     </div>
@@ -362,8 +338,8 @@
     <div id="infoModal" class="modal-overlay hidden">
         <div class="modal-content">
             <button class="modal-close-btn" id="closeInfoModalBtn">&times;</button>
-            <h2 id="infoModalTitle" class="text-3xl font-bold mb-4 text-[#4A90E2]"></h2>
-            <div id="infoModalContent" class="text-gray-700 text-base leading-relaxed">
+            <h2 id="infoModalTitle" class="text-3xl font-bold mb-4 text-[#8C9EFF]"></h2>
+            <div id="infoModalContent" class="text-gray-300 text-base leading-relaxed">
                 <!-- Content will be injected here -->
             </div>
         </div>
@@ -373,58 +349,58 @@
     <div id="detailedProjectsModal" class="modal-overlay hidden">
         <div class="modal-content">
             <button class="modal-close-btn" id="closeProjectsModalBtn">&times;</button>
-            <h2 class="text-3xl font-bold mb-4 text-[#4A90E2]">My Projects</h2>
+            <h2 class="text-3xl font-bold mb-4 text-[#8C9EFF]">My Projects</h2>
 
             <!-- Tab Content: My Projects (now the only content) -->
             <div id="my-projects" class="tab-content">
                 <!-- GitHub Stats Streak Placeholder -->
                 <div class="mb-6 text-center">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">My GitHub Streak</h3>
+                    <h3 class="text-xl font-semibold text-gray-200 mb-2">My GitHub Streak</h3>
                     <!-- Updated GitHub Streak Image -->
                     <img src="https://streak-stats.demolab.com?user=kdbrian&theme=dark&short_numbers=true&date_format=n%2Fj%5B%2FY%5D&hide_longest_streak=true" alt="GitHub Streak" class="mx-auto w-full max-w-xl rounded-md">
-                    <p class="text-gray-600 text-sm mt-2">Daily contributions visualized.</p>
+                    <p class="text-gray-400 text-sm mt-2">Daily contributions visualized.</p>
                 </div>
 
                 <div class="space-y-8">
                     <!-- Project 1 -->
-                    <div class="border-b border-gray-300 pb-4">
-                        <img src="https://placehold.co/200x120/EBF5F9/4A90E2?text=PseudoNotes" alt="PseudoNotes Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-900">PseudoNotes</h3>
-                        <p class="text-gray-700 text-xs mb-1">A software application aimed at helping developers share solutions for software-related problems through a simplified pseudo language. Defining it as a DSL for the domain Problem Solving.</p>
-                        <p class="text-gray-600 text-xs"><strong>Tech Stack:</strong> (Details on specific tech stack from resume if available, otherwise placeholder)</p>
-                        <p class="text-gray-600 text-xs"><strong>Challenge Solved:</strong> Streamlining solution sharing for software problems.</p>
+                    <div class="border-b border-gray-600 pb-4">
+                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=PseudoNotes" alt="PseudoNotes Project" class="w-full h-auto rounded-md mb-2">
+                        <h3 class="text-lg font-medium text-gray-100">PseudoNotes</h3>
+                        <p class="text-gray-300 text-xs mb-1">A software application aimed at helping developers share solutions for software-related problems through a simplified pseudo language. Defining it as a DSL for the domain Problem Solving.</p>
+                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> (Details on specific tech stack from resume if available, otherwise placeholder)</p>
+                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Streamlining solution sharing for software problems.</p>
                     </div>
                     <!-- Project 2 -->
-                    <div class="border-b border-gray-300 pb-4">
-                        <img src="https://placehold.co/200x120/EBF5F9/4A90E2?text=Sage/Emerg" alt="Sage/Emerg Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-900">Sage / Emerg (SOS Button)</h3>
-                        <p class="text-gray-700 text-xs mb-1">Delivered using tools like Firebase (Firestore, Cloud Messaging, App Distribution). The application is aimed to work as a portable SOS-Button.</p>
-                        <p class="text-gray-600 text-xs"><strong>Tech Stack:</strong> Android Kotlin, Firebase (Firestore, Cloud Messaging, App Distribution)</p>
-                        <p class="text-gray-600 text-xs"><strong>Challenge Solved:</strong> Providing immediate assistance in critical situations.</p>
+                    <div class="border-b border-gray-600 pb-4">
+                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=Sage/Emerg" alt="Sage/Emerg Project" class="w-full h-auto rounded-md mb-2">
+                        <h3 class="text-lg font-medium text-gray-100">Sage / Emerg (SOS Button)</h3>
+                        <p class="text-gray-300 text-xs mb-1">Delivered using tools like Firebase (Firestore, Cloud Messaging, App Distribution). The application is aimed to work as a portable SOS-Button.</p>
+                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> Android Kotlin, Firebase (Firestore, Cloud Messaging, App Distribution)</p>
+                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Providing immediate assistance in critical situations.</p>
                     </div>
                     <!-- Project 3 -->
-                    <div class="border-b border-gray-300 pb-4">
-                        <img src="https://placehold.co/200x120/EBF5F9/4A90E2?text=HiddenGems" alt="Hidden Gems Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-900">Hidden Gems</h3>
-                        <p class="text-gray-700 text-xs mb-1">An Android app used by students around campus to share revision materials and essential documents.</p>
-                        <p class="text-gray-600 text-xs"><strong>Tech Stack:</strong> Android, Firebase</p>
-                        <p class="text-gray-600 text-xs"><strong>Challenge Solved:</strong> Facilitating academic resource sharing among students.</p>
+                    <div class="border-b border-gray-600 pb-4">
+                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=HiddenGems" alt="Hidden Gems Project" class="w-full h-auto rounded-md mb-2">
+                        <h3 class="text-lg font-medium text-gray-100">Hidden Gems</h3>
+                        <p class="text-gray-300 text-xs mb-1">An Android app used by students around campus to share revision materials and essential documents.</p>
+                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> Android, Firebase</p>
+                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Facilitating academic resource sharing among students.</p>
                     </div>
                     <!-- Project 4 -->
-                    <div class="border-b border-gray-300 pb-4">
-                        <img src="https://placehold.co/200x120/EBF5F9/4A90E2?text=VNS" alt="VNS Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-900">VNS (Vet Services)</h3>
-                        <p class="text-gray-700 text-xs mb-1">A software application aimed at helping to streamline the request of vet services by farmers. Managed to publish the initial version to Playstore.</p>
-                        <p class="text-gray-600 text-xs"><strong>Tech Stack:</strong> App Kotlin, Backend (REST)</p>
-                        <p class="text-gray-600 text-xs"><strong>Challenge Solved:</strong> Improving access to veterinary services for farmers.</p>
+                    <div class="border-b border-gray-600 pb-4">
+                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=VNS" alt="VNS Project" class="w-full h-auto rounded-md mb-2">
+                        <h3 class="text-lg font-medium text-gray-100">VNS (Vet Services)</h3>
+                        <p class="text-gray-300 text-xs mb-1">A software application aimed at helping to streamline the request of vet services by farmers. Managed to publish the initial version to Playstore.</p>
+                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> App Kotlin, Backend (REST)</p>
+                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Improving access to veterinary services for farmers.</p>
                     </div>
                     <!-- Project 5 -->
                     <div class="pb-4">
-                        <img src="https://placehold.co/200x120/EBF5F9/4A90E2?text=Menus" alt="Menus Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-900">Menus</h3>
-                        <p class="text-gray-700 text-xs mb-1">A software application aimed at bringing the comfort of advertisement of local restaurants to clients who can then place orders, reservations, and save their custom menus. Aimed to target multiple platforms including Web, Android & Tv.</p>
-                        <p class="text-gray-600 text-xs"><strong>Tech Stack:</strong> (Development in-progress, aimed for Web, Android & Tv)</p>
-                        <p class="text-gray-600 text-xs"><strong>Challenge Solved:</strong> Enhancing local restaurant visibility and customer convenience.</p>
+                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=Menus" alt="Menus Project" class="w-full h-auto rounded-md mb-2">
+                        <h3 class="text-lg font-medium text-gray-100">Menus</h3>
+                        <p class="text-gray-300 text-xs mb-1">A software application aimed at bringing the comfort of advertisement of local restaurants to clients who can then place orders, reservations, and save their custom menus. Aimed to target multiple platforms including Web, Android & Tv.</p>
+                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> (Development in-progress, aimed for Web, Android & Tv)</p>
+                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Enhancing local restaurant visibility and customer convenience.</p>
                     </div>
                 </div>
             </div>
@@ -435,26 +411,26 @@
     <div id="contactModal" class="modal-overlay hidden">
         <div class="modal-content">
             <button class="modal-close-btn" id="closeContactModalBtn">&times;</button>
-            <h2 class="text-3xl font-bold mb-4 text-[#4A90E2]">Get in Touch</h2>
-            <div class="text-gray-700 text-base leading-relaxed space-y-4">
+            <h2 class="text-3xl font-bold mb-4 text-[#8C9EFF]">Get in Touch</h2>
+            <div class="text-gray-300 text-base leading-relaxed space-y-4">
                 <p>Feel free to reach out for collaborations, opportunities, or just a chat!</p>
                 <p><strong>Email:</strong> Kidigabrian@outlook.com</p>
                 <p><strong>Phone:</strong> +(2547) 838 871 93</p>
-                <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#4A90E2] hover:underline">Brian Kidiga</a></p>
+                <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#8C9EFF] hover:underline">Brian Kidiga</a></p>
                 <form class="mt-6 space-y-4">
                     <div>
-                        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                        <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-100 border-gray-300 text-gray-900" placeholder="Your Name">
+                        <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Name:</label>
+                        <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="Your Name">
                     </div>
                     <div>
-                        <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                        <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-100 border-gray-300 text-gray-900" placeholder="your@example.com">
+                        <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email:</label>
+                        <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="your@example.com">
                     </div>
                     <div>
-                        <label for="message" class="block text-gray-700 text-sm font-bold mb-2">Message:</label>
-                        <textarea id="message" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-100 border-gray-300 text-gray-900" placeholder="Your message..."></textarea>
+                        <label for="message" class="block text-gray-300 text-sm font-bold mb-2">Message:</label>
+                        <textarea id="message" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="Your message..."></textarea>
                     </div>
-                    <button type="submit" class="bg-[#4A90E2] hover:bg-[#3B82F6] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">Send Message</button>
+                    <button type="submit" class="bg-[#8C9EFF] hover:bg-[#6A8EAE] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">Send Message</button>
                 </form>
             </div>
         </div>
@@ -482,13 +458,6 @@
 
         const contactModal = document.getElementById('contactModal');
         const closeContactModalBtn = document.getElementById('closeContactModalBtn');
-
-        // Removed tab-related elements as they are no longer needed
-        // const tabButtons = document.querySelectorAll('.tab-button');
-        // const tabContents = document.querySelectorAll('.tab-content');
-        // const historyList = document.getElementById('historyList');
-        // const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        // const noHistoryMessage = document.getElementById('noHistoryMessage');
 
         const allCards = document.querySelectorAll('.card');
 
@@ -548,7 +517,6 @@
 
                 if (cardId === 'projects-summary') {
                     openModal(detailedProjectsModal);
-                    // No need to call showTab as there's only one section now
                 } else if (cardId === 'contact-summary') {
                     openModal(contactModal);
                 } else {
