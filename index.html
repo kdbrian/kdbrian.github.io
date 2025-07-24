@@ -339,7 +339,7 @@
             <div>
                 <h2 class="text-2xl font-semibold mb-4 text-[#4A90E2]">My Projects</h2>
                 <p class="text-gray-700 text-sm mb-3 line-clamp-4">
-                    Explore my past projects, including Android apps, backend solutions, and research initiatives. See my GitHub contribution streak and generate new project ideas!
+                    Explore my past projects, including Android apps, backend solutions, and research initiatives. See my GitHub contribution streak.
                 </p>
             </div>
             <button class="text-[#4A90E2] hover:underline text-sm self-end mt-2">View Projects</button>
@@ -375,14 +375,7 @@
             <button class="modal-close-btn" id="closeProjectsModalBtn">&times;</button>
             <h2 class="text-3xl font-bold mb-4 text-[#4A90E2]">My Projects</h2>
 
-            <!-- Tabs for Projects Modal -->
-            <div class="flex border-b border-gray-300 mb-6">
-                <button class="tab-button active" data-tab="my-projects">My Projects</button>
-                <button class="tab-button" data-tab="generate-idea">Generate Idea</button>
-                <button class="tab-button" data-tab="idea-history">Idea History</button>
-            </div>
-
-            <!-- Tab Content: My Projects -->
+            <!-- Tab Content: My Projects (now the only content) -->
             <div id="my-projects" class="tab-content">
                 <!-- GitHub Stats Streak Placeholder -->
                 <div class="mb-6 text-center">
@@ -435,39 +428,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Tab Content: Generate Idea -->
-            <div id="generate-idea" class="tab-content hidden">
-                <p class="text-gray-700 mb-4">Refine the prompt below to generate a new project idea tailored to your skills, or use the default prompt.</p>
-                <textarea id="customPromptInput" class="w-full p-3 rounded-md border border-gray-300 bg-gray-100 text-gray-900 mb-4 focus:outline-none focus:border-[#4A90E2]" rows="4" placeholder="e.g., 'Suggest a mobile app for tracking personal finances with AI insights.'"></textarea>
-
-                <button id="generateProjectBtn" class="bg-[#4A90E2] hover:bg-[#3B82F6] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center mx-auto">
-                    Generate Project Idea ✨
-                </button>
-                <div id="loadingIndicator" class="hidden mt-4 flex items-center justify-center">
-                    <div class="loading-spinner"></div>
-                    <span class="ml-2 text-gray-600">Generating...</span>
-                </div>
-                <div id="projectIdeaOutput" class="generated-idea-output mt-4 hidden">
-                    <h3 class="text-lg font-medium text-[#4A90E2] mb-2">Generated Idea:</h3>
-                    <div id="projectIdeaContent" class="text-gray-700"></div>
-                    <button id="sendIdeaEmailBtn" class="mt-4 bg-[#607D8B] hover:bg-[#455A64] text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                        Send Idea via Email 📧
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tab Content: Idea History -->
-            <div id="idea-history" class="tab-content hidden">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Previously Generated Ideas</h3>
-                <div id="historyList" class="space-y-4">
-                    <!-- History items will be dynamically added here -->
-                    <p class="text-gray-600" id="noHistoryMessage">No ideas generated yet. Generate one in the 'Generate Idea' tab!</p>
-                </div>
-                <button id="clearHistoryBtn" class="mt-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                    Clear History
-                </button>
-            </div>
         </div>
     </div>
 
@@ -519,21 +479,16 @@
 
         const detailedProjectsModal = document.getElementById('detailedProjectsModal');
         const closeProjectsModalBtn = document.getElementById('closeProjectsModalBtn');
-        const generateProjectBtn = document.getElementById('generateProjectBtn');
-        const customPromptInput = document.getElementById('customPromptInput');
-        const projectIdeaOutput = document.getElementById('projectIdeaOutput');
-        const projectIdeaContent = document.getElementById('projectIdeaContent');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const sendIdeaEmailBtn = document.getElementById('sendIdeaEmailBtn');
 
         const contactModal = document.getElementById('contactModal');
         const closeContactModalBtn = document.getElementById('closeContactModalBtn');
 
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const historyList = document.getElementById('historyList');
-        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        const noHistoryMessage = document.getElementById('noHistoryMessage');
+        // Removed tab-related elements as they are no longer needed
+        // const tabButtons = document.querySelectorAll('.tab-button');
+        // const tabContents = document.querySelectorAll('.tab-content');
+        // const historyList = document.getElementById('historyList');
+        // const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        // const noHistoryMessage = document.getElementById('noHistoryMessage');
 
         const allCards = document.querySelectorAll('.card');
 
@@ -593,7 +548,7 @@
 
                 if (cardId === 'projects-summary') {
                     openModal(detailedProjectsModal);
-                    showTab('my-projects');
+                    // No need to call showTab as there's only one section now
                 } else if (cardId === 'contact-summary') {
                     openModal(contactModal);
                 } else {
@@ -622,145 +577,18 @@
             if (event.target === contactModal) closeModal(contactModal);
         });
 
-        // Tab switching logic for Projects Modal
-        function showTab(tabId) {
-            tabContents.forEach(content => {
-                if (content.id === tabId) {
-                    content.classList.remove('hidden');
-                } else {
-                    content.classList.add('hidden');
-                }
-            });
-            tabButtons.forEach(button => {
-                if (button.dataset.tab === tabId) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-            if (tabId === 'idea-history') {
-                loadHistory();
-            }
-        }
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                showTab(button.dataset.tab);
-            });
-        });
-
-        // History Management
-        let generatedIdeas = JSON.parse(localStorage.getItem('generatedIdeas')) || [];
-
-        function saveHistory() {
-            localStorage.setItem('generatedIdeas', JSON.stringify(generatedIdeas));
-        }
-
-        function renderHistory() {
-            historyList.innerHTML = '';
-            if (generatedIdeas.length === 0) {
-                noHistoryMessage.classList.remove('hidden');
-            } else {
-                noHistoryMessage.classList.add('hidden');
-                generatedIdeas.forEach((idea, index) => {
-                    const ideaItem = document.createElement('div');
-                    ideaItem.className = 'generated-idea-output';
-                    ideaItem.innerHTML = `<h3 class="text-lg font-medium text-[#4A90E2] mb-2">Idea #${generatedIdeas.length - index}:</h3><div class="text-gray-700">${idea}</div>`;
-                    historyList.prepend(ideaItem);
-                });
-            }
-        }
-
-        function loadHistory() {
-            generatedIdeas = JSON.parse(localStorage.getItem('generatedIdeas')) || [];
-            renderHistory();
-        }
-
-        clearHistoryBtn.addEventListener('click', () => {
-            generatedIdeas = [];
-            saveHistory();
-            renderHistory();
-        });
-
-        // Gemini API integration for project idea generation
-        generateProjectBtn.addEventListener('click', async () => {
-            loadingIndicator.classList.remove('hidden');
-            projectIdeaOutput.classList.add('hidden');
-            projectIdeaContent.innerHTML = '';
-            sendIdeaEmailBtn.classList.add('hidden');
-
-            const skills = "Android, Backend, Go, Java, Kotlin, Spring Boot, Firebase, REST API, Problem Solving, Data Structures and Algorithms, System Programming";
-            let userPrompt = customPromptInput.value.trim();
-            let prompt;
-
-            if (userPrompt) {
-                prompt = `Considering my skills as an Android and Backend Developer (${skills}), ${userPrompt}. Keep the response concise, around 50-70 words, and do not use markdown formatting like **bold** or *italics*.`;
-            } else {
-                prompt = `As an Android and Backend Developer with skills in ${skills}, suggest a minimalist project idea that combines these skills. Focus on a unique problem it solves and a brief description. Keep it concise, around 50-70 words. Do not use markdown formatting like **bold** or *italics*.`;
-            }
-
-            try {
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // Canvas will automatically provide the API key
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const cleanedText = text.replace(/\*\*|\*|_/g, ''); // Clean up potential markdown characters
-                    projectIdeaContent.innerHTML = cleanedText;
-                    projectIdeaOutput.classList.remove('hidden');
-                    sendIdeaEmailBtn.classList.remove('hidden');
-
-                    generatedIdeas.push(cleanedText);
-                    saveHistory();
-
-                } else {
-                    projectIdeaContent.innerHTML = "Failed to generate a project idea. Please try again.";
-                    projectIdeaOutput.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                projectIdeaContent.innerHTML = "An error occurred while generating the idea. Please check your network connection.";
-                projectIdeaOutput.classList.remove('hidden');
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        });
-
-        // Send Idea via Email
-        sendIdeaEmailBtn.addEventListener('click', () => {
-            const idea = projectIdeaContent.textContent;
-            if (idea) {
-                const subject = encodeURIComponent("Project Idea from Brian Kidiga's Portfolio");
-                const body = encodeURIComponent(`Hello,\n\nHere's a project idea generated from Brian Kidiga's portfolio:\n\n${idea}\n\nBest regards,\n[Your Name]`);
-                window.location.href = `mailto:?subject=${subject}&body=${body}`;
-            }
-        });
-
         // Initial SVG animation on page load
-        window.onload = () => {
+        document.addEventListener('DOMContentLoaded', () => {
             if (helloSvgText) {
-                // No getTotalLength needed for opacity animation
                 helloSvgText.style.opacity = '1'; // Make text visible
 
                 // Fade out the welcome overlay after animation
                 setTimeout(() => {
                     welcomeOverlay.style.opacity = '0';
                     welcomeOverlay.style.visibility = 'hidden';
-                }, 1500); // Shorter duration for simple fade-in
+                }, 1000); // Adjusted duration for simple fade-in and quick fade-out
             }
-        };
+        });
     </script>
 </body>
 </html>
