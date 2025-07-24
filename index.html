@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter for a clean, modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js CDN for the mesh effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         /* Color Palette (inspired by the image):
            - Primary Background: #1A1A2E (Dark Blue/Purple)
@@ -181,6 +183,21 @@
             opacity: 0; /* Start invisible */
             transition: opacity 1s ease-in; /* Fade in effect */
         }
+
+        /* Mesh Canvas Styling */
+        #meshCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind other content */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.5s ease-in-out;
+        }
+        .landing-page:hover #meshCanvas {
+            opacity: 0.2; /* Visible on hover */
+        }
     </style>
 </head>
 <body>
@@ -194,13 +211,13 @@
 
     <!-- Main Landing Page Section -->
     <div id="landingPage" class="landing-page relative w-full h-screen flex flex-col items-center justify-center p-4">
-        <!-- Profile Picture Placeholder -->
-        <div class="mb-8">
-            <img src="https://avatars.githubusercontent.com/u/98683954?v=4" alt="Brian Kidiga Profile" class="rounded-full border-4 border-[#8C9EFF] shadow-lg transform transition-transform duration-300 hover:scale-105">
+        <!-- Mesh Canvas -->
+        <canvas id="meshCanvas"></canvas>
+
+        <div class="hero-content flex-col items-center relative z-10"> <!-- z-10 to keep content above canvas -->
+            <h1 class="text-5xl md:text-7xl font-bold mb-2 glow-text text-center">Brian Kidiga</h1>
         </div>
-        <h1 class="text-5xl md:text-7xl font-bold mb-4 glow-text text-center">Brian Kidiga</h1>
-        <p class="text-xl md:text-3xl text-gray-300 text-center">Android Developer | Backend Developer</p>
-        <p class="text-md md:text-lg text-gray-400 mt-2 text-center">BSc. Computer Science</p>
+
 
         <!-- Arrow to toggle cards -->
         <div id="toggleCardsArrow" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-30">
@@ -399,7 +416,7 @@
                         <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=Menus" alt="Menus Project" class="w-full h-auto rounded-md mb-2">
                         <h3 class="text-lg font-medium text-gray-100">Menus</h3>
                         <p class="text-gray-300 text-xs mb-1">A software application aimed at bringing the comfort of advertisement of local restaurants to clients who can then place orders, reservations, and save their custom menus. Aimed to target multiple platforms including Web, Android & Tv.</p>
-                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> (Development in-progress, aimed for Web, Android & Tv)</p>
+                        <p class="text-400 text-xs"><strong>Tech Stack:</strong> (Development in-progress, aimed for Web, Android & Tv)</p>
                         <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Enhancing local restaurant visibility and customer convenience.</p>
                     </div>
                 </div>
@@ -447,6 +464,7 @@
         const landingPage = document.getElementById('landingPage');
         const cardsContainer = document.getElementById('cardsContainer');
         const toggleCardsArrow = document.getElementById('toggleCardsArrow');
+        const meshCanvas = document.getElementById('meshCanvas');
 
         const infoModal = document.getElementById('infoModal');
         const infoModalTitle = document.getElementById('infoModalTitle');
@@ -462,6 +480,71 @@
         const allCards = document.querySelectorAll('.card');
 
         let cardsVisible = false;
+
+        // Three.js variables
+        let scene, camera, renderer, mesh;
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+        let animationFrameId;
+
+        // Function to initialize Three.js mesh
+        function initMesh() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: meshCanvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Create a grid geometry
+            const gridSize = 100;
+            const divisions = 20;
+            const geometry = new THREE.PlaneGeometry(gridSize, gridSize, divisions, divisions);
+
+            // Material for the mesh (lines)
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x8C9EFF, // Light Purple/Blue for the mesh lines
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1 // Initially subtle
+            });
+
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            camera.position.z = 50; // Adjust camera to see the grid
+
+            // Position the mesh in the center
+            mesh.position.set(0, 0, 0);
+        }
+
+        // Animation loop for Three.js mesh
+        function animateMesh() {
+            animationFrameId = requestAnimationFrame(animateMesh);
+
+            // Update mesh rotation based on mouse position
+            targetX += (mouseX - targetX) * 0.02;
+            targetY += (mouseY - targetY) * 0.02;
+
+            mesh.rotation.x = targetY * 0.0001;
+            mesh.rotation.y = targetX * 0.0001;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle mouse movement for mesh interaction
+        function onMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        }
+
+        // Handle window resize for Three.js
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
 
         // Function to open a generic modal
         function openModal(modalElement, title, content) {
@@ -545,17 +628,24 @@
             if (event.target === contactModal) closeModal(contactModal);
         });
 
-        // Initial SVG animation on page load
+        // Initial SVG animation and mesh initialization on page load
         document.addEventListener('DOMContentLoaded', () => {
             if (helloSvgText) {
-                helloSvgText.style.opacity = '1'; // Make text visible
+                helloSvgText.style.opacity = '1';
 
-                // Fade out the welcome overlay after animation
                 setTimeout(() => {
                     welcomeOverlay.style.opacity = '0';
                     welcomeOverlay.style.visibility = 'hidden';
-                }, 1000); // Adjusted duration for simple fade-in and quick fade-out
+                }, 1000);
             }
+
+            // Initialize Three.js mesh
+            initMesh();
+            animateMesh();
+
+            // Event listeners for mesh interaction
+            landingPage.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('resize', onWindowResize);
         });
     </script>
 </body>
