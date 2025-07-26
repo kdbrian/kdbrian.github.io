@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: A multi-section, task-oriented SPA. The structure includes: 1) A header with navigation to quickly jump to sections. 2) A 'Welcome' section to set the context. 3) An 'Interactive Email Templates' section where users can select a template type, see it populated, and copy it. This is more usable than static text. 4) An 'Outreach Strategy Funnel' section visualizing the process from research to follow-up, making the strategy easier to grasp. 5) An 'Effectiveness Checklist' section providing an interactive to-do list for users to track their preparation. This structure turns a passive guide into an active tool, guiding the user through the process of preparing and executing their outreach. -->
-    <!-- Visualization & Content Choices: 1) Email Templates: Report Info -> Static email templates. Goal -> Allow easy customization and use. Viz/Method -> HTML forms and textareas with JS to dynamically display and update templates. Interaction -> Dropdown to select template, button to copy to clipboard. Justification -> Far more practical and engaging than reading plain text. Library -> Vanilla JS. 2) Outreach Techniques: Report Info -> List of 8 techniques. Goal -> Organize these steps into a memorable process. Viz/Method -> A funnel chart created with Chart.js. Interaction -> Hovering over chart segments reveals details. Justification -> A funnel visual clearly represents the process of narrowing down prospects and moving them through the outreach stages. Library -> Chart.js. 3) Checklist: Report Info -> Key techniques like research, personalization. Goal -> Provide an actionable checklist. Viz/Method -> Styled HTML list with interactive checkboxes. Interaction -> Clicking checkboxes to mark tasks complete. Justification -> Reinforces best practices and provides a sense of accomplishment. Library -> Vanilla JS. -->
+    <!-- Application Structure Plan: A multi-section, task-oriented SPA. The structure includes: 1) A header with navigation. 2) A 'Welcome' section. 3) An 'Interactive Email Templates' section with draggable body paragraphs for reordering, optional input fields, and an editable subject line. 4) An 'Outreach Strategy Funnel' section. 5) An 'Effectiveness Checklist' section. 6) A 'Customize Templates' section. 7) A new 'History' section to save, view, and manage generated emails. This structure provides comprehensive tools for client outreach, from initial drafting to historical tracking. -->
+    <!-- Visualization & Content Choices: 1) Email Templates: Report Info -> Static email templates. Goal -> Allow easy customization, reordering of content, and use. Viz/Method -> HTML forms, textareas, draggable `div` elements for body paragraphs, and a direct input for the subject. JS to dynamically display, update, and reorder content. Interaction -> Dropdown to select template, drag-and-drop for body sections, direct editing of subject, copy button, and a new 'Save to History' button. Optional fields are visually indicated and their placeholders removed if left blank. Justification -> Provides granular control over email structure and content, making it highly practical. Library -> Vanilla JS. 2) Outreach Techniques: Report Info -> List of 8 techniques. Goal -> Organize these steps into a memorable process. Viz/Method -> A funnel chart created with Chart.js. Interaction -> Hovering over chart segments reveals details. Justification -> A funnel visual clearly represents the process of narrowing down prospects and moving them through the outreach stages. Library -> Chart.js. 3) Checklist: Report Info -> Key techniques like research, personalization. Goal -> Provide an actionable checklist. Viz/Method -> Styled HTML list with interactive checkboxes. Interaction -> Clicking checkboxes to mark tasks complete. Justification -> Reinforces best practices and provides a sense of accomplishment. Library -> Vanilla JS. 4) Customize Templates: Report Info -> Need to customize templates. Goal -> Allow users to modify and save template subjects and bodies. Viz/Method -> HTML forms with textareas for subject and body, and a save/reset mechanism. Interaction -> Select template, edit text, save/reset. Justification -> Enables users to tailor templates to their specific needs and branding, enhancing reusability. Library -> Vanilla JS, localStorage for persistence. 5) History: Report Info -> Need to track sent emails. Goal -> Store and retrieve previously generated emails. Viz/Method -> HTML list of cards for each saved email, showing subject, snippet, and timestamp. Interaction -> 'Save to History' button in templates section. 'Load' and 'Delete' buttons for each history item. 'Clear All' history button. Justification -> Provides a practical way to manage and review past communications. Library -> Vanilla JS, localStorage for persistence. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -48,7 +48,7 @@
             border-radius: 8px;
             padding: 16px;
             position: fixed;
-            z-index: 1;
+            z-index: 100;
             left: 50%;
             bottom: 30px;
             opacity: 0;
@@ -57,6 +57,29 @@
         .toast.show {
             visibility: visible;
             opacity: 1;
+        }
+        .draggable-item {
+            cursor: grab;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            background-color: #f9fafb; /* gray-50 */
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .draggable-item:hover {
+            background-color: #eff6ff; /* blue-50 */
+            border-color: #a5b4fc; /* blue-300 */
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed #4f46e5;
+        }
+        .drag-over {
+            border-top: 2px solid #4f46e5;
+        }
+        .drag-over-bottom {
+            border-bottom: 2px solid #4f46e5;
         }
     </style>
 </head>
@@ -69,6 +92,8 @@
                 <a href="#templates" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Templates</a>
                 <a href="#strategy" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Strategy</a>
                 <a href="#checklist" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Checklist</a>
+                <a href="#customize-templates" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Customize</a>
+                <a href="#history" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">History</a>
             </div>
             <div class="md:hidden">
                  <button id="menu-btn" class="text-gray-600 focus:outline-none">
@@ -80,6 +105,8 @@
             <a href="#templates" class="block py-2 text-gray-600">Templates</a>
             <a href="#strategy" class="block py-2 text-gray-600">Strategy</a>
             <a href="#checklist" class="block py-2 text-gray-600">Checklist</a>
+            <a href="#customize-templates" class="block py-2 text-gray-600">Customize</a>
+            <a href="#history" class="block py-2 text-gray-600">History</a>
         </div>
     </header>
 
@@ -93,26 +120,34 @@
         <section id="templates" class="mb-16 scroll-mt-20">
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-bold text-gray-900">Interactive Email Templates</h2>
-                <p class="text-md text-gray-600 mt-2">Select a template, fill in the details, and copy the result with one click.</p>
+                <p class="text-md text-gray-600 mt-2">Select a template, fill in the details, reorder paragraphs, and copy the result with one click.</p>
             </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-                <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-8">
                     <div>
                         <label for="template-select" class="block text-sm font-medium text-gray-700 mb-2">1. Choose a Template:</label>
                         <select id="template-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="cold">Cold Outreach (Initial Contact)</option>
-                            <option value="follow-up">Follow-Up (No Response)</option>
-                            <option value="proposal">Proposal Follow-Up</option>
                         </select>
                         <div id="template-fields" class="mt-6 space-y-4">
                         </div>
                     </div>
                     <div>
-                        <label for="email-output" class="block text-sm font-medium text-gray-700 mb-2">2. Your Generated Email:</label>
-                        <textarea id="email-output" rows="15" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm" readonly></textarea>
-                        <button id="copy-btn" class="mt-4 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                            Copy to Clipboard
-                        </button>
+                        <label for="email-subject-input" class="block text-sm font-medium text-gray-700 mb-2">2. Your Generated Email:</label>
+                        <input type="text" id="email-subject-input" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm mb-3" placeholder="Subject Line">
+                        <div class="bg-gray-50 p-3 border border-gray-300 rounded-md">
+                            <div id="email-body-draggable-container" class="space-y-2 min-h-[200px] border border-dashed border-gray-300 p-2 rounded-md">
+                                <!-- Draggable paragraphs will be inserted here -->
+                            </div>
+                        </div>
+                        <textarea id="email-output-hidden" class="hidden"></textarea> <!-- Hidden textarea for copy functionality -->
+                        <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                            <button id="copy-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                Copy to Clipboard
+                            </button>
+                            <button id="save-to-history-btn" class="flex-1 bg-gray-700 text-white font-semibold py-3 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition-colors">
+                                Save to History
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -130,7 +165,7 @@
             </div>
         </section>
 
-        <section id="checklist" class="scroll-mt-20">
+        <section id="checklist" class="mb-16 scroll-mt-20">
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-bold text-gray-900">Pre-Outreach Effectiveness Checklist</h2>
                 <p class="text-md text-gray-600 mt-2">Ensure every email you send is perfectly crafted for maximum impact. Check off each item as you complete it.</p>
@@ -138,6 +173,52 @@
             <div class="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto">
                 <ul id="checklist-items" class="space-y-4">
                 </ul>
+            </div>
+        </section>
+
+        <section id="customize-templates" class="mb-16 scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">Customize Your Templates</h2>
+                <p class="text-md text-gray-600 mt-2">Modify and save your own versions of the email templates for future use.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+                <div class="mb-6">
+                    <label for="customize-template-select" class="block text-sm font-medium text-gray-700 mb-2">Select Template to Customize:</label>
+                    <select id="customize-template-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="customize-subject" class="block text-sm font-medium text-gray-700 mb-2">Subject Line:</label>
+                    <input type="text" id="customize-subject" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="mb-6">
+                    <label for="customize-body" class="block text-sm font-medium text-gray-700 mb-2">Email Body:</label>
+                    <textarea id="customize-body" rows="15" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    <p class="text-sm text-gray-500 mt-1">Use `[PLACEHOLDER]` format for dynamic fields (e.g., `[Client's Company Name]`).</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="save-custom-template-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Save Custom Template
+                    </button>
+                    <button id="reset-template-btn" class="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="history" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">Email History</h2>
+                <p class="text-md text-gray-600 mt-2">Review and manage your previously generated emails.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+                <div id="history-list" class="space-y-4">
+                    <!-- History items will be rendered here -->
+                </div>
+                <button id="clear-history-btn" class="mt-8 w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 transition-colors">
+                    Clear All History
+                </button>
             </div>
         </section>
 
@@ -151,46 +232,49 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const templates = {
+            const defaultTemplates = {
                 cold: {
+                    name: 'Cold Outreach (Initial Contact)',
                     subject: "Enhancing [Client's Company Name]'s Mobile Presence with [Your Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nMy name is [Your Name] and I am with [Your Company Name], a consultancy specializing in innovative mobile app solutions that drive business growth and enhance user engagement.\n\nI was recently researching [Client's Company Name] and was particularly impressed by [mention something specific you admire].\n\nGiven your focus on [mention client's industry or specific business area], I believe there's a significant opportunity to [mention a specific benefit] through a tailored mobile application. We've helped companies like [mention a similar company] achieve [mention a quantifiable result].\n\nWould you be open to a brief 15-minute call next week to discuss how a strategic mobile app solution could specifically benefit [Client's Company Name] and help you achieve your [mention a specific goal]?\n\nPlease let me know what time works best for you, or if you prefer, you can book a slot directly via my calendar: [Link to your scheduling tool].\n\nThank you for your time and consideration.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]\n[Your Phone Number]`,
+                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nMy name is [Your Name] and I am with [Your Company Name], a consultancy specializing in innovative mobile app solutions that drive business growth and enhance user engagement.\n\nI was recently researching [Client's Company Name] and was particularly impressed by [Specific Admiration].\n\nGiven your focus on [Client's Industry], I believe there's a significant opportunity to [Specific Benefit] through a tailored mobile application. We've helped companies like [Similar Company] achieve [Quantifiable Result].\n\nWould you be open to a brief 15-minute call next week to discuss how a strategic mobile app solution could specifically benefit [Client's Company Name] and help you achieve your [Specific Client Goal]?\n\nPlease let me know what time works best for you, or if you prefer, you can book a slot directly via my calendar: [Scheduling Link].\n\nThank you for your time and consideration.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]\n[Your Phone Number]`,
                     fields: [
                         { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
                         { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
                         { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
                         { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
-                        { id: 'specificAdmire', label: 'Specific Admiration', placeholder: 'e.g., their recent product launch' },
-                        { id: 'clientIndustry', label: 'Client\'s Industry', placeholder: 'e.g., retail' },
-                        { id: 'specificBenefit', label: 'Specific Benefit', placeholder: 'e.g., streamline operations' },
-                        { id: 'similarCompany', label: 'Similar Company', placeholder: 'e.g., another retail leader' },
-                        { id: 'quantifiableResult', label: 'Quantifiable Result', placeholder: 'e.g., a 30% increase in engagement' },
-                        { id: 'specificGoal', label: 'Specific Client Goal', placeholder: 'e.g., growth targets' },
-                        { id: 'calendarLink', label: 'Scheduling Link', placeholder: 'e.g., calendly.com/your-name' },
+                        { id: 'specificAdmire', label: 'Specific Admiration', placeholder: 'e.g., their recent product launch', optional: true },
+                        { id: 'clientIndustry', label: 'Client\'s Industry', placeholder: 'e.g., retail', optional: true },
+                        { id: 'specificBenefit', label: 'Specific Benefit', placeholder: 'e.g., streamline operations', optional: true },
+                        { id: 'similarCompany', label: 'Similar Company', placeholder: 'e.g., another retail leader', optional: true },
+                        { id: 'quantifiableResult', label: 'Quantifiable Result', placeholder: 'e.g., a 30% increase in engagement', optional: true },
+                        { id: 'specificGoal', label: 'Specific Client Goal', placeholder: 'e.g., growth targets', optional: true },
+                        { id: 'calendarLink', label: 'Scheduling Link', placeholder: 'e.g., calendly.com/your-name', optional: true },
                         { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
                         { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
-                        { id: 'yourPhone', label: 'Your Phone Number', placeholder: 'e.g., +1-234-567-890' },
+                        { id: 'yourPhone', label: 'Your Phone Number', placeholder: 'e.g., +1-234-567-890', optional: true },
                     ]
                 },
                 'follow-up': {
+                    name: 'Follow-Up (No Response)',
                     subject: "Following Up: Mobile App Opportunities for [Client's Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope you're having a productive week.\n\nI sent an email last [Day of previous email] regarding how [Your Company Name] could potentially assist [Client's Company Name] in leveraging mobile app solutions to [reiterate key benefit].\n\nI understand you're busy, but I genuinely believe exploring this could open up new avenues for your business. We've seen great success in [mention a specific area].\n\nWould you still be open to a quick chat sometime next week? Perhaps [suggest 2-3 specific times/days]?\n\nIf now isn't the right time, please let me know when might be better, or if you're not the best person to discuss this, who you would recommend I speak with.\n\nThanks again for your time.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
+                    body: `Dear [Client Contact Name],\n\nI hope you're having a productive week.\n\nI sent an email last [Day of previous email] regarding how [Your Company Name] could potentially assist [Client's Company Name] in leveraging mobile app solutions to [Key Benefit to Reiterate].\n\nI understand you're busy, but I genuinely believe exploring this could open up new avenues for your business. We've seen great success in [Specific Area of Success].\n\nWould you still be open to a quick chat sometime next week? Perhaps [Suggested Times]?\n\nIf now isn't the right time, please let me know when might be better, or if you're not the best person to discuss this, who you would recommend I speak with.\n\nThanks again for your time.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
                     fields: [
                         { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
                         { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
                         { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
                         { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
                         { id: 'previousDay', label: 'Day of Previous Email', placeholder: 'e.g., Tuesday' },
-                        { id: 'keyBenefit', label: 'Key Benefit to Reiterate', placeholder: 'e.g., enhance user experience' },
-                        { id: 'specificArea', label: 'Specific Area of Success', placeholder: 'e.g., creating intuitive customer apps' },
-                        { id: 'suggestedTimes', label: 'Suggested Times', placeholder: 'e.g., Tuesday at 10am or Thursday at 2pm' },
+                        { id: 'keyBenefit', label: 'Key Benefit to Reiterate', placeholder: 'e.g., enhance user experience', optional: true },
+                        { id: 'specificArea', label: 'Specific Area of Success', placeholder: 'e.g., creating intuitive customer apps', optional: true },
+                        { id: 'suggestedTimes', label: 'Suggested Times', placeholder: 'e.g., Tuesday at 10am or Thursday at 2pm', optional: true },
                         { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
                         { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
                     ]
                 },
                 proposal: {
+                    name: 'Proposal Follow-Up',
                     subject: "Following Up: Proposal for [Project Name/Client's Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nI'm following up on the proposal I sent on [Date you sent the proposal] regarding [Project Name/brief description of the solution]. I wanted to ensure you received it and had a chance to review it.\n\nDo you have any initial thoughts or questions after reviewing the proposed mobile app solution? I'm happy to schedule a call to walk through it in more detail, clarify any points, or discuss how we can tailor it further to meet your specific needs.\n\nPlease let me know if there's a convenient time for a brief discussion next week.\n\nLooking forward to hearing from you.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
+                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nI'm following up on the proposal I sent on [Date Proposal Was Sent] regarding [Project Name / Description]. I wanted to ensure you received it and had a chance to review it.\n\nDo you have any initial thoughts or questions after reviewing the proposed mobile app solution? I'm happy to schedule a call to walk through it in more detail, clarify any points, or discuss how we can tailor it further to meet your specific needs.\n\nPlease let me know if there's a convenient time for a brief discussion next week.\n\nLooking forward to hearing from you.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
                     fields: [
                         { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
                         { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
@@ -203,6 +287,8 @@
                     ]
                 }
             };
+
+            let currentTemplates = JSON.parse(localStorage.getItem('customTemplates')) || JSON.parse(JSON.stringify(defaultTemplates));
 
             const checklistData = [
                 { text: "Thoroughly researched the client's business, industry, and needs.", checked: false },
@@ -217,9 +303,47 @@
 
             const templateSelect = document.getElementById('template-select');
             const templateFieldsContainer = document.getElementById('template-fields');
-            const emailOutput = document.getElementById('email-output');
+            const emailSubjectInput = document.getElementById('email-subject-input');
+            const emailBodyDraggableContainer = document.getElementById('email-body-draggable-container');
+            const emailOutputHidden = document.getElementById('email-output-hidden');
             const copyBtn = document.getElementById('copy-btn');
+            const saveToHistoryBtn = document.getElementById('save-to-history-btn'); // New button
             const toast = document.getElementById('toast-notification');
+
+            const customizeTemplateSelect = document.getElementById('customize-template-select');
+            const customizeSubjectInput = document.getElementById('customize-subject');
+            const customizeBodyTextarea = document.getElementById('customize-body');
+            const saveCustomTemplateBtn = document.getElementById('save-custom-template-btn');
+            const resetTemplateBtn = document.getElementById('reset-template-btn');
+
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+            let draggedItem = null;
+
+            function updateTemplateSelects() {
+                templateSelect.innerHTML = '';
+                customizeTemplateSelect.innerHTML = '';
+                for (const key in currentTemplates) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = currentTemplates[key].name;
+                    templateSelect.appendChild(option);
+
+                    const customizeOption = document.createElement('option');
+                    customizeOption.value = key;
+                    customizeOption.textContent = currentTemplates[key].name;
+                    customizeTemplateSelect.appendChild(customizeOption);
+                }
+                if (templateSelect.value) {
+                    generateFields(currentTemplates[templateSelect.value].fields);
+                    emailSubjectInput.value = currentTemplates[templateSelect.value].subject;
+                    updateEmailOutput();
+                }
+                if (customizeTemplateSelect.value) {
+                    loadTemplateForCustomization(customizeTemplateSelect.value);
+                }
+            }
 
             function generateFields(fields) {
                 templateFieldsContainer.innerHTML = '';
@@ -227,8 +351,12 @@
                     const fieldWrapper = document.createElement('div');
                     const label = document.createElement('label');
                     label.htmlFor = field.id;
-                    label.className = 'block text-sm font-medium text-gray-600';
+                    label.className = 'block text-sm font-medium text-gray-700';
                     label.textContent = field.label;
+                    if (field.optional) {
+                        label.textContent += ' (Optional)';
+                        label.className += ' text-gray-500';
+                    }
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.id = field.id;
@@ -243,63 +371,225 @@
 
             function updateEmailOutput() {
                 const selectedTemplateKey = templateSelect.value;
-                const template = templates[selectedTemplateKey];
+                const template = currentTemplates[selectedTemplateKey];
+                let currentSubject = template.subject; // Start with the template's subject
                 let body = template.body;
-                let subject = `Subject: ${template.subject}`;
 
+                const fieldValues = {};
                 template.fields.forEach(field => {
                     const inputElement = document.getElementById(field.id);
-                    if (inputElement) {
-                        const value = inputElement.value || `[${field.label.replace(':', '')}]`;
-                        const placeholderRegexBody = new RegExp(`\\[${field.label.replace(':', '').replace(/\s+/g, '\\s*')}\\]`, 'gi');
-                        const placeholderRegexSubject = new RegExp(`\\[${field.label.replace(':', '').replace(/\s+/g, '\\s*')}\\]`, 'gi');
-                        
-                        // Special handling for placeholders that are substrings of others
-                        if (field.id === 'yourName') body = body.replace(/\[Your Name\]/g, value);
-                        else if (field.id === 'yourCompany') {
-                            body = body.replace(/\[Your Company Name\]/g, value);
-                            subject = subject.replace(/\[Your Company Name\]/g, value);
-                        }
-                        else if (field.id === 'clientCompany') {
-                            body = body.replace(/\[Client's Company Name\]/g, value);
-                            subject = subject.replace(/\[Client's Company Name\]/g, value);
-                        }
-                        else if (field.id === 'clientContact') body = body.replace(/\[Client Contact Name\]/g, value);
-                        else if (field.id === 'specificAdmire') body = body.replace(/\[mention something specific you admire\]/g, value);
-                        else if (field.id === 'clientIndustry') body = body.replace(/\[mention client's industry or specific business area\]/g, value);
-                        else if (field.id === 'specificBenefit') body = body.replace(/\[mention a specific benefit\]/g, value);
-                        else if (field.id === 'similarCompany') body = body.replace(/\[mention a similar company\]/g, value);
-                        else if (field.id === 'quantifiableResult') body = body.replace(/\[mention a quantifiable result\]/g, value);
-                        else if (field.id === 'specificGoal') body = body.replace(/\[mention a specific goal\]/g, value);
-                        else if (field.id === 'calendarLink') body = body.replace(/\[Link to your scheduling tool\]/g, value);
-                        else if (field.id === 'yourTitle') body = body.replace(/\[Your Title\]/g, value);
-                        else if (field.id === 'yourWebsite') body = body.replace(/\[Your Website\]/g, value);
-                        else if (field.id === 'yourPhone') body = body.replace(/\[Your Phone Number\]/g, value);
-                        else if (field.id === 'previousDay') body = body.replace(/\[Day of previous email\]/g, value);
-                        else if (field.id === 'keyBenefit') body = body.replace(/\[reiterate key benefit\]/g, value);
-                        else if (field.id === 'specificArea') body = body.replace(/\[mention a specific area\]/g, value);
-                        else if (field.id === 'suggestedTimes') body = body.replace(/\[suggest 2-3 specific times\/days\]/g, value);
-                        else if (field.id === 'proposalDate') body = body.replace(/\[Date you sent the proposal\]/g, value);
-                        else if (field.id === 'projectName') {
-                            body = body.replace(/\[Project Name\/brief description of the solution\]/g, value);
-                            subject = subject.replace(/\[Project Name\/Client's Company Name\]/g, value);
-                        }
-                    }
+                    fieldValues[field.id] = inputElement ? inputElement.value.trim() : '';
                 });
-                emailOutput.value = `${subject}\n\n${body}`;
+
+                // Replace placeholders in subject
+                for (const field of template.fields) {
+                    const placeholder = `[${field.label.replace(':', '').replace(/\s+/g, ' ').trim()}]`;
+                    const value = fieldValues[field.id];
+                    if (value && value !== '') {
+                        currentSubject = currentSubject.replace(new RegExp(escapeRegExp(placeholder), 'g'), value);
+                    } else if (field.optional) {
+                        currentSubject = currentSubject.replace(new RegExp(escapeRegExp(placeholder), 'g'), '');
+                    }
+                }
+                emailSubjectInput.value = currentSubject.replace(/\s+/g, ' ').trim();
+
+                // Replace placeholders in body and split into draggable paragraphs
+                for (const field of template.fields) {
+                    const placeholder = `[${field.label.replace(':', '').replace(/\s+/g, ' ').trim()}]`;
+                    const value = fieldValues[field.id];
+                    if (value && value !== '') {
+                        body = body.replace(new RegExp(escapeRegExp(placeholder), 'g'), value);
+                    } else if (field.optional) {
+                        body = body.replace(new RegExp(escapeRegExp(placeholder), 'g'), '');
+                    }
+                }
+
+                populateDraggableBody(body);
             }
 
-            templateSelect.addEventListener('change', () => {
-                const selectedTemplateKey = templateSelect.value;
-                generateFields(templates[selectedTemplateKey].fields);
-                updateEmailOutput();
-            });
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            function populateDraggableBody(bodyContent) {
+                emailBodyDraggableContainer.innerHTML = '';
+                const paragraphs = bodyContent.split('\n\n').filter(p => p.trim() !== '');
+                paragraphs.forEach((p, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'draggable-item p-3 rounded-md bg-white shadow-sm border border-gray-200 text-sm leading-relaxed';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('data-id', `item-${index}`);
+                    div.textContent = p.trim();
+                    emailBodyDraggableContainer.appendChild(div);
+                });
+                addDragDropListeners();
+                updateHiddenOutput();
+            }
+
+            function addDragDropListeners() {
+                const items = emailBodyDraggableContainer.querySelectorAll('.draggable-item');
+                items.forEach(item => {
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragover', handleDragOver);
+                    item.addEventListener('dragleave', handleDragLeave);
+                    item.addEventListener('drop', handleDrop);
+                    item.addEventListener('dragend', handleDragEnd);
+                });
+            }
+
+            function handleDragStart(e) {
+                draggedItem = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.dataset.id);
+                setTimeout(() => this.classList.add('dragging'), 0);
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const target = e.target.closest('.draggable-item');
+                if (target && target !== draggedItem) {
+                    const rect = target.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
+                        item.classList.remove('drag-over', 'drag-over-bottom');
+                    });
+                    if (e.clientY < midY) {
+                        target.classList.add('drag-over');
+                    } else {
+                        target.classList.add('drag-over-bottom');
+                    }
+                }
+            }
+
+            function handleDragLeave(e) {
+                e.target.classList.remove('drag-over', 'drag-over-bottom');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                const target = e.target.closest('.draggable-item');
+                if (target && target !== draggedItem) {
+                    const rect = target.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        emailBodyDraggableContainer.insertBefore(draggedItem, target);
+                    } else {
+                        emailBodyDraggableContainer.insertBefore(draggedItem, target.nextSibling);
+                    }
+                }
+                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
+                    item.classList.remove('drag-over', 'drag-over-bottom');
+                });
+                updateHiddenOutput();
+            }
+
+            function handleDragEnd() {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+            }
+
+            function updateHiddenOutput() {
+                let fullBody = '';
+                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
+                    fullBody += item.textContent.trim() + '\n\n';
+                });
+                emailOutputHidden.value = `Subject: ${emailSubjectInput.value}\n\n${fullBody.trim()}`;
+            }
 
             copyBtn.addEventListener('click', () => {
-                emailOutput.select();
+                emailOutputHidden.select();
                 document.execCommand('copy');
-                toast.classList.add('show');
-                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                showToast('Copied to clipboard!');
+            });
+
+            saveToHistoryBtn.addEventListener('click', () => {
+                const subject = emailSubjectInput.value;
+                let body = '';
+                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
+                    body += item.textContent.trim() + '\n\n';
+                });
+                body = body.trim();
+
+                if (!subject || !body) {
+                    showToast('Subject and body cannot be empty to save to history.', 'bg-red-500');
+                    return;
+                }
+
+                saveEmailToHistory({ subject, body, timestamp: Date.now() });
+                showToast('Email saved to history!');
+            });
+
+            function saveEmailToHistory(email) {
+                const history = JSON.parse(localStorage.getItem('emailHistory')) || [];
+                history.unshift(email); // Add to the beginning
+                localStorage.setItem('emailHistory', JSON.stringify(history));
+                renderHistory();
+            }
+
+            function renderHistory() {
+                historyList.innerHTML = '';
+                const history = JSON.parse(localStorage.getItem('emailHistory')) || [];
+
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p class="text-center text-gray-500">No emails saved in history yet.</p>';
+                    clearHistoryBtn.classList.add('hidden');
+                    return;
+                } else {
+                    clearHistoryBtn.classList.remove('hidden');
+                }
+
+                history.forEach((item, index) => {
+                    const historyCard = document.createElement('div');
+                    historyCard.className = 'bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200';
+                    const date = new Date(item.timestamp).toLocaleString();
+                    const bodySnippet = item.body.substring(0, 150) + (item.body.length > 150 ? '...' : '');
+
+                    historyCard.innerHTML = `
+                        <h3 class="font-semibold text-gray-800 mb-1">Subject: ${item.subject}</h3>
+                        <p class="text-sm text-gray-600 mb-2">${bodySnippet}</p>
+                        <p class="text-xs text-gray-400 mb-3">Saved: ${date}</p>
+                        <div class="flex gap-2">
+                            <button data-index="${index}" class="load-history-btn text-indigo-600 hover:text-indigo-800 font-medium text-sm">Load</button>
+                            <button data-index="${index}" class="delete-history-btn text-red-500 hover:text-red-700 font-medium text-sm">Delete</button>
+                        </div>
+                    `;
+                    historyList.appendChild(historyCard);
+                });
+
+                document.querySelectorAll('.load-history-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        const itemToLoad = history[index];
+                        emailSubjectInput.value = itemToLoad.subject;
+                        populateDraggableBody(itemToLoad.body);
+                        showToast('Email loaded into template area!');
+                        document.querySelector('#templates').scrollIntoView({ behavior: 'smooth' });
+                    });
+                });
+
+                document.querySelectorAll('.delete-history-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        deleteHistoryItem(index);
+                    });
+                });
+            }
+
+            function deleteHistoryItem(index) {
+                let history = JSON.parse(localStorage.getItem('emailHistory')) || [];
+                history.splice(index, 1);
+                localStorage.setItem('emailHistory', JSON.stringify(history));
+                renderHistory();
+                showToast('Email deleted from history!', 'bg-red-500');
+            }
+
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all email history? This action cannot be undone.')) {
+                    localStorage.removeItem('emailHistory');
+                    renderHistory();
+                    showToast('All history cleared!', 'bg-red-500');
+                }
             });
 
             function renderChecklist() {
@@ -394,6 +684,50 @@
                 }
             });
 
+            function loadTemplateForCustomization(templateKey) {
+                const template = currentTemplates[templateKey];
+                customizeSubjectInput.value = template.subject;
+                customizeBodyTextarea.value = template.body;
+            }
+
+            saveCustomTemplateBtn.addEventListener('click', () => {
+                const templateKey = customizeTemplateSelect.value;
+                currentTemplates[templateKey].subject = customizeSubjectInput.value;
+                currentTemplates[templateKey].body = customizeBodyTextarea.value;
+                localStorage.setItem('customTemplates', JSON.stringify(currentTemplates));
+                showToast('Template saved successfully!');
+                updateTemplateSelects();
+                templateSelect.value = templateKey;
+                generateFields(currentTemplates[templateKey].fields);
+                emailSubjectInput.value = currentTemplates[templateKey].subject;
+                updateEmailOutput();
+            });
+
+            resetTemplateBtn.addEventListener('click', () => {
+                const templateKey = customizeTemplateSelect.value;
+                currentTemplates[templateKey] = JSON.parse(JSON.stringify(defaultTemplates[templateKey]));
+                localStorage.setItem('customTemplates', JSON.stringify(currentTemplates));
+                showToast('Template reset to default!');
+                loadTemplateForCustomization(templateKey);
+                updateTemplateSelects();
+                templateSelect.value = templateKey;
+                generateFields(currentTemplates[templateKey].fields);
+                emailSubjectInput.value = currentTemplates[templateKey].subject;
+                updateEmailOutput();
+            });
+
+            customizeTemplateSelect.addEventListener('change', (e) => {
+                loadTemplateForCustomization(e.target.value);
+            });
+
+            emailSubjectInput.addEventListener('input', updateEmailOutput);
+
+            function showToast(message, bgColor = 'bg-gray-700') {
+                toast.textContent = message;
+                toast.className = `toast show ${bgColor}`; // Apply background color
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            }
+
             const menuBtn = document.getElementById('menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             menuBtn.addEventListener('click', () => {
@@ -431,9 +765,15 @@
                 });
             });
 
-            generateFields(templates.cold.fields);
-            updateEmailOutput();
+            updateTemplateSelects();
+            templateSelect.addEventListener('change', () => {
+                const selectedTemplateKey = templateSelect.value;
+                generateFields(currentTemplates[selectedTemplateKey].fields);
+                emailSubjectInput.value = currentTemplates[selectedTemplateKey].subject;
+                updateEmailOutput();
+            });
             renderChecklist();
+            renderHistory(); // Initial render of history
         });
     </script>
 </body>
