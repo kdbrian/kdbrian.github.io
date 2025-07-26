@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Client Outreach Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A multi-section, task-oriented SPA. The structure includes: 1) A header with navigation to quickly jump to sections. 2) A 'Welcome' section to set the context. 3) An 'Interactive Email Templates' section where users can select a template type, see it populated, and copy it. This is more usable than static text. 4) An 'Outreach Strategy Funnel' section visualizing the process from research to follow-up, making the strategy easier to grasp. 5) An 'Effectiveness Checklist' section providing an interactive to-do list for users to track their preparation. This structure turns a passive guide into an active tool, guiding the user through the process of preparing and executing their outreach. -->
+    <!-- Visualization & Content Choices: 1) Email Templates: Report Info -> Static email templates. Goal -> Allow easy customization and use. Viz/Method -> HTML forms and textareas with JS to dynamically display and update templates. Interaction -> Dropdown to select template, button to copy to clipboard. Justification -> Far more practical and engaging than reading plain text. Library -> Vanilla JS. 2) Outreach Techniques: Report Info -> List of 8 techniques. Goal -> Organize these steps into a memorable process. Viz/Method -> A funnel chart created with Chart.js. Interaction -> Hovering over chart segments reveals details. Justification -> A funnel visual clearly represents the process of narrowing down prospects and moving them through the outreach stages. Library -> Chart.js. 3) Checklist: Report Info -> Key techniques like research, personalization. Goal -> Provide an actionable checklist. Viz/Method -> Styled HTML list with interactive checkboxes. Interaction -> Clicking checkboxes to mark tasks complete. Justification -> Reinforces best practices and provides a sense of accomplishment. Library -> Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4f46e5; /* indigo-600 */
+            border-bottom-color: #4f46e5;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-indigo-600">Outreach Assistant</div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#templates" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Templates</a>
+                <a href="#strategy" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Strategy</a>
+                <a href="#checklist" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Checklist</a>
+            </div>
+            <div class="md:hidden">
+                 <button id="menu-btn" class="text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#templates" class="block py-2 text-gray-600">Templates</a>
+            <a href="#strategy" class="block py-2 text-gray-600">Strategy</a>
+            <a href="#checklist" class="block py-2 text-gray-600">Checklist</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="welcome" class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Transform Your Client Outreach</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">This interactive tool translates your outreach guide into an actionable workflow. Use the sections below to craft perfect emails, understand the strategy, and prepare for success.</p>
+        </section>
+
+        <section id="templates" class="mb-16 scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">Interactive Email Templates</h2>
+                <p class="text-md text-gray-600 mt-2">Select a template, fill in the details, and copy the result with one click.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="template-select" class="block text-sm font-medium text-gray-700 mb-2">1. Choose a Template:</label>
+                        <select id="template-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="cold">Cold Outreach (Initial Contact)</option>
+                            <option value="follow-up">Follow-Up (No Response)</option>
+                            <option value="proposal">Proposal Follow-Up</option>
+                        </select>
+                        <div id="template-fields" class="mt-6 space-y-4">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="email-output" class="block text-sm font-medium text-gray-700 mb-2">2. Your Generated Email:</label>
+                        <textarea id="email-output" rows="15" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm" readonly></textarea>
+                        <button id="copy-btn" class="mt-4 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Copy to Clipboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategy" class="mb-16 scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">The Outreach Strategy Funnel</h2>
+                <p class="text-md text-gray-600 mt-2">Visualize the client outreach process from initial research to successful follow-up. Hover over each stage to understand its importance.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+                <div class="chart-container">
+                    <canvas id="strategyChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="checklist" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">Pre-Outreach Effectiveness Checklist</h2>
+                <p class="text-md text-gray-600 mt-2">Ensure every email you send is perfectly crafted for maximum impact. Check off each item as you complete it.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto">
+                <ul id="checklist-items" class="space-y-4">
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="toast-notification" class="toast">Copied to clipboard!</div>
+
+    <footer class="text-center py-8 mt-16 border-t">
+        <p class="text-gray-500">&copy; 2025 Mobile App Solutions Consultancy. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const templates = {
+                cold: {
+                    subject: "Enhancing [Client's Company Name]'s Mobile Presence with [Your Company Name]",
+                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nMy name is [Your Name] and I am with [Your Company Name], a consultancy specializing in innovative mobile app solutions that drive business growth and enhance user engagement.\n\nI was recently researching [Client's Company Name] and was particularly impressed by [mention something specific you admire].\n\nGiven your focus on [mention client's industry or specific business area], I believe there's a significant opportunity to [mention a specific benefit] through a tailored mobile application. We've helped companies like [mention a similar company] achieve [mention a quantifiable result].\n\nWould you be open to a brief 15-minute call next week to discuss how a strategic mobile app solution could specifically benefit [Client's Company Name] and help you achieve your [mention a specific goal]?\n\nPlease let me know what time works best for you, or if you prefer, you can book a slot directly via my calendar: [Link to your scheduling tool].\n\nThank you for your time and consideration.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]\n[Your Phone Number]`,
+                    fields: [
+                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
+                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
+                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
+                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
+                        { id: 'specificAdmire', label: 'Specific Admiration', placeholder: 'e.g., their recent product launch' },
+                        { id: 'clientIndustry', label: 'Client\'s Industry', placeholder: 'e.g., retail' },
+                        { id: 'specificBenefit', label: 'Specific Benefit', placeholder: 'e.g., streamline operations' },
+                        { id: 'similarCompany', label: 'Similar Company', placeholder: 'e.g., another retail leader' },
+                        { id: 'quantifiableResult', label: 'Quantifiable Result', placeholder: 'e.g., a 30% increase in engagement' },
+                        { id: 'specificGoal', label: 'Specific Client Goal', placeholder: 'e.g., growth targets' },
+                        { id: 'calendarLink', label: 'Scheduling Link', placeholder: 'e.g., calendly.com/your-name' },
+                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
+                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
+                        { id: 'yourPhone', label: 'Your Phone Number', placeholder: 'e.g., +1-234-567-890' },
+                    ]
+                },
+                'follow-up': {
+                    subject: "Following Up: Mobile App Opportunities for [Client's Company Name]",
+                    body: `Dear [Client Contact Name],\n\nI hope you're having a productive week.\n\nI sent an email last [Day of previous email] regarding how [Your Company Name] could potentially assist [Client's Company Name] in leveraging mobile app solutions to [reiterate key benefit].\n\nI understand you're busy, but I genuinely believe exploring this could open up new avenues for your business. We've seen great success in [mention a specific area].\n\nWould you still be open to a quick chat sometime next week? Perhaps [suggest 2-3 specific times/days]?\n\nIf now isn't the right time, please let me know when might be better, or if you're not the best person to discuss this, who you would recommend I speak with.\n\nThanks again for your time.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
+                    fields: [
+                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
+                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
+                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
+                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
+                        { id: 'previousDay', label: 'Day of Previous Email', placeholder: 'e.g., Tuesday' },
+                        { id: 'keyBenefit', label: 'Key Benefit to Reiterate', placeholder: 'e.g., enhance user experience' },
+                        { id: 'specificArea', label: 'Specific Area of Success', placeholder: 'e.g., creating intuitive customer apps' },
+                        { id: 'suggestedTimes', label: 'Suggested Times', placeholder: 'e.g., Tuesday at 10am or Thursday at 2pm' },
+                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
+                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
+                    ]
+                },
+                proposal: {
+                    subject: "Following Up: Proposal for [Project Name/Client's Company Name]",
+                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nI'm following up on the proposal I sent on [Date you sent the proposal] regarding [Project Name/brief description of the solution]. I wanted to ensure you received it and had a chance to review it.\n\nDo you have any initial thoughts or questions after reviewing the proposed mobile app solution? I'm happy to schedule a call to walk through it in more detail, clarify any points, or discuss how we can tailor it further to meet your specific needs.\n\nPlease let me know if there's a convenient time for a brief discussion next week.\n\nLooking forward to hearing from you.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
+                    fields: [
+                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
+                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
+                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
+                        { id: 'proposalDate', label: 'Date Proposal Was Sent', placeholder: 'e.g., July 22, 2025' },
+                        { id: 'projectName', label: 'Project Name / Description', placeholder: 'e.g., Project Phoenix' },
+                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
+                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
+                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
+                    ]
+                }
+            };
+
+            const checklistData = [
+                { text: "Thoroughly researched the client's business, industry, and needs.", checked: false },
+                { text: "Identified the correct decision-maker to contact.", checked: false },
+                { text: "Personalized the email with specific details about the client's company.", checked: false },
+                { text: "Crafted a compelling and relevant subject line.", checked: false },
+                { text: "Focused on benefits for the client, not just features of the app.", checked: false },
+                { text: "Included a clear, specific, and easy-to-follow Call to Action (CTA).", checked: false },
+                { text: "Proofread the entire email for any grammar or spelling errors.", checked: false },
+                { text: "Prepared a follow-up plan in case of no response.", checked: false }
+            ];
+
+            const templateSelect = document.getElementById('template-select');
+            const templateFieldsContainer = document.getElementById('template-fields');
+            const emailOutput = document.getElementById('email-output');
+            const copyBtn = document.getElementById('copy-btn');
+            const toast = document.getElementById('toast-notification');
+
+            function generateFields(fields) {
+                templateFieldsContainer.innerHTML = '';
+                fields.forEach(field => {
+                    const fieldWrapper = document.createElement('div');
+                    const label = document.createElement('label');
+                    label.htmlFor = field.id;
+                    label.className = 'block text-sm font-medium text-gray-600';
+                    label.textContent = field.label;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = field.id;
+                    input.placeholder = field.placeholder;
+                    input.className = 'mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500';
+                    fieldWrapper.appendChild(label);
+                    fieldWrapper.appendChild(input);
+                    templateFieldsContainer.appendChild(fieldWrapper);
+                });
+                templateFieldsContainer.addEventListener('input', updateEmailOutput);
+            }
+
+            function updateEmailOutput() {
+                const selectedTemplateKey = templateSelect.value;
+                const template = templates[selectedTemplateKey];
+                let body = template.body;
+                let subject = `Subject: ${template.subject}`;
+
+                template.fields.forEach(field => {
+                    const inputElement = document.getElementById(field.id);
+                    if (inputElement) {
+                        const value = inputElement.value || `[${field.label.replace(':', '')}]`;
+                        const placeholderRegexBody = new RegExp(`\\[${field.label.replace(':', '').replace(/\s+/g, '\\s*')}\\]`, 'gi');
+                        const placeholderRegexSubject = new RegExp(`\\[${field.label.replace(':', '').replace(/\s+/g, '\\s*')}\\]`, 'gi');
+                        
+                        // Special handling for placeholders that are substrings of others
+                        if (field.id === 'yourName') body = body.replace(/\[Your Name\]/g, value);
+                        else if (field.id === 'yourCompany') {
+                            body = body.replace(/\[Your Company Name\]/g, value);
+                            subject = subject.replace(/\[Your Company Name\]/g, value);
+                        }
+                        else if (field.id === 'clientCompany') {
+                            body = body.replace(/\[Client's Company Name\]/g, value);
+                            subject = subject.replace(/\[Client's Company Name\]/g, value);
+                        }
+                        else if (field.id === 'clientContact') body = body.replace(/\[Client Contact Name\]/g, value);
+                        else if (field.id === 'specificAdmire') body = body.replace(/\[mention something specific you admire\]/g, value);
+                        else if (field.id === 'clientIndustry') body = body.replace(/\[mention client's industry or specific business area\]/g, value);
+                        else if (field.id === 'specificBenefit') body = body.replace(/\[mention a specific benefit\]/g, value);
+                        else if (field.id === 'similarCompany') body = body.replace(/\[mention a similar company\]/g, value);
+                        else if (field.id === 'quantifiableResult') body = body.replace(/\[mention a quantifiable result\]/g, value);
+                        else if (field.id === 'specificGoal') body = body.replace(/\[mention a specific goal\]/g, value);
+                        else if (field.id === 'calendarLink') body = body.replace(/\[Link to your scheduling tool\]/g, value);
+                        else if (field.id === 'yourTitle') body = body.replace(/\[Your Title\]/g, value);
+                        else if (field.id === 'yourWebsite') body = body.replace(/\[Your Website\]/g, value);
+                        else if (field.id === 'yourPhone') body = body.replace(/\[Your Phone Number\]/g, value);
+                        else if (field.id === 'previousDay') body = body.replace(/\[Day of previous email\]/g, value);
+                        else if (field.id === 'keyBenefit') body = body.replace(/\[reiterate key benefit\]/g, value);
+                        else if (field.id === 'specificArea') body = body.replace(/\[mention a specific area\]/g, value);
+                        else if (field.id === 'suggestedTimes') body = body.replace(/\[suggest 2-3 specific times\/days\]/g, value);
+                        else if (field.id === 'proposalDate') body = body.replace(/\[Date you sent the proposal\]/g, value);
+                        else if (field.id === 'projectName') {
+                            body = body.replace(/\[Project Name\/brief description of the solution\]/g, value);
+                            subject = subject.replace(/\[Project Name\/Client's Company Name\]/g, value);
+                        }
+                    }
+                });
+                emailOutput.value = `${subject}\n\n${body}`;
+            }
+
+            templateSelect.addEventListener('change', () => {
+                const selectedTemplateKey = templateSelect.value;
+                generateFields(templates[selectedTemplateKey].fields);
+                updateEmailOutput();
+            });
+
+            copyBtn.addEventListener('click', () => {
+                emailOutput.select();
+                document.execCommand('copy');
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            });
+
+            function renderChecklist() {
+                const checklistContainer = document.getElementById('checklist-items');
+                checklistContainer.innerHTML = '';
+                checklistData.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center p-4 bg-gray-50 rounded-lg transition-colors';
+                    li.innerHTML = `
+                        <input id="check-${index}" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" ${item.checked ? 'checked' : ''}>
+                        <label for="check-${index}" class="ml-3 block text-gray-900 cursor-pointer">${item.text}</label>
+                    `;
+                    const checkbox = li.querySelector(`#check-${index}`);
+                    const label = li.querySelector('label');
+                    if(item.checked) {
+                        label.classList.add('line-through', 'text-gray-400');
+                        li.classList.add('bg-green-50');
+                    }
+                    checkbox.addEventListener('change', () => {
+                        checklistData[index].checked = checkbox.checked;
+                        if(checkbox.checked) {
+                            label.classList.add('line-through', 'text-gray-400');
+                            li.classList.add('bg-green-50');
+                        } else {
+                            label.classList.remove('line-through', 'text-gray-400');
+                            li.classList.remove('bg-green-50');
+                        }
+                    });
+                    checklistContainer.appendChild(li);
+                });
+            }
+            
+            const strategyCtx = document.getElementById('strategyChart').getContext('2d');
+            new Chart(strategyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Research & Identify', 'Personalize & Craft', 'Engage & Propose', 'Follow-Up & Nurture'],
+                    datasets: [{
+                        label: 'Effort Distribution',
+                        data: [100, 85, 60, 40],
+                        backgroundColor: [
+                            'rgba(165, 180, 252, 0.6)', // indigo-300
+                            'rgba(129, 140, 248, 0.6)', // indigo-400
+                            'rgba(99, 102, 241, 0.6)', // indigo-500
+                            'rgba(79, 70, 229, 0.6)'  // indigo-600
+                        ],
+                        borderColor: [
+                            'rgba(165, 180, 252, 1)',
+                            'rgba(129, 140, 248, 1)',
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(79, 70, 229, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    const tooltips = {
+                                        'Research & Identify': 'Understand business, pain points, and find the right contact.',
+                                        'Personalize & Craft': 'Tailor the message and value proposition. Write a clear, concise email.',
+                                        'Engage & Propose': 'Send the initial outreach and any subsequent proposals.',
+                                        'Follow-Up & Nurture': 'Persistently but politely follow up to keep the conversation going.'
+                                    };
+                                    return tooltips[context.label] || '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            display: false
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    if(mobileMenu.classList.contains('hidden') === false){
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            generateFields(templates.cold.fields);
+            updateEmailOutput();
+            renderChecklist();
+        });
+    </script>
+</body>
+</html>
