@@ -39,24 +39,8 @@
             position: relative; 
         }
         
-        /* === SEMI-TRANSPARENT MESH OVERLAY (Gridlines) === */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; 
-            opacity: 0.05; /* Less visible than the gradient */
-            
-            /* Gridline Pattern */
-            background-image: 
-                linear-gradient(to right, var(--text-color) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--text-color) 1px, transparent 1px);
-            background-size: 30px 30px; 
-            pointer-events: none; 
-        }
+        /* === MESH BACKGROUND REMOVED === */
+        /* body::before rules are completely removed */
 
 
         /* Content Container and Sections */
@@ -110,22 +94,26 @@
             line-height: 1;
         }
         
-        /* Enlarged Hexagon Image */
-        .user-image {
-            width: 250px; /* Enlarged */
-            height: 275px; /* Proportional height adjustment */
-            background: url('img/user_profile.jpg') center/cover;
-            background-color: #d3d3d3; 
-            border: 8px solid var(--primary-accent); /* Border enlarged */
+        /* Enlarged Hexagon User Image */
+        .user-image-wrapper {
+            width: 250px; /* Base for the image */
+            height: 275px; 
+            margin-bottom: 25px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border: 8px solid var(--primary-accent); /* Border around the clipped image */
             box-shadow: 0 0 30px rgba(7,7,7, 0.5);
             transition: all 0.5s ease-in-out;
-            margin-bottom: 25px;
-            
-            /* Hexagon Shape */
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            overflow: hidden; /* Ensure image respects clip-path */
         }
 
-        .user-image:hover {
+        .user-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the wrapper while maintaining aspect ratio */
+            display: block; /* Remove extra space below image */
+        }
+
+        .user-image-wrapper:hover {
             transform: scale(1.05) rotate(3deg);
             box-shadow: 0 0 40px var(--secondary-accent);
         }
@@ -163,7 +151,6 @@
             transition: background 0.3s;
         }
         .collapsible-content {
-            /* Toggling starts with display: none and toggles to display: block */
             display: none; 
             padding: 10px 0;
             border-left: 3px solid var(--secondary-accent);
@@ -176,22 +163,21 @@
 
         /* === FLOATING FOOTER === */
         footer {
-            /* Position footer at the bottom of the viewport, but fixed */
             position: fixed;
             bottom: 20px; 
             left: 50%;
-            transform: translateX(-50%); /* Center horizontally */
+            transform: translateX(-50%); 
             
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 30px; /* Padding for size and content separation */
+            padding: 20px 30px; 
             
             background: var(--footer-bg);
             color: white;
-            border-radius: 20px; /* Rounded corners */
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); /* Floating effect */
-            z-index: 100; /* Ensure it floats above other content */
+            border-radius: 20px; 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); 
+            z-index: 100; 
         }
         .footer-links {
             display: flex;
@@ -201,7 +187,7 @@
         .footer-links a {
             color: var(--primary-accent); 
             text-decoration: none;
-            font-size: 1.4em; /* Slightly larger icons */
+            font-size: 1.4em; 
             transition: color 0.3s;
         }
         .footer-links a:hover {
@@ -223,7 +209,9 @@
 
     <header class="hero-section" id="hero">
         <div class="user-panel">
-            <div class="user-image"></div>
+            <div class="user-image-wrapper">
+                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
+            </div>
             <h1>BRIAN KIDIGA</h1>
             
             <div class="tagline-container">
@@ -320,9 +308,9 @@
                     <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="menus">
-                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
-                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2" class="carousel-slide">
-                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3" class="carousel-slide">
+                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1">
+                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2">
+                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3">
                         </div>
                         <button class="prev" onclick="moveSlide('menus', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('menus', 1)">&#10095;</button>
@@ -336,8 +324,8 @@
                     <p>A document repository that allows for online document sharing. It allows users to fully interact with documents without having to read all of it.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="sage">
-                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
-                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2" class="carousel-slide">
+                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1">
+                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2">
                         </div>
                         <button class="prev" onclick="moveSlide('sage', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('sage', 1)">&#10095;</button>
@@ -351,8 +339,8 @@
                     <p>An online application used as a toolkit for drivers and travelers. It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="tow">
-                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
-                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2" class="carousel-slide">
+                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1">
+                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2">
                         </div>
                         <button class="prev" onclick="moveSlide('tow', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('tow', 1)">&#10095;</button>
@@ -415,7 +403,6 @@
                     const targetId = header.getAttribute('data-target');
                     const content = document.getElementById(targetId);
 
-                    // This ensures the initial state is hidden and it toggles correctly.
                     content.classList.toggle('active');
                     header.classList.toggle('active');
                 });
@@ -438,7 +425,6 @@
                 const x = (e.clientX / window.innerWidth) * 100;
                 const y = (e.clientY / window.innerHeight) * 100;
                 
-                // Update the radial gradient center point
                 body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
             }
             
@@ -450,18 +436,13 @@
             let taglineIndex = 0;
 
             function swapTagline() {
-                // Fade out current text
                 taglineElement.classList.remove('active');
                 taglineElement.style.transform = 'translateY(20px)';
 
                 setTimeout(() => {
-                    // Update content
                     taglineElement.textContent = taglines[taglineIndex];
-                    
-                    // Fade in new text
                     taglineElement.classList.add('active');
                     taglineElement.style.transform = 'translateY(0)';
-
                     taglineIndex = (taglineIndex + 1) % taglines.length;
                 }, 500);
             }
