@@ -3,777 +3,599 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Client Outreach Assistant</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: A multi-section, task-oriented SPA. The structure includes: 1) A header with navigation. 2) A 'Welcome' section. 3) An 'Interactive Email Templates' section with draggable body paragraphs for reordering, optional input fields, and an editable subject line. 4) An 'Outreach Strategy Funnel' section. 5) An 'Effectiveness Checklist' section. 6) A 'Customize Templates' section. 7) A new 'History' section to save, view, and manage generated emails. This structure provides comprehensive tools for client outreach, from initial drafting to historical tracking. -->
-    <!-- Visualization & Content Choices: 1) Email Templates: Report Info -> Static email templates. Goal -> Allow easy customization, reordering of content, and use. Viz/Method -> HTML forms, textareas, draggable `div` elements for body paragraphs, and a direct input for the subject. JS to dynamically display, update, and reorder content. Interaction -> Dropdown to select template, drag-and-drop for body sections, direct editing of subject, copy button, and a new 'Save to History' button. Optional fields are visually indicated and their placeholders removed if left blank. Justification -> Provides granular control over email structure and content, making it highly practical. Library -> Vanilla JS. 2) Outreach Techniques: Report Info -> List of 8 techniques. Goal -> Organize these steps into a memorable process. Viz/Method -> A funnel chart created with Chart.js. Interaction -> Hovering over chart segments reveals details. Justification -> A funnel visual clearly represents the process of narrowing down prospects and moving them through the outreach stages. Library -> Chart.js. 3) Checklist: Report Info -> Key techniques like research, personalization. Goal -> Provide an actionable checklist. Viz/Method -> Styled HTML list with interactive checkboxes. Interaction -> Clicking checkboxes to mark tasks complete. Justification -> Reinforces best practices and provides a sense of accomplishment. Library -> Vanilla JS. 4) Customize Templates: Report Info -> Need to customize templates. Goal -> Allow users to modify and save template subjects and bodies. Viz/Method -> HTML forms with textareas for subject and body, and a save/reset mechanism. Interaction -> Select template, edit text, save/reset. Justification -> Enables users to tailor templates to their specific needs and branding, enhancing reusability. Library -> Vanilla JS, localStorage for persistence. 5) History: Report Info -> Need to track sent emails. Goal -> Store and retrieve previously generated emails. Viz/Method -> HTML list of cards for each saved email, showing subject, snippet, and timestamp. Interaction -> 'Save to History' button in templates section. 'Load' and 'Delete' buttons for each history item. 'Clear All' history button. Justification -> Provides a practical way to manage and review past communications. Library -> Vanilla JS, localStorage for persistence. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Brian Kidiga | Backend Developer Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poller+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
+        /* CSS Variables for Custom Palette: 0A0908, EAE0D5, F46036, FFFBDB */
+        :root {
+            --primary-bg: #0A0908;       /* Near Black */
+            --content-text: #EAE0D5;     /* Off-White/Light Text */
+            --primary-accent: #F46036;   /* Vibrant Orange */
+            --secondary-accent: #FFFBDB; /* Creamy Yellow/Highlight */
+            
+            /* Gradient Background Setup */
+            --gradient-light: #1A1A1A; 
+            --gradient-dark: #0A0908; 
+        }
+
+        /* Basic Reset and Typography */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poller One', serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: var(--content-text);
+            overflow-x: hidden; 
+            min-height: 100vh;
+            
+            background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
+            background-size: 200% 200%;
+            transition: background 0.2s ease-out; 
+            position: relative; 
         }
-        .chart-container {
+
+        /* Global Content and Section Styling */
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--primary-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(244, 96, 54, 0.3);
+        }
+        
+        h2, h3 {
+            font-family: 'Poller One', serif;
+            color: var(--primary-accent);
+            border-bottom: 2px solid var(--secondary-accent);
+            padding-bottom: 5px;
+        }
+
+        /* ======================================= */
+        /* === NEW: CLEAN MULTI-COLUMN LISTS   === */
+        /* ======================================= */
+        section ul {
+            list-style: none; /* Clear default bullets */
+            padding-left: 0;
+            margin-top: 10px;
+            display: grid;
+            /* Default to one column, will be modified by media queries/sections */
+            grid-template-columns: 1fr; 
+            gap: 10px 20px;
+        }
+        
+        /* Skills section uses a 2-column layout on desktop */
+        #skills-content ul {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        /* Remove custom bullet decoration for all list items */
+        section li {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        section li:before {
+            content: none; 
+        }
+
+        /* Experience job points use the default block styling (no columns) */
+        .job ul {
+            grid-template-columns: 1fr;
+            list-style: none; /* Ensure no list bullets */
+            margin-top: 5px;
+        }
+        /* Restore the visual bullet for job points using padding/border (similar to original) */
+        .job ul li {
             position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
+            padding-left: 20px;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
+        .job ul li:before {
+            content: "\2022"; /* Large bullet point */
+            color: var(--primary-accent);
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.2em;
+        }
+
+        /* Education list is kept simple, can be one column or two on desktop */
+        #education ul {
+            grid-template-columns: 1fr;
+        }
+
+
+        /* ======================================= */
+        /* === 1. HEADER & HERO SECTION STYLES === */
+        /* ======================================= */
+        .hero-section {
+            height: 100vh; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            color: var(--content-text);
+        }
+
+        .user-panel {
+            flex: 0 0 30%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .user-panel h1 {
+            color: var(--content-text);
+            font-size: 4em;
+            line-height: 1;
+        }
+        
+        /* Large Circular User Image */
+        .user-image-wrapper {
+            width: 250px; 
+            height: 250px; 
+            margin-bottom: 25px;
+            
+            clip-path: circle(50% at 50% 50%);
+            border-radius: 50%; 
+
+            border: none;
+            box-shadow: 0 0 30px rgba(244, 96, 54, 0.5);
+            transition: all 0.5s ease-in-out;
+            overflow: hidden; 
+        }
+
+        .user-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            display: block; 
+        }
+
+        .user-image-wrapper:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--secondary-accent);
+        }
+        
+        /* Dynamic Tagline */
+        .tagline-container {
+            height: 40px; 
+            overflow: hidden;
+            font-size: 1.5em;
+            color: var(--primary-accent);
+        }
+        .tagline {
+            display: block;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .tagline.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Featured Project Panel */
+        .project-panel {
+            flex: 0 0 60%;
+            padding: 20px;
+        }
+
+        .project-panel h2 {
+            font-size: 3em; 
+            margin-bottom: 30px;
+            color: var(--content-text);
+            border-bottom: none;
+        }
+        .recent-project-images {
+            display: flex;
+            gap: 15px;
+        }
+        .recent-project-images img {
+            width: 30%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        .recent-project-images img:hover {
+            transform: scale(1.05);
+        }
+
+        /* ======================================= */
+        /* === 2. COLLAPSIBLE CONTENT STYLES === */
+        /* ======================================= */
+        .toggle-header {
+            cursor: pointer;
+            background: var(--primary-bg);
+            color: var(--content-text);
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--primary-accent);
+            outline: none; 
+            transition: background 0.3s;
+        }
+        .collapsible-content {
+            display: none; 
+            padding: 10px 0;
+            border-left: 3px solid var(--primary-accent);
+            padding-left: 15px;
+        }
+        .collapsible-content.active {
+            display: block; 
+        }
+        
+        /* ======================================= */
+        /* === 3. FLOATING FOOTER STYLES       === */
+        /* ======================================= */
+        footer {
+            position: fixed;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 30px; 
+            
+            background: var(--primary-bg);
+            color: var(--content-text);
+            border-radius: 20px; 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8); 
+            z-index: 100; 
+        }
+        .footer-links {
+            display: flex;
+            gap: 25px;
+        }
+        .footer-links a {
+            color: var(--primary-accent); 
+            text-decoration: none;
+            font-size: 1.4em; 
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: var(--secondary-accent);
+        }
+
+
+        /* ======================================= */
+        /* === 4. RESPONSIVENESS (MEDIA QUERIES) === */
+        /* ======================================= */
+
+        /* Tablet and Smaller Desktop (Max 900px) */
+        @media (max-width: 900px) {
+            .hero-section {
+                flex-direction: column; 
+                height: auto; 
+                padding: 50px 20px;
+                min-height: 100vh;
+            }
+
+            .user-panel {
+                flex: none; 
+                width: 100%;
+                margin-bottom: 40px;
+            }
+
+            .project-panel {
+                flex: none;
+                width: 100%;
+                text-align: center;
+            }
+
+            .project-panel h2 {
+                font-size: 2.5em; 
             }
         }
-        .nav-link {
-            transition: color 0.3s, border-bottom-color 0.3s;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: #4f46e5; /* indigo-600 */
-            border-bottom-color: #4f46e5;
-        }
-        .toast {
-            visibility: hidden;
-            min-width: 250px;
-            margin-left: -125px;
-            background-color: #1f2937;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            z-index: 100;
-            left: 50%;
-            bottom: 30px;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.5s linear;
-        }
-        .toast.show {
-            visibility: visible;
-            opacity: 1;
-        }
-        .draggable-item {
-            cursor: grab;
-            border: 1px solid #e5e7eb; /* gray-200 */
-            background-color: #f9fafb; /* gray-50 */
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .draggable-item:hover {
-            background-color: #eff6ff; /* blue-50 */
-            border-color: #a5b4fc; /* blue-300 */
-        }
-        .draggable-item.dragging {
-            opacity: 0.5;
-            border: 2px dashed #4f46e5;
-        }
-        .drag-over {
-            border-top: 2px solid #4f46e5;
-        }
-        .drag-over-bottom {
-            border-bottom: 2px solid #4f46e5;
+
+        /* Mobile Devices (Max 600px) */
+        @media (max-width: 600px) {
+            /* List structure: all lists collapse to one column */
+            section ul, #skills-content ul {
+                grid-template-columns: 1fr;
+            }
+
+            /* Adjust hero font sizes */
+            .user-panel h1 {
+                font-size: 3em;
+            }
+
+            .project-panel h2 {
+                font-size: 2em;
+            }
+
+            /* Stack project images */
+            .recent-project-images {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .recent-project-images img {
+                width: 80%; 
+                max-width: 300px;
+            }
+
+            /* Reduce image size for small screens */
+            .user-image-wrapper {
+                width: 180px; 
+                height: 180px; 
+            }
+
+            /* Adjust collapsible content padding */
+            .collapsible-content {
+                padding-left: 10px;
+            }
+            
+            /* Smaller floating footer on mobile */
+            footer {
+                padding: 10px 20px;
+                bottom: 10px;
+            }
+            .footer-links a {
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-indigo-600">Outreach Assistant</div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#templates" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Templates</a>
-                <a href="#strategy" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Strategy</a>
-                <a href="#checklist" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Checklist</a>
-                <a href="#customize-templates" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Customize</a>
-                <a href="#history" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">History</a>
+    <header class="hero-section" id="hero">
+        <div class="user-panel">
+            <div class="user-image-wrapper">
+                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
             </div>
-            <div class="md:hidden">
-                 <button id="menu-btn" class="text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+            <h1>BRIAN KIDIGA</h1>
+            
+            <div class="tagline-container">
+                <span id="tagline-text" class="tagline"></span>
             </div>
-        </nav>
-        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
-            <a href="#templates" class="block py-2 text-gray-600">Templates</a>
-            <a href="#strategy" class="block py-2 text-gray-600">Strategy</a>
-            <a href="#checklist" class="block py-2 text-gray-600">Checklist</a>
-            <a href="#customize-templates" class="block py-2 text-gray-600">Customize</a>
-            <a href="#history" class="block py-2 text-gray-600">History</a>
+        </div>
+        
+        <div class="project-panel">
+            <h2>Menus - Featured Project</h2>
+            <div class="recent-project-images">
+                <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
+                <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
+                <img src="img/menus_preview_3.jpg" alt="Menus App Screenshot 3">
+            </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-6 py-12">
+    <main class="content-container">
 
-        <section id="welcome" class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Transform Your Client Outreach</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">This interactive tool translates your outreach guide into an actionable workflow. Use the sections below to craft perfect emails, understand the strategy, and prepare for success.</p>
+        <section id="about">
+            <h2>About Me</h2>
+            <p>
+                As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from Android app development, integrations, to getting insights from data that drive businesses. I thrive on solving problems and continuously learning new technologies.
+            </p>
         </section>
 
-        <section id="templates" class="mb-16 scroll-mt-20">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-900">Interactive Email Templates</h2>
-                <p class="text-md text-gray-600 mt-2">Select a template, fill in the details, reorder paragraphs, and copy the result with one click.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-5xl mx-auto">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <label for="template-select" class="block text-sm font-medium text-gray-700 mb-2">1. Choose a Template:</label>
-                        <select id="template-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        </select>
-                        <div id="template-fields" class="mt-6 space-y-4">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="email-subject-input" class="block text-sm font-medium text-gray-700 mb-2">2. Your Generated Email:</label>
-                        <input type="text" id="email-subject-input" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm mb-3" placeholder="Subject Line">
-                        <div class="bg-gray-50 p-3 border border-gray-300 rounded-md">
-                            <div id="email-body-draggable-container" class="space-y-2 min-h-[200px] border border-dashed border-gray-300 p-2 rounded-md">
-                                <!-- Draggable paragraphs will be inserted here -->
-                            </div>
-                        </div>
-                        <textarea id="email-output-hidden" class="hidden"></textarea> <!-- Hidden textarea for copy functionality -->
-                        <div class="flex flex-col sm:flex-row gap-4 mt-4">
-                            <button id="copy-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                                Copy to Clipboard
-                            </button>
-                            <button id="save-to-history-btn" class="flex-1 bg-gray-700 text-white font-semibold py-3 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition-colors">
-                                Save to History
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="strategy" class="mb-16 scroll-mt-20">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-900">The Outreach Strategy Funnel</h2>
-                <p class="text-md text-gray-600 mt-2">Visualize the client outreach process from initial research to successful follow-up. Hover over each stage to understand its importance.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-                <div class="chart-container">
-                    <canvas id="strategyChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <section id="checklist" class="mb-16 scroll-mt-20">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-900">Pre-Outreach Effectiveness Checklist</h2>
-                <p class="text-md text-gray-600 mt-2">Ensure every email you send is perfectly crafted for maximum impact. Check off each item as you complete it.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto">
-                <ul id="checklist-items" class="space-y-4">
+        <section id="skills">
+            <h2 class="toggle-header" data-target="skills-content">Skills <span class="arrow">▼</span></h2>
+            <div id="skills-content" class="collapsible-content">
+                <h3>Development & APIs</h3>
+                <ul>
+                    <li>Android Development (Java/Kotlin)</li>
+                    <li>Rest API</li>
+                    <li>GraphQL</li>
+                </ul>
+                <h3>Databases</h3>
+                <ul>
+                    <li>SQL & No SQL</li>
+                </ul>
+                <h3>Frameworks & Technologies</h3>
+                <ul>
+                    <li>Spring boot</li>
+                    <li>Node JS</li>
+                    <li>Elastic Search</li>
+                    <li>Docker & Containerization</li>
+                </ul>
+                <h3>Tools & Version Control</h3>
+                <ul>
+                    <li>PostMan/Insomnia/httpie</li>
+                    <li>Git/Gitlab/Github</li>
+                </ul>
+                <h3>Languages</h3>
+                <ul>
+                    <li>English: Fluent</li>
+                    <li>Swahili: Fluent</li>
                 </ul>
             </div>
         </section>
 
-        <section id="customize-templates" class="mb-16 scroll-mt-20">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-900">Customize Your Templates</h2>
-                <p class="text-md text-gray-600 mt-2">Modify and save your own versions of the email templates for future use.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-                <div class="mb-6">
-                    <label for="customize-template-select" class="block text-sm font-medium text-gray-700 mb-2">Select Template to Customize:</label>
-                    <select id="customize-template-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </select>
+        <section id="experience">
+            <h2 class="toggle-header" data-target="experience-content">Experience <span class="arrow">▼</span></h2>
+            <div id="experience-content" class="collapsible-content">
+                
+                <div class="job">
+                    <h3>Pseudo (Founder & CTO)</h3>
+                    <p class="period">2025</p>
+                    <ul>
+                        <li>Launched a start-up alias pseudo.</li>
+                        <li>Deployed a mobile tool for travelers Tow. Assured travelers and EV drivers access to vital services when needed.</li>
+                        <li>Initiated development of Menus. An online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
+                    </ul>
                 </div>
-                <div class="mb-4">
-                    <label for="customize-subject" class="block text-sm font-medium text-gray-700 mb-2">Subject Line:</label>
-                    <input type="text" id="customize-subject" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="mb-6">
-                    <label for="customize-body" class="block text-sm font-medium text-gray-700 mb-2">Email Body:</label>
-                    <textarea id="customize-body" rows="15" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                    <p class="text-sm text-gray-500 mt-1">Use `[PLACEHOLDER]` format for dynamic fields (e.g., `[Client's Company Name]`).</p>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="save-custom-template-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                        Save Custom Template
-                    </button>
-                    <button id="reset-template-btn" class="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors">
-                        Reset to Default
-                    </button>
+
+                <div class="job">
+                    <h3>Android Developer Intern</h3>
+                    <p class="period">May - November 2024</p>
+                    <ul>
+                        <li>My milestone was translation, which had the app in native languages associated with different locales.</li>
+                        <li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales.</li>
+                        <li>Optimized and reduced the app size after performing analysis.</li>
+                        <li>Initially assisted in minor tasks like documentation and testing.</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
-        <section id="history" class="scroll-mt-20">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-900">Email History</h2>
-                <p class="text-md text-gray-600 mt-2">Review and manage your previously generated emails.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-                <div id="history-list" class="space-y-4">
-                    <!-- History items will be rendered here -->
+        <section id="projects">
+            <h2>Projects</h2>
+            <p>All my projects are available from my Github profile.</p>
+
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-menus">Menus <span class="arrow">▼</span></h3>
+                <div id="project-menus" class="collapsible-content">
+                    <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="menus">
+                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
+                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2" class="carousel-slide">
+                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('menus', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('menus', 1)">&#10095;</button>
+                    </div>
                 </div>
-                <button id="clear-history-btn" class="mt-8 w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 transition-colors">
-                    Clear All History
-                </button>
             </div>
+
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
+                <div id="project-sage" class="collapsible-content">
+                    <p>A document repository that allows for online document sharing. Whilist allowing users to fully interact with documents without havin to read all of it.</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="sage">
+                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
+                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('sage', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('sage', 1)">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
+                <div id="project-tow" class="collapsible-content">
+                    <p>An online application used as a toolkit for drivers and travelers. Allows for discovery of closest Tow trucks services, mechanic services, and Eateries.</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="tow">
+                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
+                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('tow', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('tow', 1)">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education">
+            <h2>Education</h2>
+            <ul>
+                <li>BSc. Computer Science</li>
+                <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
+            </ul>
         </section>
 
     </main>
 
-    <div id="toast-notification" class="toast">Copied to clipboard!</div>
-
-    <footer class="text-center py-8 mt-16 border-t">
-        <p class="text-gray-500">&copy; 2025 Mobile App Solutions Consultancy. All Rights Reserved.</p>
+    <footer>
+        <div class="footer-links">
+            <a href="[YOUR LINKEDIN URL]" target="_blank" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
+            <a href="https://kdbrian.github.io" target="_blank" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
+            <a href="[YOUR MEDIUM URL]" target="_blank" aria-label="Medium Profile"><i class="fab fa-medium"></i></a>
+        </div>
     </footer>
 
     <script>
+        // === CAROUSEL MOVEMENT FUNCTION ===
+        function moveSlide(projectName, step) {
+            const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
+            if (!carousel) return;
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            let currentIndex = -1;
+
+            slides.forEach((slide, index) => {
+                if (slide.classList.contains('active')) {
+                    currentIndex = index;
+                    slide.classList.remove('active');
+                }
+            });
+
+            let newIndex = currentIndex + step;
+            if (newIndex >= slides.length) {
+                newIndex = 0;
+            } else if (newIndex < 0) {
+                newIndex = slides.length - 1;
+            }
+
+            // Remove active from all and add to the new one
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[newIndex].classList.add('active');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const defaultTemplates = {
-                cold: {
-                    name: 'Cold Outreach (Initial Contact)',
-                    subject: "Enhancing [Client's Company Name]'s Mobile Presence with [Your Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nMy name is [Your Name] and I am with [Your Company Name], a consultancy specializing in innovative mobile app solutions that drive business growth and enhance user engagement.\n\nI was recently researching [Client's Company Name] and was particularly impressed by [Specific Admiration].\n\nGiven your focus on [Client's Industry], I believe there's a significant opportunity to [Specific Benefit] through a tailored mobile application. We've helped companies like [Similar Company] achieve [Quantifiable Result].\n\nWould you be open to a brief 15-minute call next week to discuss how a strategic mobile app solution could specifically benefit [Client's Company Name] and help you achieve your [Specific Client Goal]?\n\nPlease let me know what time works best for you, or if you prefer, you can book a slot directly via my calendar: [Scheduling Link].\n\nThank you for your time and consideration.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]\n[Your Phone Number]`,
-                    fields: [
-                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
-                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
-                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
-                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
-                        { id: 'specificAdmire', label: 'Specific Admiration', placeholder: 'e.g., their recent product launch', optional: true },
-                        { id: 'clientIndustry', label: 'Client\'s Industry', placeholder: 'e.g., retail', optional: true },
-                        { id: 'specificBenefit', label: 'Specific Benefit', placeholder: 'e.g., streamline operations', optional: true },
-                        { id: 'similarCompany', label: 'Similar Company', placeholder: 'e.g., another retail leader', optional: true },
-                        { id: 'quantifiableResult', label: 'Quantifiable Result', placeholder: 'e.g., a 30% increase in engagement', optional: true },
-                        { id: 'specificGoal', label: 'Specific Client Goal', placeholder: 'e.g., growth targets', optional: true },
-                        { id: 'calendarLink', label: 'Scheduling Link', placeholder: 'e.g., calendly.com/your-name', optional: true },
-                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
-                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
-                        { id: 'yourPhone', label: 'Your Phone Number', placeholder: 'e.g., +1-234-567-890', optional: true },
-                    ]
-                },
-                'follow-up': {
-                    name: 'Follow-Up (No Response)',
-                    subject: "Following Up: Mobile App Opportunities for [Client's Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope you're having a productive week.\n\nI sent an email last [Day of previous email] regarding how [Your Company Name] could potentially assist [Client's Company Name] in leveraging mobile app solutions to [Key Benefit to Reiterate].\n\nI understand you're busy, but I genuinely believe exploring this could open up new avenues for your business. We've seen great success in [Specific Area of Success].\n\nWould you still be open to a quick chat sometime next week? Perhaps [Suggested Times]?\n\nIf now isn't the right time, please let me know when might be better, or if you're not the best person to discuss this, who you would recommend I speak with.\n\nThanks again for your time.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
-                    fields: [
-                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
-                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
-                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
-                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
-                        { id: 'previousDay', label: 'Day of Previous Email', placeholder: 'e.g., Tuesday' },
-                        { id: 'keyBenefit', label: 'Key Benefit to Reiterate', placeholder: 'e.g., enhance user experience', optional: true },
-                        { id: 'specificArea', label: 'Specific Area of Success', placeholder: 'e.g., creating intuitive customer apps', optional: true },
-                        { id: 'suggestedTimes', label: 'Suggested Times', placeholder: 'e.g., Tuesday at 10am or Thursday at 2pm', optional: true },
-                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
-                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
-                    ]
-                },
-                proposal: {
-                    name: 'Proposal Follow-Up',
-                    subject: "Following Up: Proposal for [Project Name/Client's Company Name]",
-                    body: `Dear [Client Contact Name],\n\nI hope this email finds you well.\n\nI'm following up on the proposal I sent on [Date Proposal Was Sent] regarding [Project Name / Description]. I wanted to ensure you received it and had a chance to review it.\n\nDo you have any initial thoughts or questions after reviewing the proposed mobile app solution? I'm happy to schedule a call to walk through it in more detail, clarify any points, or discuss how we can tailor it further to meet your specific needs.\n\nPlease let me know if there's a convenient time for a brief discussion next week.\n\nLooking forward to hearing from you.\n\nBest regards,\n\n[Your Name]\n[Your Title]\n[Your Company Name]\n[Your Website]`,
-                    fields: [
-                        { id: 'yourName', label: 'Your Name', placeholder: 'e.g., Jane Doe' },
-                        { id: 'clientContact', label: 'Client Contact Name', placeholder: 'e.g., John Smith' },
-                        { id: 'clientCompany', label: 'Client\'s Company Name', placeholder: 'e.g., Global Tech' },
-                        { id: 'proposalDate', label: 'Date Proposal Was Sent', placeholder: 'e.g., July 22, 2025' },
-                        { id: 'projectName', label: 'Project Name / Description', placeholder: 'e.g., Project Phoenix' },
-                        { id: 'yourTitle', label: 'Your Title', placeholder: 'e.g., Lead Consultant' },
-                        { id: 'yourCompany', label: 'Your Company Name', placeholder: 'e.g., App Solutions Inc.' },
-                        { id: 'yourWebsite', label: 'Your Website', placeholder: 'e.g., www.appsolutions.com' },
-                    ]
-                }
-            };
+            // === EXPAND/COLLAPSE FUNCTIONALITY ===
+            document.querySelectorAll('.toggle-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const targetId = header.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
 
-            let currentTemplates = JSON.parse(localStorage.getItem('customTemplates')) || JSON.parse(JSON.stringify(defaultTemplates));
-
-            const checklistData = [
-                { text: "Thoroughly researched the client's business, industry, and needs.", checked: false },
-                { text: "Identified the correct decision-maker to contact.", checked: false },
-                { text: "Personalized the email with specific details about the client's company.", checked: false },
-                { text: "Crafted a compelling and relevant subject line.", checked: false },
-                { text: "Focused on benefits for the client, not just features of the app.", checked: false },
-                { text: "Included a clear, specific, and easy-to-follow Call to Action (CTA).", checked: false },
-                { text: "Proofread the entire email for any grammar or spelling errors.", checked: false },
-                { text: "Prepared a follow-up plan in case of no response.", checked: false }
-            ];
-
-            const templateSelect = document.getElementById('template-select');
-            const templateFieldsContainer = document.getElementById('template-fields');
-            const emailSubjectInput = document.getElementById('email-subject-input');
-            const emailBodyDraggableContainer = document.getElementById('email-body-draggable-container');
-            const emailOutputHidden = document.getElementById('email-output-hidden');
-            const copyBtn = document.getElementById('copy-btn');
-            const saveToHistoryBtn = document.getElementById('save-to-history-btn'); // New button
-            const toast = document.getElementById('toast-notification');
-
-            const customizeTemplateSelect = document.getElementById('customize-template-select');
-            const customizeSubjectInput = document.getElementById('customize-subject');
-            const customizeBodyTextarea = document.getElementById('customize-body');
-            const saveCustomTemplateBtn = document.getElementById('save-custom-template-btn');
-            const resetTemplateBtn = document.getElementById('reset-template-btn');
-
-            const historyList = document.getElementById('history-list');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-
-            let draggedItem = null;
-
-            function updateTemplateSelects() {
-                templateSelect.innerHTML = '';
-                customizeTemplateSelect.innerHTML = '';
-                for (const key in currentTemplates) {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = currentTemplates[key].name;
-                    templateSelect.appendChild(option);
-
-                    const customizeOption = document.createElement('option');
-                    customizeOption.value = key;
-                    customizeOption.textContent = currentTemplates[key].name;
-                    customizeTemplateSelect.appendChild(customizeOption);
-                }
-                if (templateSelect.value) {
-                    generateFields(currentTemplates[templateSelect.value].fields);
-                    emailSubjectInput.value = currentTemplates[templateSelect.value].subject;
-                    updateEmailOutput();
-                }
-                if (customizeTemplateSelect.value) {
-                    loadTemplateForCustomization(customizeTemplateSelect.value);
-                }
-            }
-
-            function generateFields(fields) {
-                templateFieldsContainer.innerHTML = '';
-                fields.forEach(field => {
-                    const fieldWrapper = document.createElement('div');
-                    const label = document.createElement('label');
-                    label.htmlFor = field.id;
-                    label.className = 'block text-sm font-medium text-gray-700';
-                    label.textContent = field.label;
-                    if (field.optional) {
-                        label.textContent += ' (Optional)';
-                        label.className += ' text-gray-500';
-                    }
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.id = field.id;
-                    input.placeholder = field.placeholder;
-                    input.className = 'mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500';
-                    fieldWrapper.appendChild(label);
-                    fieldWrapper.appendChild(input);
-                    templateFieldsContainer.appendChild(fieldWrapper);
+                    content.classList.toggle('active');
+                    header.classList.toggle('active');
                 });
-                templateFieldsContainer.addEventListener('input', updateEmailOutput);
-            }
-
-            function updateEmailOutput() {
-                const selectedTemplateKey = templateSelect.value;
-                const template = currentTemplates[selectedTemplateKey];
-                let currentSubject = template.subject; // Start with the template's subject
-                let body = template.body;
-
-                const fieldValues = {};
-                template.fields.forEach(field => {
-                    const inputElement = document.getElementById(field.id);
-                    fieldValues[field.id] = inputElement ? inputElement.value.trim() : '';
-                });
-
-                // Replace placeholders in subject
-                for (const field of template.fields) {
-                    const placeholder = `[${field.label.replace(':', '').replace(/\s+/g, ' ').trim()}]`;
-                    const value = fieldValues[field.id];
-                    if (value && value !== '') {
-                        currentSubject = currentSubject.replace(new RegExp(escapeRegExp(placeholder), 'g'), value);
-                    } else if (field.optional) {
-                        currentSubject = currentSubject.replace(new RegExp(escapeRegExp(placeholder), 'g'), '');
-                    }
-                }
-                emailSubjectInput.value = currentSubject.replace(/\s+/g, ' ').trim();
-
-                // Replace placeholders in body and split into draggable paragraphs
-                for (const field of template.fields) {
-                    const placeholder = `[${field.label.replace(':', '').replace(/\s+/g, ' ').trim()}]`;
-                    const value = fieldValues[field.id];
-                    if (value && value !== '') {
-                        body = body.replace(new RegExp(escapeRegExp(placeholder), 'g'), value);
-                    } else if (field.optional) {
-                        body = body.replace(new RegExp(escapeRegExp(placeholder), 'g'), '');
-                    }
-                }
-
-                populateDraggableBody(body);
-            }
-
-            function escapeRegExp(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }
-
-            function populateDraggableBody(bodyContent) {
-                emailBodyDraggableContainer.innerHTML = '';
-                const paragraphs = bodyContent.split('\n\n').filter(p => p.trim() !== '');
-                paragraphs.forEach((p, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'draggable-item p-3 rounded-md bg-white shadow-sm border border-gray-200 text-sm leading-relaxed';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('data-id', `item-${index}`);
-                    div.textContent = p.trim();
-                    emailBodyDraggableContainer.appendChild(div);
-                });
-                addDragDropListeners();
-                updateHiddenOutput();
-            }
-
-            function addDragDropListeners() {
-                const items = emailBodyDraggableContainer.querySelectorAll('.draggable-item');
-                items.forEach(item => {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragover', handleDragOver);
-                    item.addEventListener('dragleave', handleDragLeave);
-                    item.addEventListener('drop', handleDrop);
-                    item.addEventListener('dragend', handleDragEnd);
-                });
-            }
-
-            function handleDragStart(e) {
-                draggedItem = this;
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', this.dataset.id);
-                setTimeout(() => this.classList.add('dragging'), 0);
-            }
-
-            function handleDragOver(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                const target = e.target.closest('.draggable-item');
-                if (target && target !== draggedItem) {
-                    const rect = target.getBoundingClientRect();
-                    const midY = rect.top + rect.height / 2;
-                    emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
-                        item.classList.remove('drag-over', 'drag-over-bottom');
-                    });
-                    if (e.clientY < midY) {
-                        target.classList.add('drag-over');
-                    } else {
-                        target.classList.add('drag-over-bottom');
-                    }
-                }
-            }
-
-            function handleDragLeave(e) {
-                e.target.classList.remove('drag-over', 'drag-over-bottom');
-            }
-
-            function handleDrop(e) {
-                e.preventDefault();
-                const target = e.target.closest('.draggable-item');
-                if (target && target !== draggedItem) {
-                    const rect = target.getBoundingClientRect();
-                    const midY = rect.top + rect.height / 2;
-                    if (e.clientY < midY) {
-                        emailBodyDraggableContainer.insertBefore(draggedItem, target);
-                    } else {
-                        emailBodyDraggableContainer.insertBefore(draggedItem, target.nextSibling);
-                    }
-                }
-                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
-                    item.classList.remove('drag-over', 'drag-over-bottom');
-                });
-                updateHiddenOutput();
-            }
-
-            function handleDragEnd() {
-                draggedItem.classList.remove('dragging');
-                draggedItem = null;
-            }
-
-            function updateHiddenOutput() {
-                let fullBody = '';
-                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
-                    fullBody += item.textContent.trim() + '\n\n';
-                });
-                emailOutputHidden.value = `Subject: ${emailSubjectInput.value}\n\n${fullBody.trim()}`;
-            }
-
-            copyBtn.addEventListener('click', () => {
-                emailOutputHidden.select();
-                document.execCommand('copy');
-                showToast('Copied to clipboard!');
             });
 
-            saveToHistoryBtn.addEventListener('click', () => {
-                const subject = emailSubjectInput.value;
-                let body = '';
-                emailBodyDraggableContainer.querySelectorAll('.draggable-item').forEach(item => {
-                    body += item.textContent.trim() + '\n\n';
-                });
-                body = body.trim();
-
-                if (!subject || !body) {
-                    showToast('Subject and body cannot be empty to save to history.', 'bg-red-500');
-                    return;
-                }
-
-                saveEmailToHistory({ subject, body, timestamp: Date.now() });
-                showToast('Email saved to history!');
-            });
-
-            function saveEmailToHistory(email) {
-                const history = JSON.parse(localStorage.getItem('emailHistory')) || [];
-                history.unshift(email); // Add to the beginning
-                localStorage.setItem('emailHistory', JSON.stringify(history));
-                renderHistory();
-            }
-
-            function renderHistory() {
-                historyList.innerHTML = '';
-                const history = JSON.parse(localStorage.getItem('emailHistory')) || [];
-
-                if (history.length === 0) {
-                    historyList.innerHTML = '<p class="text-center text-gray-500">No emails saved in history yet.</p>';
-                    clearHistoryBtn.classList.add('hidden');
-                    return;
-                } else {
-                    clearHistoryBtn.classList.remove('hidden');
-                }
-
-                history.forEach((item, index) => {
-                    const historyCard = document.createElement('div');
-                    historyCard.className = 'bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200';
-                    const date = new Date(item.timestamp).toLocaleString();
-                    const bodySnippet = item.body.substring(0, 150) + (item.body.length > 150 ? '...' : '');
-
-                    historyCard.innerHTML = `
-                        <h3 class="font-semibold text-gray-800 mb-1">Subject: ${item.subject}</h3>
-                        <p class="text-sm text-gray-600 mb-2">${bodySnippet}</p>
-                        <p class="text-xs text-gray-400 mb-3">Saved: ${date}</p>
-                        <div class="flex gap-2">
-                            <button data-index="${index}" class="load-history-btn text-indigo-600 hover:text-indigo-800 font-medium text-sm">Load</button>
-                            <button data-index="${index}" class="delete-history-btn text-red-500 hover:text-red-700 font-medium text-sm">Delete</button>
-                        </div>
-                    `;
-                    historyList.appendChild(historyCard);
-                });
-
-                document.querySelectorAll('.load-history-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        const itemToLoad = history[index];
-                        emailSubjectInput.value = itemToLoad.subject;
-                        populateDraggableBody(itemToLoad.body);
-                        showToast('Email loaded into template area!');
-                        document.querySelector('#templates').scrollIntoView({ behavior: 'smooth' });
-                    });
-                });
-
-                document.querySelectorAll('.delete-history-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        deleteHistoryItem(index);
-                    });
-                });
-            }
-
-            function deleteHistoryItem(index) {
-                let history = JSON.parse(localStorage.getItem('emailHistory')) || [];
-                history.splice(index, 1);
-                localStorage.setItem('emailHistory', JSON.stringify(history));
-                renderHistory();
-                showToast('Email deleted from history!', 'bg-red-500');
-            }
-
-            clearHistoryBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to clear all email history? This action cannot be undone.')) {
-                    localStorage.removeItem('emailHistory');
-                    renderHistory();
-                    showToast('All history cleared!', 'bg-red-500');
-                }
-            });
-
-            function renderChecklist() {
-                const checklistContainer = document.getElementById('checklist-items');
-                checklistContainer.innerHTML = '';
-                checklistData.forEach((item, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-center p-4 bg-gray-50 rounded-lg transition-colors';
-                    li.innerHTML = `
-                        <input id="check-${index}" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" ${item.checked ? 'checked' : ''}>
-                        <label for="check-${index}" class="ml-3 block text-gray-900 cursor-pointer">${item.text}</label>
-                    `;
-                    const checkbox = li.querySelector(`#check-${index}`);
-                    const label = li.querySelector('label');
-                    if(item.checked) {
-                        label.classList.add('line-through', 'text-gray-400');
-                        li.classList.add('bg-green-50');
+            // Initial carousel setup: Ensure only the first slide is visible initially
+            document.querySelectorAll('.carousel').forEach(carousel => {
+                const slides = carousel.querySelectorAll('.carousel-slide');
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active');
+                    if (index === 0 && slides.length > 0) {
+                        slide.classList.add('active');
                     }
-                    checkbox.addEventListener('change', () => {
-                        checklistData[index].checked = checkbox.checked;
-                        if(checkbox.checked) {
-                            label.classList.add('line-through', 'text-gray-400');
-                            li.classList.add('bg-green-50');
-                        } else {
-                            label.classList.remove('line-through', 'text-gray-400');
-                            li.classList.remove('bg-green-50');
-                        }
-                    });
-                    checklistContainer.appendChild(li);
                 });
+            });
+            
+            // === GRADIENT FLUID EFFECT (Full Page Mouse Pointer Tracking) ===
+            const body = document.body;
+            function updateGradientPosition(e) {
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
+                
+                body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
             }
             
-            const strategyCtx = document.getElementById('strategyChart').getContext('2d');
-            new Chart(strategyCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Research & Identify', 'Personalize & Craft', 'Engage & Propose', 'Follow-Up & Nurture'],
-                    datasets: [{
-                        label: 'Effort Distribution',
-                        data: [100, 85, 60, 40],
-                        backgroundColor: [
-                            'rgba(165, 180, 252, 0.6)', // indigo-300
-                            'rgba(129, 140, 248, 0.6)', // indigo-400
-                            'rgba(99, 102, 241, 0.6)', // indigo-500
-                            'rgba(79, 70, 229, 0.6)'  // indigo-600
-                        ],
-                        borderColor: [
-                            'rgba(165, 180, 252, 1)',
-                            'rgba(129, 140, 248, 1)',
-                            'rgba(99, 102, 241, 1)',
-                            'rgba(79, 70, 229, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label;
-                                },
-                                label: function(context) {
-                                    const tooltips = {
-                                        'Research & Identify': 'Understand business, pain points, and find the right contact.',
-                                        'Personalize & Craft': 'Tailor the message and value proposition. Write a clear, concise email.',
-                                        'Engage & Propose': 'Send the initial outreach and any subsequent proposals.',
-                                        'Follow-Up & Nurture': 'Persistently but politely follow up to keep the conversation going.'
-                                    };
-                                    return tooltips[context.label] || '';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            display: false
-                        },
-                        y: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
+            body.addEventListener('mousemove', updateGradientPosition);
 
-            function loadTemplateForCustomization(templateKey) {
-                const template = currentTemplates[templateKey];
-                customizeSubjectInput.value = template.subject;
-                customizeBodyTextarea.value = template.body;
+            // === DYNAMIC TAGLINE SWAPPER ===
+            const taglines = ["Backend Developer", "Android Developer", "Tech Strategist", "Problem Solver"];
+            const taglineElement = document.getElementById('tagline-text');
+            let taglineIndex = 0;
+
+            function swapTagline() {
+                taglineElement.classList.remove('active');
+                taglineElement.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    taglineElement.textContent = taglines[taglineIndex];
+                    taglineElement.classList.add('active');
+                    taglineElement.style.transform = 'translateY(0)';
+                    taglineIndex = (taglineIndex + 1) % taglines.length;
+                }, 500);
             }
 
-            saveCustomTemplateBtn.addEventListener('click', () => {
-                const templateKey = customizeTemplateSelect.value;
-                currentTemplates[templateKey].subject = customizeSubjectInput.value;
-                currentTemplates[templateKey].body = customizeBodyTextarea.value;
-                localStorage.setItem('customTemplates', JSON.stringify(currentTemplates));
-                showToast('Template saved successfully!');
-                updateTemplateSelects();
-                templateSelect.value = templateKey;
-                generateFields(currentTemplates[templateKey].fields);
-                emailSubjectInput.value = currentTemplates[templateKey].subject;
-                updateEmailOutput();
-            });
-
-            resetTemplateBtn.addEventListener('click', () => {
-                const templateKey = customizeTemplateSelect.value;
-                currentTemplates[templateKey] = JSON.parse(JSON.stringify(defaultTemplates[templateKey]));
-                localStorage.setItem('customTemplates', JSON.stringify(currentTemplates));
-                showToast('Template reset to default!');
-                loadTemplateForCustomization(templateKey);
-                updateTemplateSelects();
-                templateSelect.value = templateKey;
-                generateFields(currentTemplates[templateKey].fields);
-                emailSubjectInput.value = currentTemplates[templateKey].subject;
-                updateEmailOutput();
-            });
-
-            customizeTemplateSelect.addEventListener('change', (e) => {
-                loadTemplateForCustomization(e.target.value);
-            });
-
-            emailSubjectInput.addEventListener('input', updateEmailOutput);
-
-            function showToast(message, bgColor = 'bg-gray-700') {
-                toast.textContent = message;
-                toast.className = `toast show ${bgColor}`; // Apply background color
-                setTimeout(() => { toast.classList.remove('show'); }, 3000);
-            }
-
-            const menuBtn = document.getElementById('menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                    if(mobileMenu.classList.contains('hidden') === false){
-                        mobileMenu.classList.add('hidden');
-                    }
-                });
-            });
-
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('section');
-            window.addEventListener('scroll', () => {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 100) {
-                        current = section.getAttribute('id');
-                    }
-                });
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            });
-
-            updateTemplateSelects();
-            templateSelect.addEventListener('change', () => {
-                const selectedTemplateKey = templateSelect.value;
-                generateFields(currentTemplates[selectedTemplateKey].fields);
-                emailSubjectInput.value = currentTemplates[selectedTemplateKey].subject;
-                updateEmailOutput();
-            });
-            renderChecklist();
-            renderHistory(); // Initial render of history
+            swapTagline();
+            setInterval(swapTagline, 3000); 
         });
     </script>
 </body>
