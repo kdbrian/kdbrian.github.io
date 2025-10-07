@@ -29,18 +29,17 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            color: var(--text-dark); /* Default text color is dark */
+            color: var(--text-dark);
             overflow-x: hidden; 
             min-height: 100vh;
             
-            /* Initial Radial Gradient (Full Visibility) */
             background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
             background-size: 200% 200%;
             transition: background 0.2s ease-out; 
             position: relative; 
         }
 
-        /* Content Container and Sections */
+        /* Global Content and Section Styling */
         .content-container {
             max-width: 900px;
             margin: 0 auto;
@@ -52,7 +51,7 @@
             padding: 20px;
             background: var(--content-background); 
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7); /* Stronger shadow for dark theme */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
         }
         
         h2, h3 {
@@ -63,14 +62,16 @@
         }
 
 
-        /* === HEADER SECTION (Full Screen) === */
+        /* ======================================= */
+        /* === 1. HEADER & HERO SECTION STYLES === */
+        /* ======================================= */
         .hero-section {
             height: 100vh; 
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            color: var(--text-light); /* Light text on dark background */
+            color: var(--text-light);
         }
 
         .user-panel {
@@ -84,23 +85,21 @@
 
         .user-panel h1 {
             color: var(--text-light);
-            border-bottom: none;
-            margin-bottom: 15px;
             font-size: 4em;
             line-height: 1;
         }
         
         /* Large Circular User Image */
         .user-image-wrapper {
-            width: 250px; /* Enlarged diameter */
-            height: 250px; /* Ensure equal width/height for perfect circle */
+            width: 250px; 
+            height: 250px; 
             margin-bottom: 25px;
             
-            clip-path: circle(50% at 50% 50%); /* Simple circle */
-            border-radius: 50%; /* Fallback for older browsers and extra assurance */
+            clip-path: circle(50% at 50% 50%);
+            border-radius: 50%; 
 
-            border: none; /* Removed border */
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); /* Subtle light glow for dark theme */
+            border: none;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
             transition: all 0.5s ease-in-out;
             overflow: hidden; 
         }
@@ -113,8 +112,8 @@
         }
 
         .user-image-wrapper:hover {
-            transform: scale(1.05); /* No rotation for a clean circle hover */
-            box-shadow: 0 0 40px var(--primary-accent); /* Accent color on hover */
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--primary-accent);
         }
         
         /* Dynamic Tagline */
@@ -135,19 +134,40 @@
             transform: translateY(0);
         }
 
-        /* Featured Project Title Larger */
-        .project-panel h2 {
-            font-size: 3em; /* Made larger */
-            margin-bottom: 30px;
-            color: var(--text-light); /* Ensure light text on dark background */
-            border-bottom: none; /* Already none, but reiterating for clarity */
+        /* Featured Project Panel */
+        .project-panel {
+            flex: 0 0 60%;
+            padding: 20px;
         }
 
-        /* Expand/Collapse Styling */
+        .project-panel h2 {
+            font-size: 3em; 
+            margin-bottom: 30px;
+            color: var(--text-light);
+            border-bottom: none;
+        }
+        .recent-project-images {
+            display: flex;
+            gap: 15px;
+        }
+        .recent-project-images img {
+            width: 30%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        .recent-project-images img:hover {
+            transform: scale(1.05);
+        }
+
+        /* ======================================= */
+        /* === 2. COLLAPSIBLE CONTENT STYLES === */
+        /* ======================================= */
         .toggle-header {
             cursor: pointer;
             background: var(--content-background);
-            color: var(--text-dark); /* Ensure text is visible in header */
+            color: var(--text-dark);
             padding: 10px;
             margin-top: 20px;
             border-radius: 4px;
@@ -167,9 +187,23 @@
         .collapsible-content.active {
             display: block; 
         }
+        
+        /* List styles within dark theme */
+        section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        section li:before {
+            content: "•";
+            color: var(--primary-accent);
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
 
-
-        /* === FLOATING FOOTER === */
+        /* ======================================= */
+        /* === 3. FLOATING FOOTER STYLES       === */
+        /* ======================================= */
         footer {
             position: fixed;
             bottom: 20px; 
@@ -200,6 +234,81 @@
         .footer-links a:hover {
             color: var(--secondary-accent);
         }
+
+
+        /* ======================================= */
+        /* === 4. RESPONSIVENESS (MEDIA QUERIES) === */
+        /* ======================================= */
+
+        /* Tablet and Smaller Desktop (Max 900px) */
+        @media (max-width: 900px) {
+            .hero-section {
+                flex-direction: column; /* Stack vertically */
+                height: auto; /* Allow content to dictate height */
+                padding: 50px 20px;
+                min-height: 100vh; /* Ensure full viewport height initially */
+            }
+
+            .user-panel {
+                flex: none; /* Remove fixed flex basis */
+                width: 100%;
+                margin-bottom: 40px;
+            }
+
+            .project-panel {
+                flex: none;
+                width: 100%;
+                text-align: center;
+            }
+
+            .project-panel h2 {
+                font-size: 2.5em; /* Slightly reduced for tablets */
+            }
+        }
+
+        /* Mobile Devices (Max 600px) */
+        @media (max-width: 600px) {
+            /* Adjust hero font sizes */
+            .user-panel h1 {
+                font-size: 3em;
+            }
+
+            .project-panel h2 {
+                font-size: 2em;
+            }
+
+            /* Stack project images */
+            .recent-project-images {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .recent-project-images img {
+                width: 80%; /* Make images fill more of the screen */
+                max-width: 300px;
+            }
+
+            /* Reduce image size for small screens */
+            .user-image-wrapper {
+                width: 180px; 
+                height: 180px; 
+            }
+
+            /* Adjust collapsible content padding */
+            .collapsible-content {
+                padding-left: 10px;
+            }
+            
+            /* Smaller floating footer on mobile */
+            footer {
+                padding: 10px 20px;
+                bottom: 10px;
+            }
+            .footer-links a {
+                font-size: 1.2em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -207,7 +316,7 @@
     <header class="hero-section" id="hero">
         <div class="user-panel">
             <div class="user-image-wrapper">
-                <img src="uppy/user_profile.jpg" alt="Brian Kidiga Profile Picture">
+                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
             </div>
             <h1>BRIAN KIDIGA</h1>
             
@@ -305,9 +414,9 @@
                     <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="menus">
-                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1">
-                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2">
-                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3">
+                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
+                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2" class="carousel-slide">
+                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3" class="carousel-slide">
                         </div>
                         <button class="prev" onclick="moveSlide('menus', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('menus', 1)">&#10095;</button>
@@ -321,8 +430,8 @@
                     <p>A document repository that allows for online document sharing. Whilist allowing users to fully interact with documents without havin to read all of it.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="sage">
-                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1">
-                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2">
+                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
+                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2" class="carousel-slide">
                         </div>
                         <button class="prev" onclick="moveSlide('sage', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('sage', 1)">&#10095;</button>
@@ -336,8 +445,8 @@
                     <p>An online application used as a toolkit for drivers and travelers. Allows for discovery of closest Tow trucks services, mechanic services, and Eateries.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="tow">
-                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1">
-                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2">
+                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
+                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2" class="carousel-slide">
                         </div>
                         <button class="prev" onclick="moveSlide('tow', -1)">&#10094;</button>
                         <button class="next" onclick="moveSlide('tow', 1)">&#10095;</button>
@@ -386,6 +495,8 @@
                 newIndex = slides.length - 1;
             }
 
+            // Remove active from all and add to the new one
+            slides.forEach(slide => slide.classList.remove('active'));
             slides[newIndex].classList.add('active');
         }
 
@@ -401,7 +512,7 @@
                 });
             });
 
-            // Initial carousel setup
+            // Initial carousel setup: Ensure only the first slide is visible initially
             document.querySelectorAll('.carousel').forEach(carousel => {
                 const slides = carousel.querySelectorAll('.carousel-slide');
                 slides.forEach((slide, index) => {
