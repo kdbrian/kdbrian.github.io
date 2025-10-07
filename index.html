@@ -3,649 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brian Kidiga - Portfolio</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter for a clean, modern look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Three.js CDN for the mesh effect -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>Brian Kidiga | Backend Developer Portfolio</title>
+    
     <style>
-        /* Color Palette (inspired by the image):
-           - Primary Background: #1A1A2E (Dark Blue/Purple)
-           - Accent 1 (Lighter Blue/Purple): #3B3B54
-           - Accent 2 (Soft Blue/Cyan): #6A8EAE
-           - Text/Highlight: #E0E0E0 (Light Gray)
-           - Border/Glow: #8C9EFF (Light Purple/Blue)
-        */
+        /* Basic Reset and Typography */
         body {
-            font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Prevent scrollbars when cards appear or modal is open */
-            background-color: #1A1A2E; /* Dark Blue/Purple */
-            color: #E0E0E0; /* Light Gray for main text */
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        /* Custom styles for the elegant effect on hover */
-        .card-container {
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none; /* Allows interaction with elements behind when hidden */
-            /* Flexbox for horizontal arrangement and scrolling */
-            display: flex;
-            flex-wrap: nowrap; /* Prevent wrapping */
-            overflow-x: auto; /* Enable horizontal scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            scrollbar-width: none; /* Hide scrollbar for Firefox */
-            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .card-container::-webkit-scrollbar {
-            display: none;
+        h1, h2, h3 {
+            color: #0056b3;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
         }
-
-        .card-container.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto; /* Allows interaction when visible */
-        }
-        .card {
-            background-color: rgba(59, 59, 84, 0.7); /* Accent 1 with transparency */
-            backdrop-filter: blur(10px); /* Glassmorphism effect */
-            border: 1px solid rgba(140, 158, 255, 0.2); /* Light Purple/Blue with transparency */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer; /* Indicate clickable cards */
-            flex-shrink: 0; /* Prevent cards from shrinking */
-            width: 280px; /* Fixed width for cards in scrollable row */
-            margin-right: 24px; /* gap-6 equivalent */
-            color: #E0E0E0; /* Light Gray text for cards */
-        }
-        .card:last-child {
-            margin-right: 0; /* No margin on the last card */
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(140, 158, 255, 0.4); /* Light Purple/Blue glow on hover */
-        }
-        .glow-text {
-            text-shadow: 0 0 15px rgba(140, 158, 255, 0.8); /* Stronger Light Purple/Blue glow for main text */
-        }
-        .landing-page {
-            background: linear-gradient(135deg, #1A1A2E 0%, #3B3B54 100%); /* Dark Blue/Purple gradient background */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #E0E0E0; /* Light Gray for contrast on dark background */
-            position: relative;
-            z-index: 10; /* Ensure landing page is behind cards initially */
-        }
-        .loading-spinner {
-            border: 4px solid rgba(140, 158, 255, 0.3);
-            border-top: 4px solid #8C9EFF; /* Light Purple/Blue color */
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Modal specific styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Darker, more subtle overlay */
+        /* Header/Hero Section (Before Scrolling) */
+        .hero-section {
+            text-align: center;
+            padding: 50px 20px;
+            background: #e9e9e9;
+            margin-bottom: 0;
+        }
+        .recent-project-images {
             display: flex;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            gap: 15px;
+            margin-top: 20px;
         }
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
+        .recent-project-images img {
+            width: 30%; /* Three images side-by-side */
+            max-width: 250px;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            /* Placeholder styling - replace with your actual images */
+            background-color: #aaa; 
+            min-height: 150px; 
+            object-fit: cover;
         }
-        .modal-content {
-            background-color: #2C2C40; /* Slightly lighter than main background for modal */
-            border-radius: 0.75rem; /* rounded-xl */
-            padding: 1.5rem; /* p-6 */
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            border: 1px solid rgba(140, 158, 255, 0.3); /* Light Purple/Blue border */
-            box-shadow: 0 0 20px rgba(140, 158, 255, 0.4); /* Light Purple/Blue shadow */
-            transform: translateY(20px);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            color: #E0E0E0; /* Light Gray text for modal content */
-        }
-        .modal-overlay.visible .modal-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #8C9EFF; /* Light Purple/Blue color */
+
+        /* Expand/Collapse Styling */
+        .toggle-header {
             cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .modal-close-btn:hover {
-            transform: scale(1.2);
-        }
-
-        /* Arrow animation for toggling cards */
-        #toggleCardsArrow {
-            transition: transform 0.3s ease;
-        }
-        #toggleCardsArrow.rotated {
-            transform: rotate(180deg) translateX(50%); /* Rotate and adjust for center */
-        }
-
-        /* Welcome Overlay styles */
-        #welcomeOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1A1A2E 0%, #3B3B54 100%); /* Matches landing page background */
+            background: #f0f0f0;
+            padding: 10px;
+            margin-top: 0;
+            border-radius: 4px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            z-index: 2000; /* On top of everything */
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 1s ease-out, visibility 1s ease-out;
+            border-bottom: none; /* Override section H2 style */
+        }
+        .collapsible-content {
+            /* Initially hide content */
+            display: none; 
+            padding: 10px 0;
+        }
+        .collapsible-content.active {
+            /* Show content when 'active' class is added by JS */
+            display: block; 
+        }
+        .arrow {
+            transition: transform 0.3s;
+        }
+        .toggle-header.active .arrow {
+            transform: rotate(180deg);
         }
 
-        #helloSvgText {
-            fill: #8C9EFF; /* Solid fill color */
-            font-size: 80px; /* Adjust as needed */
-            font-weight: bold;
-            text-anchor: middle;
-            dominant-baseline: middle;
-            opacity: 0; /* Start invisible */
-            transition: opacity 1s ease-in; /* Fade in effect */
+        /* Carousel Styling */
+        .carousel-container {
+            position: relative;
+            max-width: 600px;
+            margin: 20px auto;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            height: 300px; /* Fixed height for image area */
         }
-
-        /* Mesh Canvas Styling */
-        #meshCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
             height: 100%;
-            z-index: 0; /* Behind other content */
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.5s ease-in-out;
         }
-        .landing-page:hover #meshCanvas {
-            opacity: 0.2; /* Visible on hover */
+        .carousel-slide {
+            width: 100%;
+            flex-shrink: 0;
+            display: none; /* Hide all slides by default */
+            height: 100%;
+            object-fit: contain; /* Ensure image fits within the fixed height */
+        }
+        .carousel-slide.active {
+            display: block; /* Show only the active slide */
+        }
+        .carousel-container button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .carousel-container .prev { left: 0; border-radius: 0 3px 3px 0;}
+        .carousel-container .next { right: 0; border-radius: 3px 0 0 3px;}
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            color: white;
+            margin-top: 30px;
+        }
+        footer a {
+            color: lightblue;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Welcome Overlay with SVG Animation -->
-    <div id="welcomeOverlay">
-        <svg width="100%" height="100%" viewBox="0 0 800 400">
-            <text id="helloSvgText" x="50%" y="50%" font-family="Inter">Hello</text>
-        </svg>
-    </div>
-
-    <!-- Main Landing Page Section -->
-    <div id="landingPage" class="landing-page relative w-full h-screen flex flex-col items-center justify-center p-4">
-        <!-- Mesh Canvas -->
-        <canvas id="meshCanvas"></canvas>
-
-        <div class="hero-content flex-col items-center relative z-10"> <!-- z-10 to keep content above canvas -->
-            <h1 class="text-5xl md:text-7xl font-bold mb-2 glow-text text-center">Brian Kidiga</h1>
+    <header class="hero-section">
+        <h1>Menus - Featured Project</h1>
+        <div class="recent-project-images">
+            <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
+            <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
+            <img src="img/menus_preview_3.jpg" alt="Menus App Screenshot 3">
         </div>
+    </header>
 
+    <main class="container">
 
-        <!-- Arrow to toggle cards -->
-        <div id="toggleCardsArrow" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-30">
-            <svg class="w-10 h-10 text-[#8C9EFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
-    </div>
+        <section id="about">
+            <h2>About Me</h2>
+            <p>
+                [cite_start]As a Computer Science graduate, I'm passionate about crafting robust and user-friendly applications and building efficient solutions[cite: 27]. [cite_start]My experience spans from Android app development, integrations, to getting insights from data that drive businesses[cite: 28]. [cite_start]I thrive on solving problems and continuously learning new technologies[cite: 29].
+            </p>
+        </section>
 
-    <!-- Cards Container - Initially hidden, toggled by arrow -->
-    <div id="cardsContainer" class="card-container fixed bottom-0 left-0 right-0 h-80 p-6 z-20 hidden">
-
-        <!-- About Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="about">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">About Me</h2>
-                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
-                    As an Android Developer with a BSc in Computer Science, I am passionate about crafting robust and user-friendly mobile applications and building efficient backend solutions. My experience spans from integrating currency converters to delivering in-app translations and developing full-stack applications. I thrive on solving complex problems and continuously learning new technologies.
-                </p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
-            <!-- Full content for modal -->
-            <div class="full-content hidden">
-                <p class="text-gray-300 text-sm mb-3">
-                    As an Android Developer with a BSc in Computer Science, I am passionate about crafting robust and user-friendly mobile applications and building efficient backend solutions. My experience spans from integrating currency converters to delivering in-app translations and developing full-stack applications. I thrive on solving complex problems and continuously learning new technologies.
-                </p>
-                <div class="text-gray-400 text-xs mt-4">
-                    <p>Email: Kidigabrian@outlook.com</p>
-                    <p>Phone: +(2547) 838 871 93</p>
-                    <p>Location: Nairobi, Kenya</p>
-                    <p>LinkedIn: <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#8C9EFF] hover:underline">Brian Kidiga</a></p>
-                </div>
-                <a href="BrianKidiga_2YOE_Android_Backend_Developer_Resume.pdf" target="_blank" class="inline-block mt-4 bg-[#8C9EFF] hover:bg-[#6A8EAE] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">View Resume</a>
-            </div>
-        </div>
-
-        <!-- Education Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="education">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Education</h2>
-                <p class="text-gray-300 text-sm mb-2">
-                    <strong>Karatina University</strong>
-                </p>
-                <p class="text-gray-400 text-xs line-clamp-2">BSc Computer Science</p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
-            <!-- Full content for modal -->
-            <div class="full-content hidden">
-                <p class="text-gray-300 text-sm mb-2">
-                    <strong>Karatina University</strong>
-                </p>
-                <p class="text-gray-400 text-xs">BSc Computer Science</p>
-                <p class="text-gray-400 text-xs">2020 - 2024</p>
-            </div>
-        </div>
-
-        <!-- Work Experience Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="experience">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Work Experience</h2>
-                <p class="text-gray-300 text-sm mb-2">
-                    <strong>Android Developer Intern - Graph Technologies</strong>
-                </p>
-                <p class="text-gray-400 text-xs mb-3 line-clamp-3">May '23 - Aug '23. Integrated a currency converter, collaborated on in-app translations, delivered bug reports and performance reports.</p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
-            <!-- Full content for modal -->
-            <div class="full-content hidden">
-                <p class="text-gray-300 text-sm mb-2">
-                    <strong>Android Developer Intern - Graph Technologies</strong>
-                </p>
-                <p class="text-gray-400 text-xs mb-3">May '23 - Aug '23</p>
-                <ul class="list-disc list-inside text-gray-300 text-sm space-y-1">
-                    <li>Integrated a currency converter into the Netdoc android app.</li>
-                    <li>Collaborated with the team to deliver in-app translations in the android app.</li>
-                    <li>Delivered Bug reports, update recommendations and overall performance reports of the Netdoc App.</li>
-                    <li>Used tools like Emerge to analyze apk size.</li>
+        <section id="skills">
+            <h2 class="toggle-header" data-target="skills-content">Skills <span class="arrow">▼</span></h2>
+            <div id="skills-content" class="collapsible-content">
+                <h3>Development & APIs</h3>
+                <ul>
+                    [cite_start]<li>Android Development (Java/Kotlin) [cite: 13, 14]</li>
+                    [cite_start]<li>Rest API [cite: 15]</li>
+                    [cite_start]<li>GraphQL [cite: 17]</li>
+                </ul>
+                <h3>Databases</h3>
+                <ul>
+                    [cite_start]<li>SQL & No SQL [cite: 16]</li>
+                </ul>
+                <h3>Frameworks & Technologies</h3>
+                <ul>
+                    [cite_start]<li>Spring boot [cite: 19]</li>
+                    [cite_start]<li>Node JS [cite: 20]</li>
+                    [cite_start]<li>Elastic Search [cite: 21]</li>
+                    [cite_start]<li>Docker & Containerization [cite: 22]</li>
+                </ul>
+                <h3>Tools & Version Control</h3>
+                <ul>
+                    [cite_start]<li>PostMan/Insomnia/httpie [cite: 18]</li>
+                    [cite_start]<li>Git/Gitlab/Github [cite: 23]</li>
+                </ul>
+                <h3>Languages</h3>
+                <ul>
+                    [cite_start]<li>English: Fluent [cite: 25]</li>
+                    [cite_start]<li>Swahili: Fluent [cite: 25]</li>
                 </ul>
             </div>
-        </div>
+        </section>
 
-        <!-- Skills Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="skills">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Skills</h2>
-                <p class="text-gray-300 text-sm line-clamp-4">
-                    Languages: Go, Java, Kotlin, Bash, SQL. Core Skills: Problem Solving, Data Structures and Algorithms, Backend, Computational Mathematics, System Programming, Trouble Shooting. Frameworks: Spring Boot, Android (Java, Kotlin, Hilt-DI, Firebase, Retrofit, Room), Go-Fiber, Gorm.
-                </p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Details</button>
-            <!-- Full content for modal -->
-            <div class="full-content hidden">
-                <div class="mb-3">
-                    <h3 class="text-lg font-medium text-gray-300 mb-1">Languages:</h3>
-                    <p class="text-gray-300 text-sm">Go, Java, Kotlin, Bash, SQL</p>
+        <section id="experience">
+            <h2 class="toggle-header" data-target="experience-content">Experience <span class="arrow">▼</span></h2>
+            <div id="experience-content" class="collapsible-content">
+                
+                <div class="job">
+                    <h3>Pseudo (Founder & CTO)</h3>
+                    [cite_start]<p class="period">2025 [cite: 34]</p>
+                    <ul>
+                        [cite_start]<li>Launched a start-up alias pseudo[cite: 33].</li>
+                        [cite_start]<li>Deployed a mobile tool for travelers, **Tow**, assuring travelers and EV drivers access to vital services when needed[cite: 35].</li>
+                        [cite_start]<li>Initiated development of **Menus**, an online application designed to help accelerate the online sale of restaurants and boost interactivity[cite: 36].</li>
+                    </ul>
                 </div>
-                <div class="mb-3">
-                    <h3 class="text-lg font-medium text-gray-300 mb-1">Core Skills:</h3>
-                    <p class="text-gray-300 text-sm">Problem Solving, Data Structures and Algorithms, Backend, Computational Mathematics, System Programming, Trouble Shooting</p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-300 mb-1">Frameworks:</h3>
-                    <ul class="list-disc list-inside text-gray-300 text-sm space-y-1">
-                        <li>Spring Boot - Java, Graph QL, Security, Jpa, Rest API, Mongodb</li>
-                        <li>Android - Java, Kotlin, Hilt-DI, Firebase, Retrofit, Room</li>
-                        <li>Go-Fiber, Gorm</li>
+
+                <div class="job">
+                    <h3>Android Developer Intern</h3>
+                    [cite_start]<p class="period">May - November 2024 [cite: 39]</p>
+                    <ul>
+                        [cite_start]<li>My milestone was **translation**, which had the app in native languages associated with different locales[cite: 43].</li>
+                        [cite_start]<li>Integrated a **currency conversion** feature into the main app to allow clients to easily make payments from different locales[cite: 43].</li>
+                        [cite_start]<li>Optimized and reduced the app size after performing analysis[cite: 44].</li>
+                        [cite_start]<li>Initially assisted in minor tasks like documentation and testing[cite: 41].</li>
                     </ul>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Projects Summary Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="projects-summary">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">My Projects</h2>
-                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
-                    Explore my past projects, including Android apps, backend solutions, and research initiatives. See my GitHub contribution streak.
-                </p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">View Projects</button>
-        </div>
+        <section id="projects">
+            <h2>Projects</h2>
+            [cite_start]<p>All my projects are available from my Github profile[cite: 46].</p>
 
-        <!-- Contact Summary Card -->
-        <div class="card rounded-xl p-6 h-full flex flex-col justify-between" data-card-id="contact-summary">
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-[#8C9EFF]">Contact Me</h2>
-                <p class="text-gray-300 text-sm mb-3 line-clamp-4">
-                    Interested in collaborating or have a question? Reach out to me via email, phone, or LinkedIn. I'm always open to new opportunities!
-                </p>
-            </div>
-            <button class="text-[#8C9EFF] hover:underline text-sm self-end mt-2">Get in Touch</button>
-        </div>
-
-    </div>
-
-    <!-- General Info Modal Structure -->
-    <div id="infoModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closeInfoModalBtn">&times;</button>
-            <h2 id="infoModalTitle" class="text-3xl font-bold mb-4 text-[#8C9EFF]"></h2>
-            <div id="infoModalContent" class="text-gray-300 text-base leading-relaxed">
-                <!-- Content will be injected here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Projects Modal Structure -->
-    <div id="detailedProjectsModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closeProjectsModalBtn">&times;</button>
-            <h2 class="text-3xl font-bold mb-4 text-[#8C9EFF]">My Projects</h2>
-
-            <!-- Tab Content: My Projects (now the only content) -->
-            <div id="my-projects" class="tab-content">
-                <!-- GitHub Stats Streak Placeholder -->
-                <div class="mb-6 text-center">
-                    <h3 class="text-xl font-semibold text-gray-200 mb-2">My GitHub Streak</h3>
-                    <!-- Updated GitHub Streak Image -->
-                    <img src="https://streak-stats.demolab.com?user=kdbrian&theme=dark&short_numbers=true&date_format=n%2Fj%5B%2FY%5D&hide_longest_streak=true" alt="GitHub Streak" class="mx-auto w-full max-w-xl rounded-md">
-                    <p class="text-gray-400 text-sm mt-2">Daily contributions visualized.</p>
-                </div>
-
-                <div class="space-y-8">
-                    <!-- Project 1 -->
-                    <div class="border-b border-gray-600 pb-4">
-                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=PseudoNotes" alt="PseudoNotes Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-100">PseudoNotes</h3>
-                        <p class="text-gray-300 text-xs mb-1">A software application aimed at helping developers share solutions for software-related problems through a simplified pseudo language. Defining it as a DSL for the domain Problem Solving.</p>
-                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> (Details on specific tech stack from resume if available, otherwise placeholder)</p>
-                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Streamlining solution sharing for software problems.</p>
-                    </div>
-                    <!-- Project 2 -->
-                    <div class="border-b border-gray-600 pb-4">
-                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=Sage/Emerg" alt="Sage/Emerg Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-100">Sage / Emerg (SOS Button)</h3>
-                        <p class="text-gray-300 text-xs mb-1">Delivered using tools like Firebase (Firestore, Cloud Messaging, App Distribution). The application is aimed to work as a portable SOS-Button.</p>
-                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> Android Kotlin, Firebase (Firestore, Cloud Messaging, App Distribution)</p>
-                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Providing immediate assistance in critical situations.</p>
-                    </div>
-                    <!-- Project 3 -->
-                    <div class="border-b border-gray-600 pb-4">
-                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=HiddenGems" alt="Hidden Gems Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-100">Hidden Gems</h3>
-                        <p class="text-gray-300 text-xs mb-1">An Android app used by students around campus to share revision materials and essential documents.</p>
-                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> Android, Firebase</p>
-                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Facilitating academic resource sharing among students.</p>
-                    </div>
-                    <!-- Project 4 -->
-                    <div class="border-b border-gray-600 pb-4">
-                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=VNS" alt="VNS Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-100">VNS (Vet Services)</h3>
-                        <p class="text-gray-300 text-xs mb-1">A software application aimed at helping to streamline the request of vet services by farmers. Managed to publish the initial version to Playstore.</p>
-                        <p class="text-gray-400 text-xs"><strong>Tech Stack:</strong> App Kotlin, Backend (REST)</p>
-                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Improving access to veterinary services for farmers.</p>
-                    </div>
-                    <!-- Project 5 -->
-                    <div class="pb-4">
-                        <img src="https://placehold.co/200x120/3B3B54/8C9EFF?text=Menus" alt="Menus Project" class="w-full h-auto rounded-md mb-2">
-                        <h3 class="text-lg font-medium text-gray-100">Menus</h3>
-                        <p class="text-gray-300 text-xs mb-1">A software application aimed at bringing the comfort of advertisement of local restaurants to clients who can then place orders, reservations, and save their custom menus. Aimed to target multiple platforms including Web, Android & Tv.</p>
-                        <p class="text-400 text-xs"><strong>Tech Stack:</strong> (Development in-progress, aimed for Web, Android & Tv)</p>
-                        <p class="text-gray-400 text-xs"><strong>Challenge Solved:</strong> Enhancing local restaurant visibility and customer convenience.</p>
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-menus">Menus <span class="arrow">▼</span></h3>
+                <div id="project-menus" class="collapsible-content">
+                    [cite_start]<p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing[cite: 47].</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="menus">
+                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
+                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2" class="carousel-slide">
+                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('menus', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('menus', 1)">&#10095;</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Contact Modal Structure -->
-    <div id="contactModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closeContactModalBtn">&times;</button>
-            <h2 class="text-3xl font-bold mb-4 text-[#8C9EFF]">Get in Touch</h2>
-            <div class="text-gray-300 text-base leading-relaxed space-y-4">
-                <p>Feel free to reach out for collaborations, opportunities, or just a chat!</p>
-                <p><strong>Email:</strong> Kidigabrian@outlook.com</p>
-                <p><strong>Phone:</strong> +(2541) 114 028 63</p>
-                <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/brian-kidiga" target="_blank" class="text-[#8C9EFF] hover:underline">Brian Kidiga</a></p>
-                <form class="mt-6 space-y-4">
-                    <div>
-                        <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Name:</label>
-                        <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="Your Name">
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
+                <div id="project-sage" class="collapsible-content">
+                    [cite_start]<p>A document repository that allows for online document sharing[cite: 48]. [cite_start]It allows users to fully interact with documents without having to read all of it[cite: 49].</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="sage">
+                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
+                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('sage', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('sage', 1)">&#10095;</button>
                     </div>
-                    <div>
-                        <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email:</label>
-                        <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="your@example.com">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-gray-300 text-sm font-bold mb-2">Message:</label>
-                        <textarea id="message" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-100" placeholder="Your message..."></textarea>
-                    </div>
-                    <button type="submit" class="bg-[#8C9EFF] hover:bg-[#6A8EAE] text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">Send Message</button>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
+            
+            <div class="project-item">
+                <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
+                <div id="project-tow" class="collapsible-content">
+                    [cite_start]<p>An online application used as a toolkit for drivers and travelers[cite: 50]. [cite_start]It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries[cite: 51].</p>
+                    <div class="carousel-container">
+                        <div class="carousel" data-project="tow">
+                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
+                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2" class="carousel-slide">
+                        </div>
+                        <button class="prev" onclick="moveSlide('tow', -1)">&#10094;</button>
+                        <button class="next" onclick="moveSlide('tow', 1)">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- Generated by AI Note -->
-    <div class="fixed bottom-2 right-2 text-gray-500 text-xs z-50">
-        Generated by AI
-    </div>
+        <section id="education">
+            <h2>Education</h2>
+            <ul>
+                <li>BSc. [cite_start]Computer Science [cite: 11]</li>
+                [cite_start]<li>GPA: 3.8 [cite: 11]</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer>
+        [cite_start]<p>Location: Nairobi, Kenya [cite: 6]</p>
+        [cite_start]<p>Github: <a href="https://kdbrian.github.io" target="_blank">kdbrian.github.io [cite: 7]</a></p>
+        <p>LinkedIn: <a href="[YOUR LINKEDIN URL]" target="_blank">[YOUR LINKEDIN URL]</a></p>
+    </footer>
 
     <script>
-        const welcomeOverlay = document.getElementById('welcomeOverlay');
-        const helloSvgText = document.getElementById('helloSvgText');
-        const landingPage = document.getElementById('landingPage');
-        const cardsContainer = document.getElementById('cardsContainer');
-        const toggleCardsArrow = document.getElementById('toggleCardsArrow');
-        const meshCanvas = document.getElementById('meshCanvas');
+        // === CAROUSEL MOVEMENT FUNCTION ===
+        function moveSlide(projectName, step) {
+            const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
+            if (!carousel) return;
 
-        const infoModal = document.getElementById('infoModal');
-        const infoModalTitle = document.getElementById('infoModalTitle');
-        const infoModalContent = document.getElementById('infoModalContent');
-        const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            let currentIndex = -1;
 
-        const detailedProjectsModal = document.getElementById('detailedProjectsModal');
-        const closeProjectsModalBtn = document.getElementById('closeProjectsModalBtn');
-
-        const contactModal = document.getElementById('contactModal');
-        const closeContactModalBtn = document.getElementById('closeContactModalBtn');
-
-        const allCards = document.querySelectorAll('.card');
-
-        let cardsVisible = false;
-
-        // Three.js variables
-        let scene, camera, renderer, mesh;
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-        let animationFrameId;
-
-        // Function to initialize Three.js mesh
-        function initMesh() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: meshCanvas, antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-
-            // Create a grid geometry
-            const gridSize = 100;
-            const divisions = 20;
-            const geometry = new THREE.PlaneGeometry(gridSize, gridSize, divisions, divisions);
-
-            // Material for the mesh (lines)
-            const material = new THREE.MeshBasicMaterial({
-                color: 0x8C9EFF, // Light Purple/Blue for the mesh lines
-                wireframe: true,
-                transparent: true,
-                opacity: 0.1 // Initially subtle
-            });
-
-            mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-
-            camera.position.z = 50; // Adjust camera to see the grid
-
-            // Position the mesh in the center
-            mesh.position.set(0, 0, 0);
-        }
-
-        // Animation loop for Three.js mesh
-        function animateMesh() {
-            animationFrameId = requestAnimationFrame(animateMesh);
-
-            // Update mesh rotation based on mouse position
-            targetX += (mouseX - targetX) * 0.02;
-            targetY += (mouseY - targetY) * 0.02;
-
-            mesh.rotation.x = targetY * 0.0001;
-            mesh.rotation.y = targetX * 0.0001;
-
-            renderer.render(scene, camera);
-        }
-
-        // Handle mouse movement for mesh interaction
-        function onMouseMove(event) {
-            mouseX = (event.clientX - windowHalfX);
-            mouseY = (event.clientY - windowHalfY);
-        }
-
-        // Handle window resize for Three.js
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        // Function to open a generic modal
-        function openModal(modalElement, title, content) {
-            if (title && content) {
-                infoModalTitle.textContent = title;
-                infoModalContent.innerHTML = content;
-                modalElement = infoModal;
-            }
-            modalElement.classList.remove('hidden');
-            setTimeout(() => {
-                modalElement.classList.add('visible');
-            }, 10);
-        }
-
-        // Function to close a generic modal
-        function closeModal(modalElement) {
-            modalElement.classList.remove('visible');
-            setTimeout(() => {
-                modalElement.classList.add('hidden');
-            }, 300);
-        }
-
-        // Toggle cards visibility with arrow animation
-        toggleCardsArrow.addEventListener('click', () => {
-            if (cardsVisible) {
-                cardsContainer.classList.remove('visible');
-                toggleCardsArrow.classList.remove('rotated');
-                setTimeout(() => {
-                    cardsContainer.classList.add('hidden');
-                    landingPage.style.opacity = '1';
-                    landingPage.style.filter = 'none';
-                }, 500);
-            } else {
-                cardsContainer.classList.remove('hidden');
-                setTimeout(() => {
-                    cardsContainer.classList.add('visible');
-                    toggleCardsArrow.classList.add('rotated');
-                    landingPage.style.opacity = '0.1';
-                    landingPage.style.filter = 'blur(5px)';
-                }, 10);
-            }
-            cardsVisible = !cardsVisible;
-        });
-
-        // Event listeners for opening specific modals on card click
-        allCards.forEach(card => {
-            card.addEventListener('click', (event) => {
-                if (event.target.tagName === 'BUTTON') {
-                    return;
-                }
-
-                const cardId = card.dataset.cardId;
-
-                if (cardId === 'projects-summary') {
-                    openModal(detailedProjectsModal);
-                } else if (cardId === 'contact-summary') {
-                    openModal(contactModal);
-                } else {
-                    const title = card.querySelector('h2').textContent;
-                    const fullContentDiv = card.querySelector('.full-content');
-                    if (fullContentDiv) {
-                        openModal(infoModal, title, fullContentDiv.innerHTML);
-                    }
+            // Find the current active slide index
+            slides.forEach((slide, index) => {
+                if (slide.classList.contains('active')) {
+                    currentIndex = index;
+                    slide.classList.remove('active');
                 }
             });
-        });
 
-        // Event listeners for closing modals
-        closeInfoModalBtn.addEventListener('click', () => closeModal(infoModal));
-        closeProjectsModalBtn.addEventListener('click', () => closeModal(detailedProjectsModal));
-        closeContactModalBtn.addEventListener('click', () => closeModal(contactModal));
+            // Calculate the new index
+            let newIndex = currentIndex + step;
 
-        // Close modals if clicking outside the modal content
-        infoModal.addEventListener('click', (event) => {
-            if (event.target === infoModal) closeModal(infoModal);
-        });
-        detailedProjectsModal.addEventListener('click', (event) => {
-            if (event.target === detailedProjectsModal) closeModal(detailedProjectsModal);
-        });
-        contactModal.addEventListener('click', (event) => {
-            if (event.target === contactModal) closeModal(contactModal);
-        });
+            // Handle wrap-around (looping)
+            if (newIndex >= slides.length) {
+                newIndex = 0;
+            } else if (newIndex < 0) {
+                newIndex = slides.length - 1;
+            }
 
-        // Initial SVG animation and mesh initialization on page load
+            // Set the new slide to active
+            slides[newIndex].classList.add('active');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            if (helloSvgText) {
-                helloSvgText.style.opacity = '1';
+            // === EXPAND/COLLAPSE FUNCTIONALITY ===
+            document.querySelectorAll('.toggle-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const targetId = header.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
 
-                setTimeout(() => {
-                    welcomeOverlay.style.opacity = '0';
-                    welcomeOverlay.style.visibility = 'hidden';
-                }, 1000);
-            }
+                    // Toggle the visibility of the content
+                    content.classList.toggle('active');
+                    header.classList.toggle('active');
+                });
+            });
 
-            // Initialize Three.js mesh
-            initMesh();
-            animateMesh();
-
-            // Event listeners for mesh interaction
-            landingPage.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('resize', onWindowResize);
+            // === CAROUSEL FUNCTIONALITY SETUP ===
+            // Ensure only the first slide of each carousel is active on load
+            document.querySelectorAll('.carousel').forEach(carousel => {
+                const slides = carousel.querySelectorAll('.carousel-slide');
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active');
+                    if (index === 0 && slides.length > 0) {
+                        slide.classList.add('active');
+                    }
+                });
+            });
         });
     </script>
 </body>
