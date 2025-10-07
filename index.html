@@ -90,32 +90,15 @@
             line-height: 1;
         }
         
-        /* Custom Shape User Image */
+        /* Large Circular User Image */
         .user-image-wrapper {
-            width: 250px; 
-            height: 275px; 
+            width: 250px; /* Enlarged diameter */
+            height: 250px; /* Ensure equal width/height for perfect circle */
             margin-bottom: 25px;
             
-            /* Custom 12-point rounded star shape from the provided image */
-            clip-path: polygon(
-                50% 0%, 
-                61.8% 12.5%, 
-                93.3% 12.5%, 
-                80.8% 25%, 
-                100% 50%, 
-                80.8% 75%, 
-                93.3% 87.5%, 
-                61.8% 87.5%, 
-                50% 100%, 
-                38.2% 87.5%, 
-                6.7% 87.5%, 
-                19.2% 75%, 
-                0% 50%, 
-                19.2% 25%, 
-                6.7% 12.5%, 
-                38.2% 12.5%
-            );
-            
+            clip-path: circle(50% at 50% 50%); /* Simple circle */
+            border-radius: 50%; /* Fallback for older browsers and extra assurance */
+
             border: 8px solid var(--primary-accent); 
             box-shadow: 0 0 30px var(--primary-accent);
             transition: all 0.5s ease-in-out;
@@ -130,7 +113,7 @@
         }
 
         .user-image-wrapper:hover {
-            transform: scale(1.05) rotate(15deg); 
+            transform: scale(1.05); /* No rotation for a clean circle hover */
             box-shadow: 0 0 40px var(--secondary-accent);
         }
         
