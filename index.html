@@ -5,78 +5,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brian Kidiga | Backend Developer Portfolio</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Poller+One&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS Variables for Colors and Animation */
+        :root {
+            --primary-color: #0056b3; /* Deep Blue */
+            --secondary-color: #008cba; /* Lighter Blue */
+            --text-color: #1a1a1a;
+            --light-text: #f4f4f4;
+            --background-start: #1c3a64; /* Dark Blue-Purple */
+            --background-end: #366092; /* Medium Blue */
+        }
+
         /* Basic Reset and Typography */
         body {
-            font-family: sans-serif;
+            font-family: 'Poller One', serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            color: var(--text-color);
+            transition: background-position 1s ease; /* For mouse hover effect */
+            
+            /* Gradient Background Setup */
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            background-size: 200% 200%; /* Larger than viewport for fluid movement */
         }
-        .container {
+
+        /* Gradient Fluid Effect on Mouse Hover (via JS update) */
+        .gradient-active {
+            background-position: var(--mouse-x) var(--mouse-y);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poller One', serif;
+            color: var(--primary-color);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
+        }
+
+        /* Container for content after the header */
+        .content-container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
-        h1, h2, h3 {
-            color: #0056b3;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 5px;
-        }
+        
         section {
             margin-bottom: 40px;
             padding: 20px;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Header/Hero Section (Before Scrolling) */
+        /* === HEADER SECTION (Full Screen) === */
         .hero-section {
-            text-align: center;
-            padding: 50px 20px;
-            background: #e9e9e9;
-            margin-bottom: 0;
+            height: 100vh; /* Fill the entire screen height */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            color: var(--light-text);
         }
+
+        .user-panel {
+            flex: 0 0 25%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .user-panel h1 {
+            color: white;
+            border-bottom: none;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        /* Cool Image Effect */
+        .user-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: url('img/user_profile.jpg') center/cover; /* Replace with your image path */
+            border: 5px solid var(--secondary-color);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+            transition: all 0.5s ease-in-out;
+            margin-bottom: 20px;
+        }
+
+        .user-image:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 30px var(--secondary-color);
+        }
+
+        .project-panel {
+            flex: 0 0 70%;
+            text-align: center;
+        }
+        
+        .project-panel h2 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: none;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
         .recent-project-images {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 20px;
         }
         .recent-project-images img {
-            width: 30%; /* Three images side-by-side */
-            max-width: 250px;
+            width: 30%;
+            max-width: 300px;
             height: auto;
-            border-radius: 4px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            /* Placeholder styling - replace with your actual images */
-            background-color: #aaa; 
-            min-height: 150px; 
-            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .recent-project-images img:hover {
+            transform: translateY(-10px);
         }
 
         /* Expand/Collapse Styling */
         .toggle-header {
             cursor: pointer;
-            background: #f0f0f0;
+            background: #e0e0e0;
             padding: 10px;
-            margin-top: 0;
+            margin-top: 20px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: none; /* Override section H2 style */
+            border-bottom: none; 
+            outline: none; /* Removed grey outline/focus ring */
+            transition: background 0.3s;
+        }
+        .toggle-header:hover {
+            background: #d0d0d0;
         }
         .collapsible-content {
-            /* Initially hide content */
             display: none; 
             padding: 10px 0;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 15px;
         }
         .collapsible-content.active {
-            /* Show content when 'active' class is added by JS */
             display: block; 
         }
         .arrow {
@@ -92,69 +171,83 @@
             max-width: 600px;
             margin: 20px auto;
             overflow: hidden;
-            border: 1px solid #ddd;
-            height: 300px; /* Fixed height for image area */
+            border: 5px solid var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            height: 350px; 
         }
         .carousel {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
             height: 100%;
         }
         .carousel-slide {
             width: 100%;
-            flex-shrink: 0;
-            display: none; /* Hide all slides by default */
             height: 100%;
-            object-fit: contain; /* Ensure image fits within the fixed height */
+            object-fit: contain; 
+            display: none; 
         }
         .carousel-slide.active {
-            display: block; /* Show only the active slide */
+            display: block; 
         }
         .carousel-container button {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 15px 10px;
             cursor: pointer;
             z-index: 10;
+            opacity: 0.8;
+            transition: opacity 0.3s;
         }
-        .carousel-container .prev { left: 0; border-radius: 0 3px 3px 0;}
-        .carousel-container .next { right: 0; border-radius: 3px 0 0 3px;}
+        .carousel-container button:hover {
+            opacity: 1;
+        }
+        .carousel-container .prev { left: 0; border-radius: 0 8px 8px 0;}
+        .carousel-container .next { right: 0; border-radius: 8px 0 0 8px;}
 
         /* Footer */
         footer {
             text-align: center;
             padding: 20px;
-            background: #333;
+            background: var(--primary-color);
             color: white;
             margin-top: 30px;
         }
         footer a {
-            color: lightblue;
+            color: #ffcc00; /* Yellow accent for links */
             text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <header class="hero-section">
-        <h1>Menus - Featured Project</h1>
-        <div class="recent-project-images">
-            <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
-            <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
-            <img src="img/menus_preview_3.jpg" alt="Menus App Screenshot 3">
+    <header class="hero-section" id="hero">
+        <div class="user-panel">
+            <div class="user-image"></div>
+            <h1>BRIAN KIDIGA</h1>
+        </div>
+        
+        <div class="project-panel">
+            <h2>Menus - Featured Project</h2>
+            <div class="recent-project-images">
+                <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
+                <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
+                <img src="img/menus_preview_3.jpg" alt="Menus App Screenshot 3">
+            </div>
         </div>
     </header>
 
-    <main class="container">
+    <main class="content-container">
 
         <section id="about">
             <h2>About Me</h2>
             <p>
-                [cite_start]As a Computer Science graduate, I'm passionate about crafting robust and user-friendly applications and building efficient solutions[cite: 27]. [cite_start]My experience spans from Android app development, integrations, to getting insights from data that drive businesses[cite: 28]. [cite_start]I thrive on solving problems and continuously learning new technologies[cite: 29].
+                As a **Computer Science graduate**, I'm passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from **Android app development**, integrations, to getting insights from data that drive businesses. I thrive on **solving problems** and continuously learning new technologies.
             </p>
         </section>
 
@@ -163,30 +256,30 @@
             <div id="skills-content" class="collapsible-content">
                 <h3>Development & APIs</h3>
                 <ul>
-                    [cite_start]<li>Android Development (Java/Kotlin) [cite: 13, 14]</li>
-                    [cite_start]<li>Rest API [cite: 15]</li>
-                    [cite_start]<li>GraphQL [cite: 17]</li>
+                    <li>Android Development (Java/Kotlin)</li>
+                    <li>Rest API</li>
+                    <li>GraphQL</li>
                 </ul>
                 <h3>Databases</h3>
                 <ul>
-                    [cite_start]<li>SQL & No SQL [cite: 16]</li>
+                    <li>SQL & No SQL</li>
                 </ul>
                 <h3>Frameworks & Technologies</h3>
                 <ul>
-                    [cite_start]<li>Spring boot [cite: 19]</li>
-                    [cite_start]<li>Node JS [cite: 20]</li>
-                    [cite_start]<li>Elastic Search [cite: 21]</li>
-                    [cite_start]<li>Docker & Containerization [cite: 22]</li>
+                    <li>Spring boot</li>
+                    <li>Node JS</li>
+                    <li>Elastic Search</li>
+                    <li>Docker & Containerization</li>
                 </ul>
                 <h3>Tools & Version Control</h3>
                 <ul>
-                    [cite_start]<li>PostMan/Insomnia/httpie [cite: 18]</li>
-                    [cite_start]<li>Git/Gitlab/Github [cite: 23]</li>
+                    <li>PostMan/Insomnia/httpie</li>
+                    <li>Git/Gitlab/Github</li>
                 </ul>
                 <h3>Languages</h3>
                 <ul>
-                    [cite_start]<li>English: Fluent [cite: 25]</li>
-                    [cite_start]<li>Swahili: Fluent [cite: 25]</li>
+                    <li>English: Fluent</li>
+                    <li>Swahili: Fluent</li>
                 </ul>
             </div>
         </section>
@@ -197,22 +290,22 @@
                 
                 <div class="job">
                     <h3>Pseudo (Founder & CTO)</h3>
-                    [cite_start]<p class="period">2025 [cite: 34]</p>
+                    <p class="period">2025</p>
                     <ul>
-                        [cite_start]<li>Launched a start-up alias pseudo[cite: 33].</li>
-                        [cite_start]<li>Deployed a mobile tool for travelers, **Tow**, assuring travelers and EV drivers access to vital services when needed[cite: 35].</li>
-                        [cite_start]<li>Initiated development of **Menus**, an online application designed to help accelerate the online sale of restaurants and boost interactivity[cite: 36].</li>
+                        <li>Launched a start-up alias pseudo.</li>
+                        <li>Deployed a mobile tool for travelers, **Tow**, assuring travelers and EV drivers access to vital services when needed.</li>
+                        <li>Initiated development of **Menus**, an online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
                     </ul>
                 </div>
 
                 <div class="job">
                     <h3>Android Developer Intern</h3>
-                    [cite_start]<p class="period">May - November 2024 [cite: 39]</p>
+                    <p class="period">May - November 2024</p>
                     <ul>
-                        [cite_start]<li>My milestone was **translation**, which had the app in native languages associated with different locales[cite: 43].</li>
-                        [cite_start]<li>Integrated a **currency conversion** feature into the main app to allow clients to easily make payments from different locales[cite: 43].</li>
-                        [cite_start]<li>Optimized and reduced the app size after performing analysis[cite: 44].</li>
-                        [cite_start]<li>Initially assisted in minor tasks like documentation and testing[cite: 41].</li>
+                        <li>My milestone was **translation**, which had the app in native languages associated with different locales.</li>
+                        <li>Integrated a **currency conversion** feature into the main app to allow clients to easily make payments from different locales.</li>
+                        <li>Optimized and reduced the app size after performing analysis.</li>
+                        <li>Initially assisted in minor tasks like documentation and testing.</li>
                     </ul>
                 </div>
             </div>
@@ -220,12 +313,12 @@
 
         <section id="projects">
             <h2>Projects</h2>
-            [cite_start]<p>All my projects are available from my Github profile[cite: 46].</p>
+            <p>All my projects are available from my Github profile.</p>
 
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-menus">Menus <span class="arrow">▼</span></h3>
                 <div id="project-menus" class="collapsible-content">
-                    [cite_start]<p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing[cite: 47].</p>
+                    <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="menus">
                             <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
@@ -241,7 +334,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
                 <div id="project-sage" class="collapsible-content">
-                    [cite_start]<p>A document repository that allows for online document sharing[cite: 48]. [cite_start]It allows users to fully interact with documents without having to read all of it[cite: 49].</p>
+                    <p>A document repository that allows for online document sharing. It allows users to fully interact with documents without having to read all of it.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="sage">
                             <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
@@ -256,7 +349,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
                 <div id="project-tow" class="collapsible-content">
-                    [cite_start]<p>An online application used as a toolkit for drivers and travelers[cite: 50]. [cite_start]It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries[cite: 51].</p>
+                    <p>An online application used as a toolkit for drivers and travelers. It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="tow">
                             <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
@@ -272,16 +365,16 @@
         <section id="education">
             <h2>Education</h2>
             <ul>
-                <li>BSc. [cite_start]Computer Science [cite: 11]</li>
-                [cite_start]<li>GPA: 3.8 [cite: 11]</li>
+                <li>BSc. Computer Science</li>
+                <li>GPA: 3.8</li>
             </ul>
         </section>
 
     </main>
 
     <footer>
-        [cite_start]<p>Location: Nairobi, Kenya [cite: 6]</p>
-        [cite_start]<p>Github: <a href="https://kdbrian.github.io" target="_blank">kdbrian.github.io [cite: 7]</a></p>
+        <p>Location: Nairobi, Kenya</p>
+        <p>Github: <a href="https://kdbrian.github.io" target="_blank">kdbrian.github.io</a></p>
         <p>LinkedIn: <a href="[YOUR LINKEDIN URL]" target="_blank">[YOUR LINKEDIN URL]</a></p>
     </footer>
 
@@ -339,6 +432,20 @@
                         slide.classList.add('active');
                     }
                 });
+            });
+            
+            // === GRADIENT FLUID EFFECT (Mouse Hover) ===
+            const body = document.body;
+            body.addEventListener('mousemove', (e) => {
+                // Calculate position based on mouse coordinates relative to the viewport
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                // Map the normalized position (0 to 1) to a background position (0% to 100%)
+                const backgroundX = (x * 100) + '%';
+                const backgroundY = (y * 100) + '%';
+                
+                body.style.backgroundPosition = `${backgroundX} ${backgroundY}`;
             });
         });
     </script>
