@@ -15,7 +15,7 @@
             --secondary-accent: #FE6847; /* Orange-Red */
             --text-color: #070707; /* Black */
             --content-background: #FEFAE0; /* Creamy White */
-            --footer-bg: #070707; /* Dark Footer */
+            --footer-bg: #070707; 
             
             /* Gradient Background Setup */
             --gradient-light: #FFEE93; 
@@ -32,14 +32,14 @@
             overflow-x: hidden; 
             min-height: 100vh;
             
-            /* Initial Radial Gradient */
+            /* Initial Radial Gradient (Full Visibility) */
             background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
-            background-size: 200% 200%; /* Larger for smooth fluid movement */
-            transition: background 0.2s ease-out; /* Smooth follow effect */
-            position: relative; /* Needed for mesh overlay */
+            background-size: 200% 200%;
+            transition: background 0.2s ease-out; 
+            position: relative; 
         }
         
-        /* === SEMI-TRANSPARENT MESH OVERLAY === */
+        /* === SEMI-TRANSPARENT MESH OVERLAY (Gridlines) === */
         body::before {
             content: "";
             position: fixed;
@@ -47,14 +47,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Behind content, above gradient */
-            opacity: 0.1; 
-            /* Simple diagonal line pattern */
-            background-image: linear-gradient(45deg, var(--text-color) 25%, transparent 25%, transparent 75%, var(--text-color) 75%),
-                              linear-gradient(45deg, var(--text-color) 25%, transparent 25%, transparent 75%, var(--text-color) 75%);
-            background-size: 50px 50px; /* Size of the grid cells */
-            background-position: 0 0, 25px 25px; 
-            pointer-events: none; /* Allows mouse events to pass through */
+            z-index: -1; 
+            opacity: 0.05; /* Less visible than the gradient */
+            
+            /* Gridline Pattern */
+            background-image: 
+                linear-gradient(to right, var(--text-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--text-color) 1px, transparent 1px);
+            background-size: 30px 30px; 
+            pointer-events: none; 
         }
 
 
@@ -78,7 +79,7 @@
             color: var(--secondary-accent);
             border-bottom: 2px solid var(--primary-accent);
             padding-bottom: 5px;
-            /* Text shadow removed */
+            /* Text shadow intentionally removed */
         }
 
 
@@ -105,33 +106,33 @@
             color: var(--text-color);
             border-bottom: none;
             margin-bottom: 15px;
-            font-size: 3.5em; /* Larger name */
+            font-size: 4em; /* Name enlarged */
             line-height: 1;
         }
         
-        /* Cool Complex Image Shape (Hexagon) and Size Increase */
+        /* Enlarged Hexagon Image */
         .user-image {
-            width: 200px; /* Enlarged */
-            height: 220px; /* Adjusted height for hexagon shape */
+            width: 250px; /* Enlarged */
+            height: 275px; /* Proportional height adjustment */
             background: url('img/user_profile.jpg') center/cover;
             background-color: #d3d3d3; 
-            border: 5px solid var(--primary-accent);
-            box-shadow: 0 0 20px rgba(7,7,7, 0.5);
+            border: 8px solid var(--primary-accent); /* Border enlarged */
+            box-shadow: 0 0 30px rgba(7,7,7, 0.5);
             transition: all 0.5s ease-in-out;
             margin-bottom: 25px;
             
-            /* Hexagon Shape using clip-path */
+            /* Hexagon Shape */
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
         }
 
         .user-image:hover {
             transform: scale(1.05) rotate(3deg);
-            box-shadow: 0 0 30px var(--secondary-accent);
+            box-shadow: 0 0 40px var(--secondary-accent);
         }
         
         /* Dynamic Tagline */
         .tagline-container {
-            height: 40px; /* Fixed height for swapping */
+            height: 40px; 
             overflow: hidden;
             font-size: 1.5em;
             color: var(--secondary-accent);
@@ -147,28 +148,50 @@
             transform: translateY(0);
         }
 
-
-        .project-panel {
-            flex: 0 0 60%;
-            text-align: center;
+        /* Expand/Collapse Styling */
+        .toggle-header {
+            cursor: pointer;
+            background: var(--content-background);
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--primary-accent); 
+            outline: none; 
+            transition: background 0.3s;
         }
-        
-        .project-panel h2 {
-            color: var(--text-color);
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            border-bottom: none;
+        .collapsible-content {
+            /* Toggling starts with display: none and toggles to display: block */
+            display: none; 
+            padding: 10px 0;
+            border-left: 3px solid var(--secondary-accent);
+            padding-left: 15px;
+        }
+        .collapsible-content.active {
+            display: block; 
         }
 
-        /* Footer */
+
+        /* === FLOATING FOOTER === */
         footer {
+            /* Position footer at the bottom of the viewport, but fixed */
+            position: fixed;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 20px;
+            padding: 20px 30px; /* Padding for size and content separation */
+            
             background: var(--footer-bg);
             color: white;
-            margin-top: 30px;
+            border-radius: 20px; /* Rounded corners */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); /* Floating effect */
+            z-index: 100; /* Ensure it floats above other content */
         }
         .footer-links {
             display: flex;
@@ -178,7 +201,7 @@
         .footer-links a {
             color: var(--primary-accent); 
             text-decoration: none;
-            font-size: 1.2em;
+            font-size: 1.4em; /* Slightly larger icons */
             transition: color 0.3s;
         }
         .footer-links a:hover {
@@ -341,8 +364,8 @@
         <section id="education">
             <h2>Education</h2>
             <ul>
-                <li>BSc. Computer Science</li>
-                <li>GPA: 3.8</li>
+                <li>**BSc. Computer Science**</li>
+                <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
             </ul>
         </section>
 
@@ -361,11 +384,10 @@
     </footer>
 
     <script>
-        // === CAROUSEL MOVEMENT FUNCTION (Remains the same) ===
+        // === CAROUSEL MOVEMENT FUNCTION ===
         function moveSlide(projectName, step) {
             const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
             if (!carousel) return;
-
             const slides = carousel.querySelectorAll('.carousel-slide');
             let currentIndex = -1;
 
@@ -377,7 +399,6 @@
             });
 
             let newIndex = currentIndex + step;
-
             if (newIndex >= slides.length) {
                 newIndex = 0;
             } else if (newIndex < 0) {
@@ -394,12 +415,13 @@
                     const targetId = header.getAttribute('data-target');
                     const content = document.getElementById(targetId);
 
+                    // This ensures the initial state is hidden and it toggles correctly.
                     content.classList.toggle('active');
                     header.classList.toggle('active');
                 });
             });
 
-            // === CAROUSEL FUNCTIONALITY SETUP ===
+            // Initial carousel setup
             document.querySelectorAll('.carousel').forEach(carousel => {
                 const slides = carousel.querySelectorAll('.carousel-slide');
                 slides.forEach((slide, index) => {
@@ -413,15 +435,13 @@
             // === GRADIENT FLUID EFFECT (Full Page Mouse Pointer Tracking) ===
             const body = document.body;
             function updateGradientPosition(e) {
-                // Get normalized mouse position (0 to 100)
                 const x = (e.clientX / window.innerWidth) * 100;
                 const y = (e.clientY / window.innerHeight) * 100;
                 
-                // Set the center of the radial gradient to the mouse position
+                // Update the radial gradient center point
                 body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
             }
             
-            // Apply tracking to the entire body
             body.addEventListener('mousemove', updateGradientPosition);
 
             // === DYNAMIC TAGLINE SWAPPER ===
@@ -442,14 +462,12 @@
                     taglineElement.classList.add('active');
                     taglineElement.style.transform = 'translateY(0)';
 
-                    // Move to the next tagline
                     taglineIndex = (taglineIndex + 1) % taglines.length;
-                }, 500); // Wait for half a second (CSS transition time)
+                }, 500);
             }
 
-            // Start the rotation and initial setup
             swapTagline();
-            setInterval(swapTagline, 3000); // Swap every 3 seconds
+            setInterval(swapTagline, 3000); 
         });
     </script>
 </body>
