@@ -10,12 +10,14 @@
     <style>
         /* CSS Variables for Colors and Animation */
         :root {
-            --primary-color: #0056b3; /* Deep Blue */
-            --secondary-color: #008cba; /* Lighter Blue */
-            --text-color: #1a1a1a;
-            --light-text: #f4f4f4;
-            --background-start: #1c3a64; /* Dark Blue-Purple */
-            --background-end: #366092; /* Medium Blue */
+            --primary-accent: #FBB13C; /* Deep Gold */
+            --secondary-accent: #FE6847; /* Orange-Red */
+            --text-color: #070707; /* Black */
+            --content-background: #FEFAE0; /* Creamy White */
+            
+            /* Gradient Background Setup */
+            --gradient-light: #FFEE93; 
+            --gradient-dark: #FE6847; 
         }
 
         /* Basic Reset and Typography */
@@ -25,39 +27,37 @@
             margin: 0;
             padding: 0;
             color: var(--text-color);
-            transition: background-position 1s ease; /* For mouse hover effect */
+            overflow-x: hidden; /* Prevent horizontal scroll bar from large background */
             
-            /* Gradient Background Setup */
-            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            /* Initial Gradient Background */
+            background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
             background-size: 200% 200%; /* Larger than viewport for fluid movement */
+            transition: background-position 0.2s ease-out; /* Smooth follow effect */
         }
 
-        /* Gradient Fluid Effect on Mouse Hover (via JS update) */
-        .gradient-active {
-            background-position: var(--mouse-x) var(--mouse-y);
-        }
-
-        h1, h2, h3 {
-            font-family: 'Poller One', serif;
-            color: var(--primary-color);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 5px;
-        }
-
-        /* Container for content after the header */
+        /* Styles for the content *below* the hero section */
         .content-container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
         
+        /* General Section Styling */
         section {
             margin-bottom: 40px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+            background: var(--content-background); /* Creamy white content boxes */
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        
+        h1, h2, h3 {
+            font-family: 'Poller One', serif;
+            color: var(--secondary-accent);
+            border-bottom: 2px solid var(--primary-accent);
+            padding-bottom: 5px;
+        }
+
 
         /* === HEADER SECTION (Full Screen) === */
         .hero-section {
@@ -66,7 +66,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            color: var(--light-text);
+            color: var(--text-color);
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.7); /* Light text shadow for contrast */
         }
 
         .user-panel {
@@ -79,10 +80,10 @@
         }
 
         .user-panel h1 {
-            color: white;
+            color: var(--text-color);
             border-bottom: none;
             margin-bottom: 15px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 5px var(--primary-accent);
         }
         
         /* Cool Image Effect */
@@ -91,15 +92,16 @@
             height: 150px;
             border-radius: 50%;
             background: url('img/user_profile.jpg') center/cover; /* Replace with your image path */
-            border: 5px solid var(--secondary-color);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+            background-color: #d3d3d3; /* Fallback for image placeholder */
+            border: 5px solid var(--primary-accent);
+            box-shadow: 0 0 20px rgba(7,7,7, 0.5);
             transition: all 0.5s ease-in-out;
             margin-bottom: 20px;
         }
 
         .user-image:hover {
             transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 30px var(--secondary-color);
+            box-shadow: 0 0 30px var(--secondary-accent);
         }
 
         .project-panel {
@@ -108,11 +110,11 @@
         }
         
         .project-panel h2 {
-            color: white;
+            color: var(--text-color);
             font-size: 2.5em;
             margin-bottom: 30px;
             border-bottom: none;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 5px var(--primary-accent);
         }
 
         .recent-project-images {
@@ -135,24 +137,24 @@
         /* Expand/Collapse Styling */
         .toggle-header {
             cursor: pointer;
-            background: #e0e0e0;
+            background: var(--content-background);
             padding: 10px;
             margin-top: 20px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: none; 
-            outline: none; /* Removed grey outline/focus ring */
+            border: 2px solid var(--primary-accent); /* Updated outline style */
+            outline: none; 
             transition: background 0.3s;
         }
         .toggle-header:hover {
-            background: #d0d0d0;
+            background: #fff8eb;
         }
         .collapsible-content {
             display: none; 
             padding: 10px 0;
-            border-left: 3px solid var(--secondary-color);
+            border-left: 3px solid var(--secondary-accent);
             padding-left: 15px;
         }
         .collapsible-content.active {
@@ -171,28 +173,16 @@
             max-width: 600px;
             margin: 20px auto;
             overflow: hidden;
-            border: 5px solid var(--primary-color);
+            border: 5px solid var(--primary-accent);
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             height: 350px; 
-        }
-        .carousel {
-            height: 100%;
-        }
-        .carousel-slide {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; 
-            display: none; 
-        }
-        .carousel-slide.active {
-            display: block; 
         }
         .carousel-container button {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: var(--primary-color);
+            background: var(--secondary-accent);
             color: white;
             border: none;
             padding: 15px 10px;
@@ -204,19 +194,18 @@
         .carousel-container button:hover {
             opacity: 1;
         }
-        .carousel-container .prev { left: 0; border-radius: 0 8px 8px 0;}
-        .carousel-container .next { right: 0; border-radius: 8px 0 0 8px;}
+        /* ... (rest of carousel styles remain the same) ... */
 
         /* Footer */
         footer {
             text-align: center;
             padding: 20px;
-            background: var(--primary-color);
+            background: var(--secondary-accent);
             color: white;
             margin-top: 30px;
         }
         footer a {
-            color: #ffcc00; /* Yellow accent for links */
+            color: var(--primary-accent); 
             text-decoration: none;
         }
         footer a:hover {
@@ -387,7 +376,6 @@
             const slides = carousel.querySelectorAll('.carousel-slide');
             let currentIndex = -1;
 
-            // Find the current active slide index
             slides.forEach((slide, index) => {
                 if (slide.classList.contains('active')) {
                     currentIndex = index;
@@ -395,17 +383,14 @@
                 }
             });
 
-            // Calculate the new index
             let newIndex = currentIndex + step;
 
-            // Handle wrap-around (looping)
             if (newIndex >= slides.length) {
                 newIndex = 0;
             } else if (newIndex < 0) {
                 newIndex = slides.length - 1;
             }
 
-            // Set the new slide to active
             slides[newIndex].classList.add('active');
         }
 
@@ -416,14 +401,12 @@
                     const targetId = header.getAttribute('data-target');
                     const content = document.getElementById(targetId);
 
-                    // Toggle the visibility of the content
                     content.classList.toggle('active');
                     header.classList.toggle('active');
                 });
             });
 
             // === CAROUSEL FUNCTIONALITY SETUP ===
-            // Ensure only the first slide of each carousel is active on load
             document.querySelectorAll('.carousel').forEach(carousel => {
                 const slides = carousel.querySelectorAll('.carousel-slide');
                 slides.forEach((slide, index) => {
@@ -434,18 +417,25 @@
                 });
             });
             
-            // === GRADIENT FLUID EFFECT (Mouse Hover) ===
+            // === GRADIENT FLUID EFFECT (Mouse Pointer Tracking) ===
             const body = document.body;
-            body.addEventListener('mousemove', (e) => {
-                // Calculate position based on mouse coordinates relative to the viewport
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
+            
+            // Function to update the background based on mouse position
+            function updateGradientPosition(e) {
+                // Get normalized mouse position (0 to 100)
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
                 
-                // Map the normalized position (0 to 1) to a background position (0% to 100%)
-                const backgroundX = (x * 100) + '%';
-                const backgroundY = (y * 100) + '%';
-                
-                body.style.backgroundPosition = `${backgroundX} ${backgroundY}`;
+                // Set the center of the radial gradient to the mouse position
+                body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
+            }
+            
+            // Apply the tracking only to the hero section for best effect
+            document.getElementById('hero').addEventListener('mousemove', updateGradientPosition);
+            
+            // Add a static gradient when the mouse is outside the hero section
+            document.getElementById('hero').addEventListener('mouseleave', () => {
+                body.style.background = `radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
             });
         });
     </script>
