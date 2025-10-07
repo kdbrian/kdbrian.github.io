@@ -9,17 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS Variables for Colors and Animation */
+        /* CSS Variables for Darker Palette */
         :root {
             --primary-accent: #FBB13C; /* Deep Gold */
             --secondary-accent: #FE6847; /* Orange-Red */
-            --text-color: #070707; /* Black */
-            --content-background: #FEFAE0; /* Creamy White */
-            --footer-bg: #070707; 
+            --text-dark: #333333; /* Dark Gray Text for Content */
+            --text-light: #FFFFFF; /* White Text for Hero/Footer */
+            --content-background: #F0F0F0; /* Light Content Boxes */
+            --footer-bg: #1D2B40; /* Dark Footer */
             
-            /* Gradient Background Setup */
-            --gradient-light: #FFEE93; 
-            --gradient-dark: #FE6847; 
+            /* Dark Gradient Background Setup */
+            --gradient-light: #0A5C63; /* Dark Teal */
+            --gradient-dark: #1D2B40; /* Dark Blue-Purple */
         }
 
         /* Basic Reset and Typography */
@@ -28,7 +29,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            color: var(--text-color);
+            color: var(--text-dark); /* Default text color is dark */
             overflow-x: hidden; 
             min-height: 100vh;
             
@@ -38,10 +39,6 @@
             transition: background 0.2s ease-out; 
             position: relative; 
         }
-        
-        /* === MESH BACKGROUND REMOVED === */
-        /* body::before rules are completely removed */
-
 
         /* Content Container and Sections */
         .content-container {
@@ -55,7 +52,7 @@
             padding: 20px;
             background: var(--content-background); 
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Increased shadow for better floating effect on dark background */
         }
         
         h2, h3 {
@@ -63,7 +60,6 @@
             color: var(--secondary-accent);
             border-bottom: 2px solid var(--primary-accent);
             padding-bottom: 5px;
-            /* Text shadow intentionally removed */
         }
 
 
@@ -74,7 +70,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            color: var(--text-color);
+            color: var(--text-light); /* Light text on dark background */
         }
 
         .user-panel {
@@ -87,34 +83,54 @@
         }
 
         .user-panel h1 {
-            color: var(--text-color);
+            color: var(--text-light);
             border-bottom: none;
             margin-bottom: 15px;
-            font-size: 4em; /* Name enlarged */
+            font-size: 4em;
             line-height: 1;
         }
         
-        /* Enlarged Hexagon User Image */
+        /* Custom Shape User Image */
         .user-image-wrapper {
-            width: 250px; /* Base for the image */
+            width: 250px; 
             height: 275px; 
             margin-bottom: 25px;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            border: 8px solid var(--primary-accent); /* Border around the clipped image */
-            box-shadow: 0 0 30px rgba(7,7,7, 0.5);
+            
+            /* Custom 12-point rounded star shape from the provided image */
+            clip-path: polygon(
+                50% 0%, 
+                61.8% 12.5%, 
+                93.3% 12.5%, 
+                80.8% 25%, 
+                100% 50%, 
+                80.8% 75%, 
+                93.3% 87.5%, 
+                61.8% 87.5%, 
+                50% 100%, 
+                38.2% 87.5%, 
+                6.7% 87.5%, 
+                19.2% 75%, 
+                0% 50%, 
+                19.2% 25%, 
+                6.7% 12.5%, 
+                38.2% 12.5%
+            );
+            
+            border: 8px solid var(--primary-accent); 
+            box-shadow: 0 0 30px var(--primary-accent);
             transition: all 0.5s ease-in-out;
-            overflow: hidden; /* Ensure image respects clip-path */
+            overflow: hidden; 
         }
 
         .user-image-wrapper img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the wrapper while maintaining aspect ratio */
-            display: block; /* Remove extra space below image */
+            object-fit: cover; 
+            display: block; 
         }
 
         .user-image-wrapper:hover {
-            transform: scale(1.05) rotate(3deg);
+            transform: scale(1.05) rotate(15deg); 
             box-shadow: 0 0 40px var(--secondary-accent);
         }
         
@@ -123,7 +139,7 @@
             height: 40px; 
             overflow: hidden;
             font-size: 1.5em;
-            color: var(--secondary-accent);
+            color: var(--primary-accent); 
         }
         .tagline {
             display: block;
@@ -146,7 +162,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid var(--primary-accent); 
+            border: 2px solid var(--secondary-accent); 
             outline: none; 
             transition: background 0.3s;
         }
@@ -171,18 +187,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 30px; 
+            padding: 15px 30px; 
             
             background: var(--footer-bg);
-            color: white;
+            color: var(--text-light);
             border-radius: 20px; 
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6); 
             z-index: 100; 
         }
         .footer-links {
             display: flex;
             gap: 25px;
-            margin-top: 15px;
         }
         .footer-links a {
             color: var(--primary-accent); 
@@ -193,16 +208,6 @@
         .footer-links a:hover {
             color: var(--secondary-accent);
         }
-        .footer-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            color: var(--content-background);
-        }
-        .footer-info i {
-            margin-right: 10px;
-            font-size: 1.5em;
-        }
     </style>
 </head>
 <body>
@@ -210,7 +215,7 @@
     <header class="hero-section" id="hero">
         <div class="user-panel">
             <div class="user-image-wrapper">
-                <img src="uppy/user_profile.jpg" alt="Brian Kidiga Profile Picture">
+                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
             </div>
             <h1>BRIAN KIDIGA</h1>
             
@@ -220,7 +225,7 @@
         </div>
         
         <div class="project-panel">
-            <h2>Menus - Featured Project</h2>
+            <h2 style="color: var(--text-light); border-bottom: none;">Menus - Featured Project</h2>
             <div class="recent-project-images">
                 <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
                 <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
@@ -234,7 +239,7 @@
         <section id="about">
             <h2>About Me</h2>
             <p>
-                As a **Computer Science graduate**, I'm passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from **Android app development**, integrations, to getting insights from data that drive businesses. I thrive on **solving problems** and continuously learning new technologies.
+                As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from Android app development, integrations, to getting insights from data that drive businesses. I thrive on solving problems and continuously learning new technologies.
             </p>
         </section>
 
@@ -280,8 +285,8 @@
                     <p class="period">2025</p>
                     <ul>
                         <li>Launched a start-up alias pseudo.</li>
-                        <li>Deployed a mobile tool for travelers, **Tow**, assuring travelers and EV drivers access to vital services when needed.</li>
-                        <li>Initiated development of **Menus**, an online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
+                        <li>Deployed a mobile tool for travelers Tow. Assured travelers and EV drivers access to vital services when needed.</li>
+                        <li>Initiated development of Menus. An online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
                     </ul>
                 </div>
 
@@ -289,8 +294,8 @@
                     <h3>Android Developer Intern</h3>
                     <p class="period">May - November 2024</p>
                     <ul>
-                        <li>My milestone was **translation**, which had the app in native languages associated with different locales.</li>
-                        <li>Integrated a **currency conversion** feature into the main app to allow clients to easily make payments from different locales.</li>
+                        <li>My milestone was translation, which had the app in native languages associated with different locales.</li>
+                        <li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales.</li>
                         <li>Optimized and reduced the app size after performing analysis.</li>
                         <li>Initially assisted in minor tasks like documentation and testing.</li>
                     </ul>
@@ -321,7 +326,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
                 <div id="project-sage" class="collapsible-content">
-                    <p>A document repository that allows for online document sharing. It allows users to fully interact with documents without having to read all of it.</p>
+                    <p>A document repository that allows for online document sharing. Whilist allowing users to fully interact with documents without havin to read all of it.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="sage">
                             <img src="img/sage_1.jpg" alt="Sage Screenshot 1">
@@ -336,7 +341,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
                 <div id="project-tow" class="collapsible-content">
-                    <p>An online application used as a toolkit for drivers and travelers. It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries.</p>
+                    <p>An online application used as a toolkit for drivers and travelers. Allows for discovery of closest Tow trucks services, mechanic services, and Eateries.</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="tow">
                             <img src="img/tow_1.jpg" alt="Tow Screenshot 1">
@@ -352,7 +357,7 @@
         <section id="education">
             <h2>Education</h2>
             <ul>
-                <li>**BSc. Computer Science**</li>
+                <li>BSc. Computer Science</li>
                 <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
             </ul>
         </section>
@@ -360,14 +365,10 @@
     </main>
 
     <footer>
-        <div class="footer-info">
-            <i class="fas fa-map-marker-alt"></i>
-            <p>Nairobi, Kenya</p>
-        </div>
         <div class="footer-links">
-            <a href="[YOUR LINKEDIN URL]" target="_blank" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i> LinkedIn</a>
-            <a href="https://kdbrian.github.io" target="_blank" aria-label="GitHub Profile"><i class="fab fa-github"></i> GitHub</a>
-            <a href="[YOUR MEDIUM URL]" target="_blank" aria-label="Medium Profile"><i class="fab fa-medium"></i> Medium</a>
+            <a href="[YOUR LINKEDIN URL]" target="_blank" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
+            <a href="https://kdbrian.github.io" target="_blank" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
+            <a href="[YOUR MEDIUM URL]" target="_blank" aria-label="Medium Profile"><i class="fab fa-medium"></i></a>
         </div>
     </footer>
 
