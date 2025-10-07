@@ -13,9 +13,9 @@
         :root {
             --primary-accent: #FBB13C; /* Deep Gold */
             --secondary-accent: #FE6847; /* Orange-Red */
-            --text-dark: #333333; /* Dark Gray Text for Content */
+            --text-dark: #E0E0E0; /* Lighter text for dark background */
             --text-light: #FFFFFF; /* White Text for Hero/Footer */
-            --content-background: #F0F0F0; /* Light Content Boxes */
+            --content-background: #2A2A2A; /* Darker content boxes */
             --footer-bg: #1D2B40; /* Dark Footer */
             
             /* Dark Gradient Background Setup */
@@ -52,7 +52,7 @@
             padding: 20px;
             background: var(--content-background); 
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Increased shadow for better floating effect on dark background */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7); /* Stronger shadow for dark theme */
         }
         
         h2, h3 {
@@ -99,8 +99,8 @@
             clip-path: circle(50% at 50% 50%); /* Simple circle */
             border-radius: 50%; /* Fallback for older browsers and extra assurance */
 
-            border: 8px solid var(--primary-accent); 
-            box-shadow: 0 0 30px var(--primary-accent);
+            border: none; /* Removed border */
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); /* Subtle light glow for dark theme */
             transition: all 0.5s ease-in-out;
             overflow: hidden; 
         }
@@ -114,7 +114,7 @@
 
         .user-image-wrapper:hover {
             transform: scale(1.05); /* No rotation for a clean circle hover */
-            box-shadow: 0 0 40px var(--secondary-accent);
+            box-shadow: 0 0 40px var(--primary-accent); /* Accent color on hover */
         }
         
         /* Dynamic Tagline */
@@ -135,10 +135,19 @@
             transform: translateY(0);
         }
 
+        /* Featured Project Title Larger */
+        .project-panel h2 {
+            font-size: 3em; /* Made larger */
+            margin-bottom: 30px;
+            color: var(--text-light); /* Ensure light text on dark background */
+            border-bottom: none; /* Already none, but reiterating for clarity */
+        }
+
         /* Expand/Collapse Styling */
         .toggle-header {
             cursor: pointer;
             background: var(--content-background);
+            color: var(--text-dark); /* Ensure text is visible in header */
             padding: 10px;
             margin-top: 20px;
             border-radius: 4px;
@@ -198,7 +207,7 @@
     <header class="hero-section" id="hero">
         <div class="user-panel">
             <div class="user-image-wrapper">
-                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
+                <img src="uppy/user_profile.jpg" alt="Brian Kidiga Profile Picture">
             </div>
             <h1>BRIAN KIDIGA</h1>
             
@@ -208,7 +217,7 @@
         </div>
         
         <div class="project-panel">
-            <h2 style="color: var(--text-light); border-bottom: none;">Menus - Featured Project</h2>
+            <h2>Menus - Featured Project</h2>
             <div class="recent-project-images">
                 <img src="img/menus_preview_1.jpg" alt="Menus App Screenshot 1">
                 <img src="img/menus_preview_2.jpg" alt="Menus App Screenshot 2">
