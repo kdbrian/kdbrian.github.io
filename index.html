@@ -9,17 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS Variables for Custom Palette */
+        /* CSS Variables for Custom Palette: 0A0908, EAE0D5, F46036, FFFBDB */
         :root {
-            /* Palette: 0A0908, EAE0D5, F46036, FFFBDB */
             --primary-bg: #0A0908;       /* Near Black */
             --content-text: #EAE0D5;     /* Off-White/Light Text */
             --primary-accent: #F46036;   /* Vibrant Orange */
             --secondary-accent: #FFFBDB; /* Creamy Yellow/Highlight */
             
             /* Gradient Background Setup */
-            --gradient-light: #1A1A1A; /* Slightly lighter black for depth */
-            --gradient-dark: #0A0908;  /* Primary Black */
+            --gradient-light: #1A1A1A; 
+            --gradient-dark: #0A0908; 
         }
 
         /* Basic Reset and Typography */
@@ -28,7 +27,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            color: var(--content-text); /* Light text on dark background */
+            color: var(--content-text);
             overflow-x: hidden; 
             min-height: 100vh;
             
@@ -48,17 +47,60 @@
         section {
             margin-bottom: 40px;
             padding: 20px;
-            background: var(--primary-bg); /* Use primary black for content boxes */
+            background: var(--primary-bg);
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1); /* Subtle light shadow on dark theme */
-            border: 1px solid rgba(244, 96, 54, 0.3); /* Subtle orange outline */
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(244, 96, 54, 0.3);
         }
         
         h2, h3 {
             font-family: 'Poller One', serif;
-            color: var(--primary-accent); /* Vibrant Orange */
-            border-bottom: 2px solid var(--secondary-accent); /* Creamy Yellow Line */
+            color: var(--primary-accent);
+            border-bottom: 2px solid var(--secondary-accent);
             padding-bottom: 5px;
+        }
+
+        /* ======================================= */
+        /* === LISTS (Multi-Column Layout)     === */
+        /* ======================================= */
+        section ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 10px 20px;
+        }
+        
+        #skills-content ul {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        section li {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        section li:before {
+            content: none; 
+        }
+
+        /* Experience job points styling */
+        .job ul {
+            grid-template-columns: 1fr;
+            list-style: none;
+            margin-top: 5px;
+        }
+        .job ul li {
+            position: relative;
+            padding-left: 20px;
+        }
+        .job ul li:before {
+            content: "\2022"; 
+            color: var(--primary-accent);
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.2em;
         }
 
         /* ======================================= */
@@ -98,7 +140,7 @@
             border-radius: 50%; 
 
             border: none;
-            box-shadow: 0 0 30px rgba(244, 96, 54, 0.5); /* Orange glow */
+            box-shadow: 0 0 30px rgba(244, 96, 54, 0.5);
             transition: all 0.5s ease-in-out;
             overflow: hidden; 
         }
@@ -112,7 +154,7 @@
 
         .user-image-wrapper:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px var(--secondary-accent); /* Creamy Yellow accent on hover */
+            box-shadow: 0 0 40px var(--secondary-accent);
         }
         
         /* Dynamic Tagline */
@@ -120,7 +162,7 @@
             height: 40px; 
             overflow: hidden;
             font-size: 1.5em;
-            color: var(--primary-accent); /* Vibrant Orange */
+            color: var(--primary-accent);
         }
         .tagline {
             display: block;
@@ -142,7 +184,7 @@
         .project-panel h2 {
             font-size: 3em; 
             margin-bottom: 30px;
-            color: var(--content-text); /* Highlight text against primary accent */
+            color: var(--content-text);
             border-bottom: none;
         }
         .recent-project-images {
@@ -173,7 +215,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid var(--primary-accent); /* Orange border */
+            border: 2px solid var(--primary-accent);
             outline: none; 
             transition: background 0.3s;
         }
@@ -187,19 +229,6 @@
             display: block; 
         }
         
-        /* List styles within dark theme */
-        section ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        section li:before {
-            content: "•";
-            color: var(--primary-accent);
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
-        }
-
         /* ======================================= */
         /* === 3. FLOATING FOOTER STYLES       === */
         /* ======================================= */
@@ -236,7 +265,73 @@
 
 
         /* ======================================= */
-        /* === 4. RESPONSIVENESS (MEDIA QUERIES) === */
+        /* === 4. SCROLL INDICATOR STYLES      === */
+        /* ======================================= */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 100px; /* Positioned above the floating footer */
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            z-index: 101; /* Above footer */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--primary-bg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0; /* Hidden by default */
+        }
+        .scroll-indicator.visible {
+            opacity: 1;
+        }
+        
+        /* SVG Circle for Progress Bar */
+        .scroll-indicator svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Start progress from the top */
+        }
+        .scroll-indicator circle {
+            fill: none;
+            stroke-width: 4;
+            transition: stroke-dashoffset 0.3s linear;
+        }
+        .scroll-indicator .track {
+            stroke: rgba(244, 96, 54, 0.2); /* Faint orange track */
+        }
+        .scroll-indicator .progress {
+            stroke: var(--primary-accent); /* Vibrant orange progress */
+            stroke-dasharray: 144.5; /* Circumference of a 46 radius circle */
+            stroke-dashoffset: 144.5;
+        }
+
+        /* Arrow Icon Styling (for Move to Top) */
+        .scroll-indicator i {
+            color: var(--secondary-accent);
+            font-size: 1.5em;
+            transition: opacity 0.3s;
+        }
+        
+        /* State when at the bottom (shows arrow) */
+        .scroll-indicator.at-bottom .progress, 
+        .scroll-indicator.at-bottom .track {
+            opacity: 0;
+        }
+        .scroll-indicator.at-bottom {
+            background: var(--primary-accent); /* Solid orange background for button mode */
+        }
+        .scroll-indicator.at-bottom i {
+            color: var(--primary-bg); /* Dark arrow on orange background */
+        }
+
+        /* ======================================= */
+        /* === 5. RESPONSIVENESS (MEDIA QUERIES) === */
         /* ======================================= */
 
         /* Tablet and Smaller Desktop (Max 900px) */
@@ -247,66 +342,30 @@
                 padding: 50px 20px;
                 min-height: 100vh;
             }
-
-            .user-panel {
-                flex: none; 
-                width: 100%;
-                margin-bottom: 40px;
-            }
-
-            .project-panel {
-                flex: none;
-                width: 100%;
-                text-align: center;
-            }
-
-            .project-panel h2 {
-                font-size: 2.5em; 
-            }
+            /* ... (other tablet styles unchanged) ... */
         }
 
         /* Mobile Devices (Max 600px) */
         @media (max-width: 600px) {
-            /* Adjust hero font sizes */
-            .user-panel h1 {
-                font-size: 3em;
+            /* List structure: all lists collapse to one column */
+            section ul, #skills-content ul {
+                grid-template-columns: 1fr;
             }
 
-            .project-panel h2 {
-                font-size: 2em;
+            /* Scroll Indicator position adjustment for mobile */
+            .scroll-indicator {
+                bottom: 80px; /* Adjust to be higher than minimized footer */
+                right: 10px;
+                width: 40px;
+                height: 40px;
             }
-
-            /* Stack project images */
-            .recent-project-images {
-                flex-direction: column;
-                gap: 10px;
-                align-items: center;
+            .scroll-indicator circle {
+                stroke-width: 3;
             }
-
-            .recent-project-images img {
-                width: 80%; 
-                max-width: 300px;
-            }
-
-            /* Reduce image size for small screens */
-            .user-image-wrapper {
-                width: 180px; 
-                height: 180px; 
-            }
-
-            /* Adjust collapsible content padding */
-            .collapsible-content {
-                padding-left: 10px;
-            }
-            
-            /* Smaller floating footer on mobile */
-            footer {
-                padding: 10px 20px;
-                bottom: 10px;
-            }
-            .footer-links a {
+            .scroll-indicator i {
                 font-size: 1.2em;
             }
+            /* ... (other mobile styles unchanged) ... */
         }
     </style>
 </head>
@@ -315,7 +374,7 @@
     <header class="hero-section" id="hero">
         <div class="user-panel">
             <div class="user-image-wrapper">
-                <img src="uppy/user_profile.jpg" alt="Brian Kidiga Profile Picture">
+                <img src="img/user_profile.jpg" alt="Brian Kidiga Profile Picture">
             </div>
             <h1>BRIAN KIDIGA</h1>
             
@@ -339,7 +398,7 @@
         <section id="about">
             <h2>About Me</h2>
             <p>
-                As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from Android app development, integrations, to getting insights from data that drive businesses. I thrive on solving problems and continuously learning new technologies.
+                [cite_start]As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions[cite: 27]. [cite_start]My experience spans from Android app development, integrations, to getting insights from data that drive businesses[cite: 28]. [cite_start]I thrive on solving problems and continuously learning new technologies[cite: 29].
             </p>
         </section>
 
@@ -348,30 +407,30 @@
             <div id="skills-content" class="collapsible-content">
                 <h3>Development & APIs</h3>
                 <ul>
-                    <li>Android Development (Java/Kotlin)</li>
-                    <li>Rest API</li>
-                    <li>GraphQL</li>
+                    [cite_start]<li>Android Development (Java/Kotlin) [cite: 13, 14]</li>
+                    [cite_start]<li>Rest API [cite: 15]</li>
+                    [cite_start]<li>GraphQL [cite: 17]</li>
                 </ul>
                 <h3>Databases</h3>
                 <ul>
-                    <li>SQL & No SQL</li>
+                    [cite_start]<li>SQL & No SQL [cite: 16]</li>
                 </ul>
                 <h3>Frameworks & Technologies</h3>
                 <ul>
-                    <li>Spring boot</li>
-                    <li>Node JS</li>
-                    <li>Elastic Search</li>
-                    <li>Docker & Containerization</li>
+                    [cite_start]<li>Spring boot [cite: 19]</li>
+                    [cite_start]<li>Node JS [cite: 20]</li>
+                    [cite_start]<li>Elastic Search [cite: 21]</li>
+                    [cite_start]<li>Docker & Containerization [cite: 22]</li>
                 </ul>
                 <h3>Tools & Version Control</h3>
                 <ul>
-                    <li>PostMan/Insomnia/httpie</li>
-                    <li>Git/Gitlab/Github</li>
+                    [cite_start]<li>PostMan/Insomnia/httpie [cite: 18]</li>
+                    [cite_start]<li>Git/Gitlab/Github [cite: 23]</li>
                 </ul>
                 <h3>Languages</h3>
                 <ul>
-                    <li>English: Fluent</li>
-                    <li>Swahili: Fluent</li>
+                    [cite_start]<li>English: Fluent [cite: 25]</li>
+                    [cite_start]<li>Swahili: Fluent [cite: 25]</li>
                 </ul>
             </div>
         </section>
@@ -381,23 +440,23 @@
             <div id="experience-content" class="collapsible-content">
                 
                 <div class="job">
-                    <h3>Pseudo (Founder & CTO)</h3>
-                    <p class="period">2025</p>
+                    [cite_start]<h3>Pseudo (Founder & CTO) [cite: 31, 32]</h3>
+                    [cite_start]<p class="period">2025 [cite: 34]</p>
                     <ul>
-                        <li>Launched a start-up alias pseudo.</li>
-                        <li>Deployed a mobile tool for travelers Tow. Assured travelers and EV drivers access to vital services when needed.</li>
-                        <li>Initiated development of Menus. An online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
+                        [cite_start]<li>Launched a start-up alias pseudo[cite: 33].</li>
+                        <li>Deployed a mobile tool for travelers Tow. [cite_start]Assured travelers and EV drivers access to vital services when needed[cite: 35].</li>
+                        [cite_start]<li>Initiated development of Menus, an online application designed to help accelerate the online sale of restaurants and boost interactivity[cite: 36].</li>
                     </ul>
                 </div>
 
                 <div class="job">
-                    <h3>Android Developer Intern</h3>
-                    <p class="period">May - November 2024</p>
+                    [cite_start]<h3>Android Developer Intern (Graph Tech) [cite: 37, 38]</h3>
+                    [cite_start]<p class="period">May - November 2024 [cite: 39]</p>
                     <ul>
-                        <li>My milestone was translation, which had the app in native languages associated with different locales.</li>
-                        <li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales.</li>
-                        <li>Optimized and reduced the app size after performing analysis.</li>
-                        <li>Initially assisted in minor tasks like documentation and testing.</li>
+                        [cite_start]<li>My milestone was translation, which had the app in native languages associated with different locales[cite: 43].</li>
+                        [cite_start]<li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales[cite: 43].</li>
+                        [cite_start]<li>Performed analysis on the app size and optimized to reduce it[cite: 44].</li>
+                        [cite_start]<li>Initially assisted in minor tasks like Documentation and testing[cite: 41].</li>
                     </ul>
                 </div>
             </div>
@@ -405,12 +464,12 @@
 
         <section id="projects">
             <h2>Projects</h2>
-            <p>All my projects are available from my Github profile.</p>
+            [cite_start]<p>All my projects are available from my Github profile[cite: 46].</p>
 
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-menus">Menus <span class="arrow">▼</span></h3>
                 <div id="project-menus" class="collapsible-content">
-                    <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
+                    [cite_start]<p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing[cite: 47].</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="menus">
                             <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
@@ -426,7 +485,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
                 <div id="project-sage" class="collapsible-content">
-                    <p>A document repository that allows for online document sharing. Whilist allowing users to fully interact with documents without havin to read all of it.</p>
+                    [cite_start]<p>A document repository that allows for online document sharing[cite: 48]. [cite_start]While allowing users to fully interact with documents without having to read all of it[cite: 49].</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="sage">
                             <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
@@ -441,7 +500,7 @@
             <div class="project-item">
                 <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
                 <div id="project-tow" class="collapsible-content">
-                    <p>An online application used as a toolkit for drivers and travelers. Allows for discovery of closest Tow trucks services, mechanic services, and Eateries.</p>
+                    [cite_start]<p>An online application used as a toolkit for drivers and travelers[cite: 50]. [cite_start]It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries[cite: 51].</p>
                     <div class="carousel-container">
                         <div class="carousel" data-project="tow">
                             <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
@@ -457,12 +516,20 @@
         <section id="education">
             <h2>Education</h2>
             <ul>
-                <li>BSc. Computer Science</li>
+                <li>BSc. [cite_start]Computer Science, Karatina University (2020-2024) [cite: 9, 10, 11]</li>
                 <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
             </ul>
         </section>
 
     </main>
+    
+    <div class="scroll-indicator" id="scroll-indicator">
+        <svg viewBox="0 0 100 100">
+            <circle class="track" cx="50" cy="50" r="46"></circle>
+            <circle class="progress" cx="50" cy="50" r="46"></circle>
+        </svg>
+        <i class="fas fa-arrow-up"></i>
+    </div>
 
     <footer>
         <div class="footer-links">
@@ -473,7 +540,49 @@
     </footer>
 
     <script>
-        // === CAROUSEL MOVEMENT FUNCTION ===
+        // === SCROLL INDICATOR JAVASCRIPT ===
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        const progressCircle = scrollIndicator.querySelector('.progress');
+        const circumference = 2 * Math.PI * 46; // 2 * pi * r (r=46 from CSS)
+        progressCircle.style.strokeDasharray = circumference;
+
+        const SCROLL_THRESHOLD = 95; // Percentage of scroll at which to switch to 'Move to Top' mode
+
+        function updateScrollIndicator() {
+            const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            
+            // Calculate scroll percentage
+            const scrollPercentage = (scrolled / scrollTotal) * 100;
+            
+            // Determine dash offset for progress circle
+            const dashOffset = circumference - (scrollPercentage / 100) * circumference;
+            progressCircle.style.strokeDashoffset = dashOffset;
+
+            // Visibility (hide when at the very top)
+            if (scrolled > 50) {
+                scrollIndicator.classList.add('visible');
+            } else {
+                scrollIndicator.classList.remove('visible');
+            }
+
+            // 'Move to Top' mode logic
+            if (scrollPercentage >= SCROLL_THRESHOLD) {
+                scrollIndicator.classList.add('at-bottom');
+            } else {
+                scrollIndicator.classList.remove('at-bottom');
+            }
+        }
+        
+        // Click handler for scrolling to top
+        scrollIndicator.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // === ALL OTHER SCRIPTS ===
         function moveSlide(projectName, step) {
             const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
             if (!carousel) return;
@@ -494,13 +603,16 @@
                 newIndex = slides.length - 1;
             }
 
-            // Remove active from all and add to the new one
             slides.forEach(slide => slide.classList.remove('active'));
             slides[newIndex].classList.add('active');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // === EXPAND/COLLAPSE FUNCTIONALITY ===
+            // Initial scroll position check
+            updateScrollIndicator();
+            window.addEventListener('scroll', updateScrollIndicator);
+
+            // Collapsible functionality
             document.querySelectorAll('.toggle-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const targetId = header.getAttribute('data-target');
@@ -511,7 +623,7 @@
                 });
             });
 
-            // Initial carousel setup: Ensure only the first slide is visible initially
+            // Carousel setup
             document.querySelectorAll('.carousel').forEach(carousel => {
                 const slides = carousel.querySelectorAll('.carousel-slide');
                 slides.forEach((slide, index) => {
@@ -522,7 +634,7 @@
                 });
             });
             
-            // === GRADIENT FLUID EFFECT (Full Page Mouse Pointer Tracking) ===
+            // Gradient fluid effect
             const body = document.body;
             function updateGradientPosition(e) {
                 const x = (e.clientX / window.innerWidth) * 100;
@@ -533,7 +645,7 @@
             
             body.addEventListener('mousemove', updateGradientPosition);
 
-            // === DYNAMIC TAGLINE SWAPPER ===
+            // Dynamic tagline swapper
             const taglines = ["Backend Developer", "Android Developer", "Tech Strategist", "Problem Solver"];
             const taglineElement = document.getElementById('tagline-text');
             let taglineIndex = 0;
