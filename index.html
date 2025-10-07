@@ -6,6 +6,7 @@
     <title>Brian Kidiga | Backend Developer Portfolio</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poller+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         /* CSS Variables for Colors and Animation */
@@ -14,6 +15,7 @@
             --secondary-accent: #FE6847; /* Orange-Red */
             --text-color: #070707; /* Black */
             --content-background: #FEFAE0; /* Creamy White */
+            --footer-bg: #070707; /* Dark Footer */
             
             /* Gradient Background Setup */
             --gradient-light: #FFEE93; 
@@ -27,51 +29,71 @@
             margin: 0;
             padding: 0;
             color: var(--text-color);
-            overflow-x: hidden; /* Prevent horizontal scroll bar from large background */
+            overflow-x: hidden; 
+            min-height: 100vh;
             
-            /* Initial Gradient Background */
+            /* Initial Radial Gradient */
             background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
-            background-size: 200% 200%; /* Larger than viewport for fluid movement */
-            transition: background-position 0.2s ease-out; /* Smooth follow effect */
+            background-size: 200% 200%; /* Larger for smooth fluid movement */
+            transition: background 0.2s ease-out; /* Smooth follow effect */
+            position: relative; /* Needed for mesh overlay */
+        }
+        
+        /* === SEMI-TRANSPARENT MESH OVERLAY === */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Behind content, above gradient */
+            opacity: 0.1; 
+            /* Simple diagonal line pattern */
+            background-image: linear-gradient(45deg, var(--text-color) 25%, transparent 25%, transparent 75%, var(--text-color) 75%),
+                              linear-gradient(45deg, var(--text-color) 25%, transparent 25%, transparent 75%, var(--text-color) 75%);
+            background-size: 50px 50px; /* Size of the grid cells */
+            background-position: 0 0, 25px 25px; 
+            pointer-events: none; /* Allows mouse events to pass through */
         }
 
-        /* Styles for the content *below* the hero section */
+
+        /* Content Container and Sections */
         .content-container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
         
-        /* General Section Styling */
         section {
             margin-bottom: 40px;
             padding: 20px;
-            background: var(--content-background); /* Creamy white content boxes */
+            background: var(--content-background); 
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         
-        h1, h2, h3 {
+        h2, h3 {
             font-family: 'Poller One', serif;
             color: var(--secondary-accent);
             border-bottom: 2px solid var(--primary-accent);
             padding-bottom: 5px;
+            /* Text shadow removed */
         }
 
 
         /* === HEADER SECTION (Full Screen) === */
         .hero-section {
-            height: 100vh; /* Fill the entire screen height */
+            height: 100vh; 
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
             color: var(--text-color);
-            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.7); /* Light text shadow for contrast */
         }
 
         .user-panel {
-            flex: 0 0 25%;
+            flex: 0 0 30%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -83,29 +105,51 @@
             color: var(--text-color);
             border-bottom: none;
             margin-bottom: 15px;
-            text-shadow: 1px 1px 5px var(--primary-accent);
+            font-size: 3.5em; /* Larger name */
+            line-height: 1;
         }
         
-        /* Cool Image Effect */
+        /* Cool Complex Image Shape (Hexagon) and Size Increase */
         .user-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: url('img/user_profile.jpg') center/cover; /* Replace with your image path */
-            background-color: #d3d3d3; /* Fallback for image placeholder */
+            width: 200px; /* Enlarged */
+            height: 220px; /* Adjusted height for hexagon shape */
+            background: url('img/user_profile.jpg') center/cover;
+            background-color: #d3d3d3; 
             border: 5px solid var(--primary-accent);
             box-shadow: 0 0 20px rgba(7,7,7, 0.5);
             transition: all 0.5s ease-in-out;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            
+            /* Hexagon Shape using clip-path */
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
         }
 
         .user-image:hover {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.05) rotate(3deg);
             box-shadow: 0 0 30px var(--secondary-accent);
         }
+        
+        /* Dynamic Tagline */
+        .tagline-container {
+            height: 40px; /* Fixed height for swapping */
+            overflow: hidden;
+            font-size: 1.5em;
+            color: var(--secondary-accent);
+        }
+        .tagline {
+            display: block;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .tagline.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
 
         .project-panel {
-            flex: 0 0 70%;
+            flex: 0 0 60%;
             text-align: center;
         }
         
@@ -114,102 +158,41 @@
             font-size: 2.5em;
             margin-bottom: 30px;
             border-bottom: none;
-            text-shadow: 1px 1px 5px var(--primary-accent);
         }
-
-        .recent-project-images {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .recent-project-images img {
-            width: 30%;
-            max-width: 300px;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.3s;
-        }
-        .recent-project-images img:hover {
-            transform: translateY(-10px);
-        }
-
-        /* Expand/Collapse Styling */
-        .toggle-header {
-            cursor: pointer;
-            background: var(--content-background);
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 2px solid var(--primary-accent); /* Updated outline style */
-            outline: none; 
-            transition: background 0.3s;
-        }
-        .toggle-header:hover {
-            background: #fff8eb;
-        }
-        .collapsible-content {
-            display: none; 
-            padding: 10px 0;
-            border-left: 3px solid var(--secondary-accent);
-            padding-left: 15px;
-        }
-        .collapsible-content.active {
-            display: block; 
-        }
-        .arrow {
-            transition: transform 0.3s;
-        }
-        .toggle-header.active .arrow {
-            transform: rotate(180deg);
-        }
-
-        /* Carousel Styling */
-        .carousel-container {
-            position: relative;
-            max-width: 600px;
-            margin: 20px auto;
-            overflow: hidden;
-            border: 5px solid var(--primary-accent);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            height: 350px; 
-        }
-        .carousel-container button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--secondary-accent);
-            color: white;
-            border: none;
-            padding: 15px 10px;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-        .carousel-container button:hover {
-            opacity: 1;
-        }
-        /* ... (rest of carousel styles remain the same) ... */
 
         /* Footer */
         footer {
-            text-align: center;
-            padding: 20px;
-            background: var(--secondary-accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            background: var(--footer-bg);
             color: white;
             margin-top: 30px;
         }
-        footer a {
+        .footer-links {
+            display: flex;
+            gap: 25px;
+            margin-top: 15px;
+        }
+        .footer-links a {
             color: var(--primary-accent); 
             text-decoration: none;
+            font-size: 1.2em;
+            transition: color 0.3s;
         }
-        footer a:hover {
-            text-decoration: underline;
+        .footer-links a:hover {
+            color: var(--secondary-accent);
+        }
+        .footer-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--content-background);
+        }
+        .footer-info i {
+            margin-right: 10px;
+            font-size: 1.5em;
         }
     </style>
 </head>
@@ -219,6 +202,10 @@
         <div class="user-panel">
             <div class="user-image"></div>
             <h1>BRIAN KIDIGA</h1>
+            
+            <div class="tagline-container">
+                <span id="tagline-text" class="tagline"></span>
+            </div>
         </div>
         
         <div class="project-panel">
@@ -362,13 +349,19 @@
     </main>
 
     <footer>
-        <p>Location: Nairobi, Kenya</p>
-        <p>Github: <a href="https://kdbrian.github.io" target="_blank">kdbrian.github.io</a></p>
-        <p>LinkedIn: <a href="[YOUR LINKEDIN URL]" target="_blank">[YOUR LINKEDIN URL]</a></p>
+        <div class="footer-info">
+            <i class="fas fa-map-marker-alt"></i>
+            <p>Nairobi, Kenya</p>
+        </div>
+        <div class="footer-links">
+            <a href="[YOUR LINKEDIN URL]" target="_blank" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            <a href="https://kdbrian.github.io" target="_blank" aria-label="GitHub Profile"><i class="fab fa-github"></i> GitHub</a>
+            <a href="[YOUR MEDIUM URL]" target="_blank" aria-label="Medium Profile"><i class="fab fa-medium"></i> Medium</a>
+        </div>
     </footer>
 
     <script>
-        // === CAROUSEL MOVEMENT FUNCTION ===
+        // === CAROUSEL MOVEMENT FUNCTION (Remains the same) ===
         function moveSlide(projectName, step) {
             const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
             if (!carousel) return;
@@ -417,10 +410,8 @@
                 });
             });
             
-            // === GRADIENT FLUID EFFECT (Mouse Pointer Tracking) ===
+            // === GRADIENT FLUID EFFECT (Full Page Mouse Pointer Tracking) ===
             const body = document.body;
-            
-            // Function to update the background based on mouse position
             function updateGradientPosition(e) {
                 // Get normalized mouse position (0 to 100)
                 const x = (e.clientX / window.innerWidth) * 100;
@@ -430,13 +421,35 @@
                 body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
             }
             
-            // Apply the tracking only to the hero section for best effect
-            document.getElementById('hero').addEventListener('mousemove', updateGradientPosition);
-            
-            // Add a static gradient when the mouse is outside the hero section
-            document.getElementById('hero').addEventListener('mouseleave', () => {
-                body.style.background = `radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
-            });
+            // Apply tracking to the entire body
+            body.addEventListener('mousemove', updateGradientPosition);
+
+            // === DYNAMIC TAGLINE SWAPPER ===
+            const taglines = ["Backend Developer", "Android Developer", "Tech Strategist", "Problem Solver"];
+            const taglineElement = document.getElementById('tagline-text');
+            let taglineIndex = 0;
+
+            function swapTagline() {
+                // Fade out current text
+                taglineElement.classList.remove('active');
+                taglineElement.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    // Update content
+                    taglineElement.textContent = taglines[taglineIndex];
+                    
+                    // Fade in new text
+                    taglineElement.classList.add('active');
+                    taglineElement.style.transform = 'translateY(0)';
+
+                    // Move to the next tagline
+                    taglineIndex = (taglineIndex + 1) % taglines.length;
+                }, 500); // Wait for half a second (CSS transition time)
+            }
+
+            // Start the rotation and initial setup
+            swapTagline();
+            setInterval(swapTagline, 3000); // Swap every 3 seconds
         });
     </script>
 </body>
