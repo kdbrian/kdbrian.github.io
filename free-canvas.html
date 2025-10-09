@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge-to-Edge Canvas Editor</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use the Inter font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Global Styles: Dark background, Inter font, EDGE-TO-EDGE */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark background (Slate-900) */
+            height: 100vh;
+            /* CRITICAL: Remove all outer space */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            color: #d1d5db; 
+        }
+        
+        /* Ensure main container is full size without margin/padding */
+        #canvasContainer {
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        /* Style for the canvas element itself (edge to edge, no border) */
+        #gridCanvas {
+            display: block;
+            background-color: white; /* Canvas remains white for content contrast */
+            width: 100%;
+            height: 100%;
+            z-index: 5; 
+            cursor: default; 
+            border: none;
+            border-radius: 0;
+            /* Hide native cursor when using custom crosshair/emoji */
+            cursor: none; 
+        }
+        
+        /* Floating Windowed Mode Container (Borderless and centered over dark background) */
+        #canvasContainer.fixed-size-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0px; 
+            background-color: #1f2937; 
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.1); 
+            transition: width 0.3s, height 0.3s, transform 0.3s, background-color 0.3s; 
+            border: none; 
+            z-index: 10;
+        }
+
+        /* Styling for the transformation handle (rotation) */
+        .handle-icon {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 185, 129, 0.8);
+            pointer-events: none; 
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="p-0 m-0 relative">
+
+    <!-- Tools & Elements Sidebar (fixed position, left) - Minimal Styling -->
+    <div class="fixed top-4 left-4 bg-white p-3 rounded-xl shadow-2xl border border-gray-100 z-20 w-64 text-gray-700">
+        <h2 class="text-sm font-bold text-gray-800 mb-2 border-b pb-1">Tools & Elements</h2>
+        
+        <!-- Cursor & Ruler Options -->
+        <div class="mb-4 pb-3 border-b border-gray-100">
+            <h3 class="text-xs font-semibold text-gray-700 mb-2">Cursor & Ruler</h3>
+            <div class="flex flex-col space-y-2">
+                 <label class="flex items-center space-x-2 text-xs text-gray-700">
+                    <input type="checkbox" id="rulerToggle" class="rounded text-indigo-600 focus:ring-indigo-500 w-3 h-3">
+                    <span>Show Crosshair Ruler</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                    <label for="rulerColor" class="text-xs font-medium">Color:</label>
+                    <input type="color" id="rulerColor" value="#ef4444" class="w-10 h-6 border-gray-300 rounded-lg"/>
+                    <select id="emojiCursorSelect" class="p-1 border border-gray-300 rounded-lg text-xs focus:ring-indigo-500 focus:border-indigo-500 w-full">
+                        <option value="">Native Cursor</option>
+                        <option value="🚀">🚀 Launch</option>
+                        <option value="🎯">🎯 Target</option>
+                        <option value="🖐️">🖐️ Hand</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool Selection & Shapes -->
+        <h3 class="text-xs font-semibold text-gray-700 mb-2">Select Tool (P, S, R)</h3>
+        <div id="shapeList" class="flex space-x-2 mb-4 pb-3 border-b border-gray-100">
+            <!-- Pen Tool (New) -->
+            <button class="tool-btn flex-1 p-2 rounded-xl border-2 border-yellow-300 bg-yellow-50 text-yellow-700 text-center text-lg font-bold shadow-md hover:bg-yellow-100 transition duration-150"
+                 id="penToolButton" data-tool="pen" title="Pen Tool (P)">
+                ✍
+            </button>
+            <!-- Rectangle Button -->
+            <button class="add-shape-btn flex-1 p-2 rounded-xl border-2 border-indigo-300 bg-indigo-50 text-indigo-700 text-center text-lg font-bold shadow-md hover:bg-indigo-100 transition duration-150"
+                 data-type="Rectangle" data-color="#4f46e5" data-size="100" title="Add Rectangle">
+                ◼︎
+            </button>
+            <!-- Circle Button -->
+            <button class="add-shape-btn flex-1 p-2 rounded-xl border-2 border-green-300 bg-green-50 text-green-700 text-center text-lg font-bold shadow-md hover:bg-green-100 transition duration-150"
+                 data-type="Circle" data-color="#10b981" data-size="60" title="Add Circle">
+                ●
+            </button>
+             <!-- Triangle Button -->
+            <button class="add-shape-btn flex-1 p-2 rounded-xl border-2 border-orange-300 bg-orange-50 text-orange-700 text-center text-lg font-bold shadow-md hover:bg-orange-100 transition duration-150"
+                 data-type="Triangle" data-color="#f97316" data-size="80" title="Add Triangle">
+                ▲
+            </button>
+        </div>
+        
+        <!-- SVG Import -->
+        <h3 class="text-xs font-semibold text-gray-700 mb-2">SVG Code</h3>
+        <textarea id="svgInput" rows="2" placeholder="Paste SVG path..." class="w-full p-1 border border-gray-300 rounded-lg text-xs resize-none text-gray-700"></textarea>
+        <button id="importSvgButton" class="w-full py-1 text-xs bg-orange-500 text-white font-semibold rounded-lg shadow-sm hover:bg-orange-600 transition duration-150 mt-1 mb-4 border-b pb-3 border-gray-100">
+            Place SVG (150px)
+        </button>
+
+        <!-- Selected Element Properties & Controls -->
+        <div id="propertiesDisplay">
+            <!-- Content filled by JS -->
+            <h2 class="text-xs font-bold text-gray-700 mb-1 border-b pb-1">Selected Element (Move)</h2>
+            <p class="text-xs text-gray-400">Double-click to select/move. Shortcuts: **P**en, **S**cale, **R**otate.</p>
+        </div>
+    </div>
+
+    <!-- Floating Control Tab (fixed position, right) - Minimal Styling -->
+    <div class="fixed top-4 right-4 bg-white p-3 rounded-xl shadow-2xl border border-gray-100 z-20 transition duration-300 w-64 text-gray-700">
+        <h2 class="text-sm font-bold text-gray-800 mb-2 border-b pb-1">Canvas Size</h2>
+        
+        <!-- Device Preset Dropdown (Expanded Android Studio Options) -->
+        <div class="mb-3">
+            <label for="devicePreset" class="text-xs font-medium block mb-1">Device Preset (Android Studio Inspired)</label>
+            <select id="devicePreset" class="w-full p-1 border border-gray-300 rounded-lg text-xs focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Full Screen (Responsive)</option>
+                <optgroup label="Android Phones & Foldables (Vertical)">
+                    <option value="360x800">Pixel 6/7/8 (360x800)</option>
+                    <option value="412x915">Pixel 5 (412x915)</option>
+                    <option value="360x780">Galaxy S20/S21 (360x780)</option>
+                    <option value="412x847">Galaxy S24 Ultra (412x847)</option>
+                    <option value="670x840">Galaxy Z Fold (Inner, 670x840)</option>
+                </optgroup>
+                 <optgroup label="iPhones (Vertical)">
+                    <option value="375x812">iPhone 13/14 (375x812)</option>
+                    <option value="414x896">iPhone XR/11 (414x896)</option>
+                    <option value="393x852">iPhone 15 Pro (393x852)</option>
+                </optgroup>
+                <optgroup label="Tablets & Desktop">
+                    <option value="1280x800">Small Tablet Landscape (1280x800)</option>
+                    <option value="800x1280">Small Tablet Portrait (800x1280)</option>
+                    <option value="1024x1366">Large Tablet Portrait (1024x1366)</option>
+                    <option value="1920x1080">Full HD Desktop (1920x1080)</option>
+                </optgroup>
+                <optgroup label="Other Devices">
+                    <option value="200x200">Wear OS Small (200x200)</option>
+                    <option value="1280x720">Android TV (1280x720)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="flex space-x-2 mb-3">
+            <input id="widthInput" type="number" placeholder="Width" class="flex-1 p-1 border border-gray-300 rounded-lg text-xs focus:ring-indigo-500 focus:border-indigo-500" min="100">
+            <input id="heightInput" type="number" placeholder="Height" class="flex-1 p-1 border border-gray-300 rounded-lg text-xs focus:ring-indigo-500 focus:border-indigo-500" min="100">
+        </div>
+        <button id="applyButton" class="w-full py-1 text-xs bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-700 transition duration-150">
+            Apply Custom Size
+        </button>
+        <button id="resetButton" class="mt-2 w-full py-1 text-xs bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition duration-150">
+            Reset to Full Screen
+        </button>
+        
+        <!-- Placed Items List -->
+        <h3 class="text-xs font-semibold text-gray-700 mt-4 mb-2 border-t pt-3">Placed Items (Visibility)</h3>
+        <div id="placedElementsList" class="space-y-1 max-h-48 overflow-y-auto">
+            <p class="text-gray-500 text-xs italic">Add elements to the canvas.</p>
+        </div>
+    </div>
+
+    <!-- Canvas Container: This div handles the edge-to-edge layout or the centered fixed window -->
+    <div id="canvasContainer" class="w-full h-full">
+        <canvas id="gridCanvas"></canvas>
+    </div>
+    
+    <!-- Coordinate Display (Fixed position, bottom-left) -->
+    <div id="coordsDisplay" class="fixed bottom-4 left-4 bg-gray-700 text-white p-2 rounded-lg text-xs font-mono shadow-xl z-30 transition duration-150 pointer-events-none opacity-0">
+        X: 0, Y: 0 (px)
+    </div>
+
+    <!-- Rotation Handle Visual Aid (HTML element to overlay on canvas) -->
+    <div id="rotationHandle" class="handle-icon hidden">↺</div>
+    
+    <script>
+        // Global variables for canvas elements and controls
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const applyButton = document.getElementById('applyButton');
+        const resetButton = document.getElementById('resetButton');
+        const devicePresetSelect = document.getElementById('devicePreset');
+        const importSvgButton = document.getElementById('importSvgButton'); 
+        const rulerToggle = document.getElementById('rulerToggle'); 
+        const rulerColorInput = document.getElementById('rulerColor'); 
+        const emojiCursorSelect = document.getElementById('emojiCursorSelect'); 
+        const rotationHandle = document.getElementById('rotationHandle');
+        
+        // Element references for display panels
+        const propertiesDisplay = document.getElementById('propertiesDisplay'); 
+        const shapeList = document.getElementById('shapeList');
+        const placedElementsList = document.getElementById('placedElementsList');
+        
+        const GRID_SIZE = 50; 
+        
+        // State management
+        let customWidth = null;
+        let customHeight = null;
+        let elements = []; 
+        let nextElementId = 1;
+        
+        // Dragging, Selection, and Cursor State
+        let isRulerVisible = false;
+        let rulerColor = '#ef4444'; // Default to red
+        let cursorEmoji = null; 
+        let isDraggingElement = false; 
+        let selectedElementId = null;
+        let dragOffsetX = 0; 
+        let dragOffsetY = 0; 
+        let mouseCanvasX = 0; 
+        let mouseCanvasY = 0; 
+
+        // Transformation and Drawing State
+        let currentTool = 'move'; // 'move', 'scale', 'rotate', 'pen'
+        let currentPenPath = null; // Stores the object of the path currently being drawn
+        let isDrawingPath = false; // Flag for active free drawing
+        
+        // --- Utility: Simple Message Box ---
+        function showMessageBox(title, message, type = 'info') {
+            const box = document.createElement('div');
+            const color = type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+            
+            box.className = `fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${color} text-white p-4 rounded-xl shadow-2xl z-50 transition duration-300 ease-in-out opacity-0 text-sm`;
+            box.innerHTML = `<h3 class="text-lg font-bold mb-1">${title}</h3><p>${message}</p>`;
+            
+            document.body.appendChild(box);
+            
+            setTimeout(() => { box.classList.remove('opacity-0'); }, 10);
+            setTimeout(() => { 
+                box.classList.add('opacity-0'); 
+                box.addEventListener('transitionend', () => box.remove());
+            }, 2000); 
+        }
+
+        // --- Drawing Logic ---
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
+            for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 2;
+            for (let x = 0; x <= canvas.width; x += GRID_SIZE * 5) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += GRID_SIZE * 5) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+        }
+
+        function drawElements() {
+            let selectedElement = null;
+
+            elements.forEach(el => {
+                if (!el.visible) return;
+                if (el.id === selectedElementId) {
+                    selectedElement = el; 
+                }
+
+                ctx.save();
+                
+                // Only shapes (not paths) have rotation/size properties
+                if (el.type !== 'Path') {
+                    const centerX = el.x + el.size / 2;
+                    const centerY = el.y + el.size / 2;
+                    
+                    // Apply rotation transformation
+                    if (el.rotation && el.rotation !== 0) {
+                        ctx.translate(centerX, centerY);
+                        ctx.rotate(el.rotation);
+                        ctx.translate(-centerX, -centerY);
+                    }
+
+                    // Selection Highlight
+                    if (el.id === selectedElementId) {
+                        ctx.strokeStyle = '#f59e0b'; // Amber border for selection
+                        ctx.lineWidth = 5;
+                    } else {
+                        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                        ctx.lineWidth = 2;
+                    }
+                    
+                    // Draw based on type
+                    ctx.fillStyle = el.color + 'aa'; 
+                    
+                    switch(el.type) {
+                        case 'Rectangle':
+                            ctx.fillRect(el.x, el.y, el.size, el.size);
+                            ctx.strokeRect(el.x, el.y, el.size, el.size);
+                            break;
+                        case 'Circle':
+                            const radius = el.size / 2;
+                            ctx.beginPath();
+                            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'Triangle':
+                            ctx.beginPath();
+                            ctx.moveTo(el.x + el.size / 2, el.y);
+                            ctx.lineTo(el.x, el.y + el.size);
+                            ctx.lineTo(el.x + el.size, el.y + el.size);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'SVG':
+                            ctx.fillStyle = el.color + 'aa';
+                            ctx.fillRect(el.x, el.y, el.size, el.size);
+                            
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = '14px Inter';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('SVG Placeholder', centerX, centerY - 5);
+                            ctx.fillText(el.svg.substring(0, 10) + '...', centerX, centerY + 15);
+                            
+                            ctx.strokeRect(el.x, el.y, el.size, el.size);
+                            break;
+                    }
+                } else if (el.type === 'Path' && el.points && el.points.length > 1) {
+                    // Draw Path
+                    ctx.beginPath();
+                    ctx.moveTo(el.points[0].x, el.points[0].y);
+                    
+                    ctx.strokeStyle = el.color; 
+                    ctx.lineWidth = 5;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    for (let i = 1; i < el.points.length; i++) {
+                        ctx.lineTo(el.points[i].x, el.points[i].y);
+                    }
+                    ctx.stroke();
+                }
+                
+                ctx.restore(); // Restore context after rotation
+            });
+            
+            // Draw the currently active path (if any)
+            if (currentPenPath && currentPenPath.points.length > 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(currentPenPath.points[0].x, currentPenPath.points[0].y);
+                
+                ctx.strokeStyle = currentPenPath.color;
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                for (let i = 1; i < currentPenPath.points.length; i++) {
+                    ctx.lineTo(currentPenPath.points[i].x, currentPenPath.points[i].y);
+                }
+                
+                ctx.stroke();
+                ctx.restore();
+            }
+            
+            // Draw HTML Rotation Handle
+            updateRotationHandle(selectedElement);
+        }
+        
+        function updateRotationHandle(el) { /* ... (No change) ... */ }
+        
+        /**
+         * Draws crosshairs centered on the cursor position (mouseCanvasX/Y).
+         * @param {number} x - Cursor X position on canvas.
+         * @param {number} y - Cursor Y position on canvas.
+         */
+        function drawCrosshairRuler(x, y) {
+            ctx.save();
+            ctx.strokeStyle = rulerColor; // Use configurable color
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]); // Dashed lines for clarity
+
+            // Vertical line
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+
+            // Horizontal line
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawRuler(x, y) { 
+            drawCrosshairRuler(x, y);
+        }
+        
+        function redrawCanvas() {
+            drawGrid();
+            drawElements();
+            
+            // Draw cursor tracker on top
+            if (isRulerVisible) {
+                drawRuler(mouseCanvasX, mouseCanvasY);
+            }
+            if (cursorEmoji) {
+                drawCustomCursor(mouseCanvasX, mouseCanvasY);
+            }
+
+            updatePlacedElementsList();
+            
+            if (selectedElementId !== null) {
+                const el = elements.find(e => e.id === selectedElementId);
+                if (el) updatePropertiesPanel(el);
+            }
+        }
+
+        // --- Sidebar Logic ---
+        
+        function updatePropertiesPanel(element) {
+            const toolName = currentTool.charAt(0).toUpperCase() + currentTool.slice(1);
+            
+            if (!element) {
+                propertiesDisplay.innerHTML = `
+                    <h2 class="text-xs font-bold text-gray-700 mb-1 border-b pb-1">Selected Element (Tool: ${toolName})</h2>
+                    <p class="text-xs text-gray-400">Double-click to select/move. Shortcuts: **P**en, **S**cale, **R**otate.</p>
+                `;
+                return;
+            }
+            
+            selectedElementId = element.id;
+
+            const typeSymbol = element.type === 'Rectangle' ? '◼︎' : (element.type === 'Circle' ? '●' : (element.type === 'Triangle' ? '▲' : (element.type === 'Path' ? '✍' : '⬣')));
+
+            propertiesDisplay.innerHTML = `
+                <h2 class="text-xs font-bold text-gray-700 mb-1 border-b pb-1">Selected Element (Tool: ${toolName})</h2>
+                <h3 class="text-sm font-semibold mb-1 truncate">${typeSymbol} #${element.id} (${element.type})</h3>
+                ${element.type !== 'Path' ? 
+                    `<p class="text-xs font-mono">X: ${Math.round(element.x)} Y: ${Math.round(element.y)}</p>
+                    <p class="text-xs font-mono">Size: ${Math.round(element.size)} px</p>
+                    <p class="text-xs font-mono">Rotation: ${Math.round((element.rotation || 0) * 180 / Math.PI)}°</p>` :
+                    `<p class="text-xs font-mono">${element.points.length} points</p>`
+                }
+            `;
+        }
+
+        function updatePlacedElementsList() {
+            placedElementsList.innerHTML = '';
+            if (elements.length === 0) {
+                placedElementsList.innerHTML = '<p class="text-gray-500 text-xs italic">Add elements to the canvas.</p>';
+                return;
+            }
+
+            elements.forEach(el => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between text-xs p-1 rounded transition duration-100 border ' + (el.visible ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-100 border-gray-200 text-gray-500');
+                
+                const typeSymbol = el.type === 'Rectangle' ? '◼︎' : (el.type === 'Circle' ? '●' : (el.type === 'Triangle' ? '▲' : (el.type === 'Path' ? '✍' : '⬣')));
+                const elementType = el.type;
+
+                // CRITICAL: Delete and Hide buttons side-by-side
+                item.innerHTML = `
+                    <span class="font-medium truncate mr-2">${typeSymbol} #${el.id}</span>
+                    <div class="flex space-x-1">
+                        <button data-id="${el.id}" class="delete-element-btn text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm bg-red-500 hover:bg-red-600">
+                            Delete
+                        </button>
+                        <button data-id="${el.id}" class="toggle-visibility-btn text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm ${el.visible ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-400 hover:bg-gray-500'}">
+                            ${el.visible ? 'Hide' : 'Show'}
+                        </button>
+                    </div>
+                `;
+                placedElementsList.appendChild(item);
+            });
+
+            placedElementsList.querySelectorAll('.toggle-visibility-btn').forEach(button => {
+                button.addEventListener('click', toggleElementVisibility);
+            });
+            
+            placedElementsList.querySelectorAll('.delete-element-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    selectedElementId = parseInt(e.target.getAttribute('data-id'), 10);
+                    handleDeleteElement();
+                });
+            });
+        }
+        
+        // --- Element Management ---
+        
+        function handleDeleteElement() {
+            if (selectedElementId === null) return;
+
+            const initialLength = elements.length;
+            elements = elements.filter(el => el.id !== selectedElementId);
+
+            if (elements.length < initialLength) {
+                selectedElementId = null;
+                isDraggingElement = false;
+                currentTool = 'move';
+                updateCursorStyle(); 
+                updatePropertiesPanel(null); 
+                redrawCanvas();
+                showMessageBox("Deleted", "Element removed.", "info");
+            }
+        }
+
+        function toggleElementVisibility(e) {
+            const id = parseInt(e.target.getAttribute('data-id'), 10);
+            const el = elements.find(e => e.id === id);
+            if (el) {
+                el.visible = !el.visible;
+                redrawCanvas();
+            }
+        }
+        
+        function addElementToCanvas(type, color, size) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            const newElement = {
+                id: nextElementId++,
+                type: type,
+                color: color,
+                size: size,
+                x: centerX - (size / 2),
+                y: centerY - (size / 2),
+                visible: true,
+                rotation: 0
+            };
+            
+            elements.push(newElement);
+            // Select the new element immediately
+            selectedElementId = newElement.id;
+            currentTool = 'move';
+            updatePropertiesPanel(newElement);
+            redrawCanvas();
+            showMessageBox("Added", `${type} placed in center.`, "info");
+        }
+
+        /**
+         * Switches the active tool, resetting state variables as needed.
+         * @param {string} newTool - The tool to activate ('move', 'scale', 'rotate', 'pen').
+         */
+        function handleToolChange(newTool) {
+            currentTool = newTool;
+            isDraggingElement = false;
+            
+            // If switching TO a non-move tool, deselect the element
+            if (newTool !== 'move') {
+                selectedElementId = null; 
+            }
+
+            // If switching FROM pen, ensure drawing state is reset
+            isDrawingPath = false; 
+            currentPenPath = null;
+            
+            updateCursorStyle(); 
+            updatePropertiesPanel(elements.find(e => e.id === selectedElementId));
+            
+            // Provide user feedback
+            showMessageBox("Tool Active", `${newTool.charAt(0).toUpperCase() + newTool.slice(1)} tool selected.`, "info");
+            redrawCanvas();
+        }
+        
+        // --- Transformation Handlers ---
+
+        function handleToolTransform(el) { /* ... (No change) ... */ 
+            const centerX = el.x + el.size / 2;
+            const centerY = el.y + el.size / 2;
+            
+            if (currentTool === 'scale') {
+                const dist = Math.sqrt((mouseCanvasX - centerX) ** 2 + (mouseCanvasY - centerY) ** 2);
+                const newSize = Math.max(20, dist * 2); 
+                const sizeChange = newSize - el.size;
+                el.x -= sizeChange / 2;
+                el.y -= sizeChange / 2;
+                el.size = newSize;
+
+            } else if (currentTool === 'rotate') {
+                const angle = Math.atan2(mouseCanvasY - centerY, mouseCanvasX - centerX);
+                el.rotation = angle;
+            }
+        }
+
+        // --- Pen Tool Logic ---
+
+        /**
+         * Gets coordinates from mouse or touch event, snapping to the grid.
+         * @param {Event} e - MouseEvent or TouchEvent.
+         * @returns {{x: number, y: number}} Snapped canvas coordinates.
+         */
+        function getSnappedCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            // Snap to nearest grid intersection for blocky/precise drawing
+            const snappedX = Math.round((clientX - rect.left) / GRID_SIZE) * GRID_SIZE;
+            const snappedY = Math.round((clientY - rect.top) / GRID_SIZE) * GRID_SIZE;
+            
+            return { x: snappedX, y: snappedY };
+        }
+
+        function startPenDraw(coords) {
+            isDrawingPath = true;
+            currentPenPath = {
+                id: nextElementId++,
+                type: 'Path',
+                color: rulerColor, // Use the current ruler color for the path
+                points: [{ x: coords.x, y: coords.y }],
+                visible: true
+            };
+            selectedElementId = null; 
+            handleToolChange('pen'); // Ensure tool is set to pen
+        }
+
+        function continuePenDraw(coords) {
+            if (!isDrawingPath || !currentPenPath) return;
+
+            const lastPoint = currentPenPath.points[currentPenPath.points.length - 1];
+            // Only add a new point if it has moved a substantial distance (due to snapping)
+            if (Math.abs(coords.x - lastPoint.x) >= GRID_SIZE || Math.abs(coords.y - lastPoint.y) >= GRID_SIZE) {
+                currentPenPath.points.push({ x: coords.x, y: coords.y });
+                redrawCanvas();
+            }
+        }
+
+        function endPenDraw() {
+            if (!isDrawingPath || !currentPenPath) return;
+            isDrawingPath = false;
+            
+            if (currentPenPath.points.length > 1) {
+                elements.push(currentPenPath);
+                showMessageBox("Path Saved", "Freehand path added.", "info");
+            } else {
+                nextElementId--; // Discard single point/click
+            }
+            currentPenPath = null;
+            redrawCanvas();
+        }
+
+        // --- Mouse Interaction Handlers ---
+
+        function handleMouseDown(e) {
+             if (currentTool === 'pen') {
+                e.preventDefault();
+                startPenDraw(getSnappedCoords(e));
+                return; 
+            }
+             if (e.button === 0) { // Left click
+                // Check if we are currently dragging a transform tool
+                if (selectedElementId !== null && (currentTool === 'scale' || currentTool === 'rotate')) {
+                    isDraggingElement = true; // Start transformation drag
+                    return; 
+                }
+             }
+        }
+        
+        function handleDoubleClick(e) {
+            if (currentTool === 'pen') return; // Do not select if in pen mode
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            isDraggingElement = false;
+            handleToolChange('move'); // Always reset to move on double click select
+
+            for (let i = elements.length - 1; i >= 0; i--) {
+                const el = elements[i];
+                // Only shapes (not paths) are selectable
+                if (el.visible && el.type !== 'Path' && isHit(el, x, y)) {
+                    selectedElementId = el.id;
+                    isDraggingElement = true;
+                    
+                    dragOffsetX = x - el.x;
+                    dragOffsetY = y - el.y;
+
+                    // Move to top layer
+                    elements.splice(i, 1);
+                    elements.push(el);
+                    
+                    updateCursorStyle(); 
+                    updatePropertiesPanel(el); 
+                    redrawCanvas();
+                    return;
+                }
+            }
+            // If no element is hit, deselect
+            selectedElementId = null;
+            updatePropertiesPanel(null); 
+            redrawCanvas();
+        }
+
+        function handleClick(e) {
+            if (currentTool === 'pen') return;
+            
+            if (isDraggingElement) {
+                e.preventDefault();
+                isDraggingElement = false;
+                currentTool = 'move'; // Lock the element down, reset tool to move
+                updateCursorStyle(); 
+                redrawCanvas();
+                
+                const el = elements.find(e => e.id === selectedElementId);
+                if (el) updatePropertiesPanel(el);
+            } else {
+                // If not dragging and clicked (single click), deselect
+                selectedElementId = null;
+                updatePropertiesPanel(null); 
+                redrawCanvas();
+            }
+        }
+
+        function handleMouseUp(e) {
+            if (currentTool === 'pen' && isDrawingPath) {
+                endPenDraw();
+            }
+            // If dragging elements for move/scale/rotate, stop the drag
+            if (isDraggingElement) {
+                isDraggingElement = false;
+                updateCursorStyle();
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            
+            // Check if the cursor is within the canvas boundaries
+            if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+
+                mouseCanvasX = Math.floor(e.clientX - rect.left);
+                mouseCanvasY = Math.floor(e.clientY - rect.top);
+                
+                // Update coordinate display
+                coordsDisplay.textContent = `X: ${mouseCanvasX}, Y: ${mouseCanvasY} (px)`;
+                coordsDisplay.classList.remove('opacity-0');
+                coordsDisplay.classList.add('opacity-100'); 
+
+                const el = elements.find(e => e.id === selectedElementId);
+                
+                if (currentTool === 'pen' && isDrawingPath) {
+                    continuePenDraw(getSnappedCoords(e)); // Pen tool handles its own redraw
+                    return; 
+                }
+
+                if (isDraggingElement && el && currentTool === 'move') {
+                    // 1. Moving
+                    el.x = mouseCanvasX - dragOffsetX;
+                    el.y = mouseCanvasY - dragOffsetY;
+                    
+                    el.x = Math.max(0, Math.min(el.x, canvas.width - el.size));
+                    el.y = Math.max(0, Math.min(el.y, canvas.height - el.size));
+                    
+                    redrawCanvas(); 
+                } else if (isDraggingElement && selectedElementId !== null && el && (currentTool === 'scale' || currentTool === 'rotate')) {
+                    // 2. Scaling or Rotating
+                    handleToolTransform(el);
+                    redrawCanvas();
+                } else if (isRulerVisible || cursorEmoji || currentTool === 'pen') {
+                    // 3. Ruler/Emoji drawing (force redraw to update custom cursor/ruler position)
+                    redrawCanvas(); 
+                }
+
+            } else {
+                // Hide coordinates/ruler/emoji when not over the canvas
+                coordsDisplay.classList.remove('opacity-100');
+                coordsDisplay.classList.add('opacity-0');
+                if ((isRulerVisible || cursorEmoji) && !isDraggingElement) {
+                    mouseCanvasX = 0;
+                    mouseCanvasY = 0;
+                    redrawCanvas();
+                }
+            }
+        }
+
+        // --- Touch Interaction Handlers (For mobile compatibility) ---
+
+        function handleTouchStart(e) {
+            // Prevent scrolling/zooming for single touch events
+            if (e.touches.length === 1) e.preventDefault(); 
+            
+            // Map to the appropriate mouse down logic
+            const touch = e.touches[0];
+            const event = { clientX: touch.clientX, clientY: touch.clientY, button: 0, target: e.target };
+            
+            // Pen tool activation
+            if (currentTool === 'pen') {
+                startPenDraw(getSnappedCoords(e));
+                return;
+            }
+            
+            // Touch emulation for double-click selection (Approximation: if an element is hit, select it)
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            for (let i = elements.length - 1; i >= 0; i--) {
+                 const el = elements[i];
+                 if (el.visible && el.type !== 'Path' && isHit(el, x, y)) {
+                    selectedElementId = el.id;
+                    isDraggingElement = true; // Start dragging immediately on touch
+                    dragOffsetX = x - el.x;
+                    dragOffsetY = y - el.y;
+                    elements.splice(i, 1);
+                    elements.push(el);
+                    updateCursorStyle(); 
+                    updatePropertiesPanel(el); 
+                    redrawCanvas();
+                    return;
+                }
+            }
+
+            // If no element hit, and not pen mode, deselect
+            selectedElementId = null;
+            updatePropertiesPanel(null); 
+            redrawCanvas();
+        }
+
+        function handleTouchMove(e) {
+            if (e.touches.length !== 1) return;
+            e.preventDefault(); // Essential for preventing scrolling while drawing/moving
+
+            const touch = e.touches[0];
+            const event = { clientX: touch.clientX, clientY: touch.clientY, target: e.target };
+            
+            // Update internal coordinates from touch
+            const rect = canvas.getBoundingClientRect();
+            mouseCanvasX = Math.floor(touch.clientX - rect.left);
+            mouseCanvasY = Math.floor(touch.clientY - rect.top);
+
+            if (currentTool === 'pen' && isDrawingPath) {
+                continuePenDraw(getSnappedCoords(e));
+            } else if (isDraggingElement) {
+                // Emulate mousemove for moving/transforming
+                handleMouseMove(event); 
+            } else if (isRulerVisible || cursorEmoji) {
+                redrawCanvas();
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (currentTool === 'pen' && isDrawingPath) {
+                endPenDraw();
+            }
+            // Stop drag after touch ends
+            isDraggingElement = false; 
+            updateCursorStyle();
+        }
+
+        // --- Other Handlers (Ruler, Cursor, Size, Input) ---
+
+        function isHit(el, x, y) {
+            if (el.type === 'Path') return false; // Paths are not selectable by bounding box
+            return x >= el.x && x <= el.x + el.size && y >= el.y && y <= el.y + el.size;
+        }
+        
+        function drawCustomCursor(x, y) { /* ... (No change) ... */ 
+             ctx.save();
+             ctx.font = '24px sans-serif';
+             ctx.textAlign = 'center';
+             ctx.textBaseline = 'middle';
+             ctx.fillText(cursorEmoji, x, y);
+             ctx.restore();
+        }
+
+        function handleRulerToggle() { 
+            isRulerVisible = rulerToggle.checked;
+            if (isRulerVisible) { cursorEmoji = null; emojiCursorSelect.value = ''; }
+            updateCursorStyle();
+            redrawCanvas();
+        }
+        
+        function handleRulerColorChange() {
+             rulerColor = rulerColorInput.value;
+             redrawCanvas();
+        }
+
+        function handleEmojiCursorChange() { 
+            cursorEmoji = emojiCursorSelect.value || null;
+            if (cursorEmoji) { rulerToggle.checked = false; isRulerVisible = false; }
+            updateCursorStyle();
+            redrawCanvas();
+        }
+
+        function updateCursorStyle() {
+            if (currentTool === 'pen') {
+                canvas.style.cursor = 'none'; // Pen uses custom crosshair/ruler
+            } else if (isDraggingElement && currentTool === 'move') {
+                canvas.style.cursor = 'grabbing';
+            } else if (selectedElementId !== null && (currentTool === 'scale' || currentTool === 'rotate')) {
+                canvas.style.cursor = currentTool === 'scale' ? 'nwse-resize' : 'crosshair';
+            } else if (cursorEmoji || isRulerVisible) {
+                canvas.style.cursor = 'none';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        }
+
+        function handleApply() { /* ... (No change) ... */ 
+            const w = parseInt(widthInput.value, 10);
+            const h = parseInt(heightInput.value, 10);
+            if (devicePresetSelect.value !== "") { devicePresetSelect.value = ""; }
+            if (!isNaN(w) && w >= 100 && !isNaN(h) && h >= 100) {
+                customWidth = w;
+                customHeight = h;
+                resizeCanvas();
+            } 
+        }
+
+        function handleReset() { /* ... (No change) ... */
+            customWidth = null;
+            customHeight = null;
+            widthInput.value = '';
+            heightInput.value = '';
+            devicePresetSelect.value = "";
+            resizeCanvas();
+        }
+
+        function handlePresetChange() { /* ... (No change) ... */
+            const selectedValue = devicePresetSelect.value;
+            if (selectedValue) {
+                const [w, h] = selectedValue.split('x').map(Number);
+                widthInput.value = w;
+                heightInput.value = h;
+                customWidth = w;
+                customHeight = h;
+                resizeCanvas(); 
+            } else {
+                handleReset(); 
+            }
+        }
+
+        function resizeCanvas() { /* ... (No change) ... */
+            if (customWidth !== null && customHeight !== null) {
+                container.style.width = `${customWidth}px`;
+                container.style.height = `${customHeight}px`;
+                container.classList.remove('w-full', 'h-full');
+                container.classList.add('fixed-size-container'); 
+                canvas.width = customWidth;
+                canvas.height = customHeight;
+            } else {
+                container.style.width = '';
+                container.style.height = '';
+                container.classList.remove('fixed-size-container');
+                container.classList.add('w-full', 'h-full');
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+            redrawCanvas();
+        }
+
+        function handleSVGImport() { /* ... (No change) ... */
+            const svgCode = document.getElementById('svgInput').value.trim();
+            if (!svgCode) {
+                showMessageBox("Error", "Paste SVG path code.", "error");
+                return;
+            }
+            const size = 150;
+            const newElement = {
+                id: nextElementId++,
+                type: 'SVG',
+                color: '#f97316', 
+                size: size, 
+                x: (canvas.width / 2) - (size / 2), 
+                y: (canvas.height / 2) - (size / 2),
+                visible: true,
+                svg: svgCode,
+                rotation: 0
+            };
+            elements.push(newElement);
+            document.getElementById('svgInput').value = '';
+            showMessageBox("Success", "SVG Placeholder placed.", "info");
+            redrawCanvas();
+        }
+
+        // --- Initialization ---
+
+        window.onload = function() {
+            resizeCanvas(); 
+            updatePropertiesPanel(null); 
+            
+            // Event Listeners for Controls
+            applyButton.addEventListener('click', handleApply);
+            resetButton.addEventListener('click', handleReset);
+            devicePresetSelect.addEventListener('change', handlePresetChange);
+
+            widthInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleApply(); });
+            heightInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleApply(); });
+            
+            // Ruler/Cursor Listeners
+            rulerToggle.addEventListener('change', handleRulerToggle);
+            rulerColorInput.addEventListener('input', handleRulerColorChange);
+            emojiCursorSelect.addEventListener('change', handleEmojiCursorChange);
+            importSvgButton.addEventListener('click', handleSVGImport);
+            
+            // Shape Button Listeners (New click-based functionality)
+            shapeList.querySelectorAll('.add-shape-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const target = e.currentTarget;
+                    const type = target.getAttribute('data-type');
+                    const color = target.getAttribute('data-color');
+                    const size = parseInt(target.getAttribute('data-size'), 10);
+                    addElementToCanvas(type, color, size);
+                });
+            });
+
+            // Pen Tool Button Listener
+            document.getElementById('penToolButton').addEventListener('click', () => {
+                handleToolChange('pen');
+            });
+            
+            // Mouse Interaction Listeners
+            canvas.addEventListener('dblclick', handleDoubleClick); 
+            canvas.addEventListener('click', handleClick); 
+            canvas.addEventListener('mousedown', handleMouseDown);
+            document.body.addEventListener('mouseup', handleMouseUp); // Listen on body for reliable stop
+            document.body.addEventListener('mousemove', handleMouseMove); // Listen on body for dragging outside canvas
+            
+            // Touch Interaction Listeners
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.body.addEventListener('touchend', handleTouchEnd);
+            
+            // Global keydown listener for shortcuts (P, S, R)
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                const key = e.key.toLowerCase();
+                
+                if (key === 'delete' || key === 'backspace') {
+                    if(selectedElementId !== null) e.preventDefault(); 
+                    handleDeleteElement();
+                } else if (key === 'escape') {
+                    handleToolChange('move');
+                } else if (key === 'p') {
+                    e.preventDefault();
+                    handleToolChange('pen');
+                } else if (key === 's' && selectedElementId !== null) {
+                    e.preventDefault();
+                    handleToolChange('scale');
+                } else if (key === 'r' && selectedElementId !== null) {
+                    e.preventDefault();
+                    handleToolChange('rotate');
+                }
+            });
+        }
+
+        window.onresize = resizeCanvas;
+
+    </script>
+
+</body>
+</html>
