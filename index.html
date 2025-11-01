@@ -646,7 +646,7 @@
             body.addEventListener('mousemove', updateGradientPosition);
 
             // Dynamic tagline swapper
-            const taglines = ["Backend Developer", "Android Developer", "Tech Strategist", "Problem Solver"];
+            const taglines = ["Backend Developer👩‍💻️", "Android Developer👨‍💻️", "Retired Vibe coder👮‍♂️️", "Cooker😎️", "Tech Enthusiast🕵️‍♂️️", "Problem Solver💂‍♂️️", "Bookmarker👨‍🎤️", "Patient Listener✍️", "Alot of things🏎️", "Learner", "Personal Favourite🤟️", "My-personal-best"];
             const taglineElement = document.getElementById('tagline-text');
             let taglineIndex = 0;
 
@@ -659,7 +659,7 @@
                     taglineElement.classList.add('active');
                     taglineElement.style.transform = 'translateY(0)';
                     taglineIndex = (taglineIndex + 1) % taglines.length;
-                }, 500);
+                }, 800);
             }
 
             swapTagline();
