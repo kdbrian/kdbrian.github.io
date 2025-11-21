@@ -1,25 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
-
-.delius-unicase-regular {
-  font-family: "Delius Unicase", cursive;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.delius-unicase-bold {
-  font-family: "Delius Unicase", cursive;
-  font-weight: 700;
-  font-style: normal;
-}
-
-
-*{
-    margin: 0;
-    padding: 0;
-    font-family: "Exo";
-}
-
-
+       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
@@ -73,4 +52,14 @@
         }
         #mobile-nav-drawer.open {
             transform: translateX(0);
+        }
+        
+        /* Custom style for circular profile image */
+        .profile-img {
+            width: 10rem;
+            height: 10rem;
+            object-fit: cover;
+            border-radius: 50%;
+            /* border: 4px solid #0369a1; sky-700 */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
