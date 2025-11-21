@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Delius+Unicase:wght@400;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
 
 .delius-unicase-regular {
   font-family: "Delius Unicase", cursive;
@@ -17,7 +16,61 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: "Delius Unicase";
+    font-family: "Exo";
 }
 
 
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        
+        /* Define the badge style for skills (Muted Slate) */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: #f1f5f9; /* bg-slate-100 */
+            color: #475569; /* text-slate-700 */
+            border-radius: 4px; /* Slightly rounded corners for badges only */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.02); 
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* SPA Logic: Style for the main portfolio sections, initially hidden */
+        .portfolio-section {
+            display: none;
+        }
+        /* SPA Logic: Active section override */
+        .portfolio-section.active {
+            display: block;
+        }
+
+        /* Project Collapse/Expansion Styles */
+        .project-content-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .project-content-body.expanded {
+            max-height: 2000px; /* Large enough value */
+        }
+        .project-item.expanded {
+            /* Visually emphasize the expanded project */
+            border: 2px solid #0369a1; /* sky-700 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            margin: 1.5rem -1rem; /* Make it cover more space horizontally */
+            padding: 1rem;
+        }
+
+        /* Mobile Nav Drawer Styles */
+        #mobile-nav-drawer {
+            transition: transform 0.3s ease-out;
+            transform: translateX(-100%);
+        }
+        #mobile-nav-drawer.open {
+            transform: translateX(0);
+        }
