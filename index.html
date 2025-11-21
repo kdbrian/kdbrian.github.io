@@ -4,666 +4,433 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brian Kidiga | Backend Developer Portfolio</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poller+One&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for social media icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- Configure Tailwind for custom colors and font -->
     <style>
-        /* CSS Variables for Custom Palette: 0A0908, EAE0D5, F46036, FFFBDB */
-        :root {
-            --primary-bg: #0A0908;       /* Near Black */
-            --content-text: #EAE0D5;     /* Off-White/Light Text */
-            --primary-accent: #F46036;   /* Vibrant Orange */
-            --secondary-accent: #FFFBDB; /* Creamy Yellow/Highlight */
-            
-            /* Gradient Background Setup */
-            --gradient-light: #1A1A1A; 
-            --gradient-dark: #0A0908; 
-        }
-
-        /* Basic Reset and Typography */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
-            font-family: 'Poller One', serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            color: var(--content-text);
-            overflow-x: hidden; 
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            
-            background: radial-gradient(circle at 50% 50%, var(--gradient-light) 0%, var(--gradient-dark) 100%);
-            background-size: 200% 200%;
-            transition: background 0.2s ease-out; 
-            position: relative; 
         }
-
-        /* Global Content and Section Styling */
-        .content-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        section {
-            margin-bottom: 40px;
-            padding: 20px;
-            background: var(--primary-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(244, 96, 54, 0.3);
-        }
-        
-        h2, h3 {
-            font-family: 'Poller One', serif;
-            color: var(--primary-accent);
-            border-bottom: 2px solid var(--secondary-accent);
-            padding-bottom: 5px;
-        }
-
-        /* ======================================= */
-        /* === LISTS (Multi-Column Layout)     === */
-        /* ======================================= */
-        section ul {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 10px;
-            display: grid;
-            grid-template-columns: 1fr; 
-            gap: 10px 20px;
-        }
-        
-        #skills-content ul {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        section li {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        section li:before {
-            content: none; 
-        }
-
-        /* Experience job points styling */
-        .job ul {
-            grid-template-columns: 1fr;
-            list-style: none;
-            margin-top: 5px;
-        }
-        .job ul li {
-            position: relative;
-            padding-left: 20px;
-        }
-        .job ul li:before {
-            content: "\2022"; 
-            color: var(--primary-accent);
-            position: absolute;
-            left: 0;
-            top: 0;
-            font-size: 1.2em;
-        }
-
-        /* ======================================= */
-        /* === 1. HEADER & HERO SECTION STYLES === */
-        /* ======================================= */
-        .hero-section {
-            height: 100vh; 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 5%;
-            color: var(--content-text);
-        }
-
-        .user-panel {
-            flex: 0 0 30%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .user-panel h1 {
-            color: var(--content-text);
-            font-size: 4em;
-            line-height: 1;
-        }
-        
-        /* Large Circular User Image */
-        .user-image-wrapper {
-            width: 250px; 
-            height: 250px; 
-            margin-bottom: 25px;
-            
-            clip-path: circle(50% at 50% 50%);
-            border-radius: 50%; 
-
-            border: none;
-            box-shadow: 0 0 30px rgba(244, 96, 54, 0.5);
-            transition: all 0.5s ease-in-out;
-            overflow: hidden; 
-        }
-
-        .user-image-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            display: block; 
-        }
-
-        .user-image-wrapper:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px var(--secondary-accent);
-        }
-        
-        /* Dynamic Tagline */
-        .tagline-container {
-            height: 40px; 
-            overflow: hidden;
-            font-size: 1.5em;
-            color: var(--primary-accent);
-        }
-        .tagline {
-            display: block;
-            transition: opacity 0.5s, transform 0.5s;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        .tagline.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Featured Project Panel */
-        .project-panel {
-            flex: 0 0 60%;
-            padding: 20px;
-        }
-
-        .project-panel h2 {
-            font-size: 3em; 
-            margin-bottom: 30px;
-            color: var(--content-text);
-            border-bottom: none;
-        }
-        .recent-project-images {
-            display: flex;
-            gap: 15px;
-        }
-        .recent-project-images img {
-            width: 30%;
-            height: auto;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
-        }
-        .recent-project-images img:hover {
-            transform: scale(1.05);
-        }
-
-        /* ======================================= */
-        /* === 2. COLLAPSIBLE CONTENT STYLES === */
-        /* ======================================= */
-        .toggle-header {
-            cursor: pointer;
-            background: var(--primary-bg);
-            color: var(--content-text);
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 2px solid var(--primary-accent);
-            outline: none; 
-            transition: background 0.3s;
-        }
+        /* Custom styles for the collapsible sections */
         .collapsible-content {
-            display: none; 
-            padding: 10px 0;
-            border-left: 3px solid var(--primary-accent);
-            padding-left: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
         }
-        .collapsible-content.active {
-            display: block; 
+        .collapsible-content.open {
+            max-height: 2000px; /* Large enough value to cover all content */
+            padding-top: 1rem;
         }
-        
-        /* ======================================= */
-        /* === 3. FLOATING FOOTER STYLES       === */
-        /* ======================================= */
-        footer {
-            position: fixed;
-            bottom: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            
-            display: flex;
-            flex-direction: column;
+        .arrow {
+            transition: transform 0.3s ease;
+        }
+        .arrow.rotate {
+            transform: rotate(180deg);
+        }
+        /* Define the badge style for skills */
+        .badge {
+            display: inline-flex;
             align-items: center;
-            padding: 15px 30px; 
-            
-            background: var(--primary-bg);
-            color: var(--content-text);
-            border-radius: 20px; 
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8); 
-            z-index: 100; 
-        }
-        .footer-links {
-            display: flex;
-            gap: 25px;
-        }
-        .footer-links a {
-            color: var(--primary-accent); 
-            text-decoration: none;
-            font-size: 1.4em; 
-            transition: color 0.3s;
-        }
-        .footer-links a:hover {
-            color: var(--secondary-accent);
-        }
-
-
-        /* ======================================= */
-        /* === 4. SCROLL INDICATOR STYLES      === */
-        /* ======================================= */
-        .scroll-indicator {
-            position: fixed;
-            bottom: 100px; /* Positioned above the floating footer */
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            z-index: 101; /* Above footer */
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: var(--primary-bg);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: opacity 0.3s, transform 0.3s;
-            opacity: 0; /* Hidden by default */
-        }
-        .scroll-indicator.visible {
-            opacity: 1;
-        }
-        
-        /* SVG Circle for Progress Bar */
-        .scroll-indicator svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg); /* Start progress from the top */
-        }
-        .scroll-indicator circle {
-            fill: none;
-            stroke-width: 4;
-            transition: stroke-dashoffset 0.3s linear;
-        }
-        .scroll-indicator .track {
-            stroke: rgba(244, 96, 54, 0.2); /* Faint orange track */
-        }
-        .scroll-indicator .progress {
-            stroke: var(--primary-accent); /* Vibrant orange progress */
-            stroke-dasharray: 144.5; /* Circumference of a 46 radius circle */
-            stroke-dashoffset: 144.5;
-        }
-
-        /* Arrow Icon Styling (for Move to Top) */
-        .scroll-indicator i {
-            color: var(--secondary-accent);
-            font-size: 1.5em;
-            transition: opacity 0.3s;
-        }
-        
-        /* State when at the bottom (shows arrow) */
-        .scroll-indicator.at-bottom .progress, 
-        .scroll-indicator.at-bottom .track {
-            opacity: 0;
-        }
-        .scroll-indicator.at-bottom {
-            background: var(--primary-accent); /* Solid orange background for button mode */
-        }
-        .scroll-indicator.at-bottom i {
-            color: var(--primary-bg); /* Dark arrow on orange background */
-        }
-
-        /* ======================================= */
-        /* === 5. RESPONSIVENESS (MEDIA QUERIES) === */
-        /* ======================================= */
-
-        /* Tablet and Smaller Desktop (Max 900px) */
-        @media (max-width: 900px) {
-            .hero-section {
-                flex-direction: column; 
-                height: auto; 
-                padding: 50px 20px;
-                min-height: 100vh;
-            }
-            /* ... (other tablet styles unchanged) ... */
-        }
-
-        /* Mobile Devices (Max 600px) */
-        @media (max-width: 600px) {
-            /* List structure: all lists collapse to one column */
-            section ul, #skills-content ul {
-                grid-template-columns: 1fr;
-            }
-
-            /* Scroll Indicator position adjustment for mobile */
-            .scroll-indicator {
-                bottom: 80px; /* Adjust to be higher than minimized footer */
-                right: 10px;
-                width: 40px;
-                height: 40px;
-            }
-            .scroll-indicator circle {
-                stroke-width: 3;
-            }
-            .scroll-indicator i {
-                font-size: 1.2em;
-            }
-            /* ... (other mobile styles unchanged) ... */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            background-color: #eef2ff; /* bg-indigo-100 */
+            color: #4338ca; /* text-indigo-700 */
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800">
 
-    <header class="hero-section" id="hero">
-        <div class="user-panel">
-            <div class="user-image-wrapper">
-                <img src="uppy/user_profile.jpg" alt="Brian Kidiga Profile Picture">
-            </div>
-            <h1>BRIAN KIDIGA</h1>
-            
-            <div class="tagline-container">
-                <span id="tagline-text" class="tagline"></span>
-            </div>
-        </div>
+    <!-- The three-column grid structure for desktop -->
+    <div id="app-container" class="lg:grid lg:grid-cols-[20rem_1fr_18rem] min-h-screen">
         
-        <div class="project-panel">
-            <h2>Goal Tracker - Featured Project</h2>
-            <div class="recent-project-images">
-                <img src="uppy/goaltracker/onboard.jpeg" alt="App Screenshot 1">
-                <img src="uppy/goaltracker/add.jpeg" alt="App Screenshot 2">
-                <img src="uppy/goaltracker/all.jpeg" alt="App Screenshot 3">
+        <!-- ============================================== -->
+        <!-- LEFT PANEL: Navigation and Personal Info (FIXED) -->
+        <!-- The shadow and rounded edge clearly separate it from the main content -->
+        <!-- ============================================== -->
+        <header class="hidden lg:block p-8 bg-white shadow-2xl h-screen sticky top-0 overflow-y-auto rounded-r-3xl z-10">
+            <div class="space-y-12">
+                <div class="space-y-1">
+                    <h1 class="text-4xl font-extrabold tracking-tight text-gray-900">BRIAN KIDIGA</h1>
+                    <div class="text-sm font-medium text-indigo-600 h-6">
+                        <span id="tagline-text"></span>
+                    </div>
+                </div>
+
+                <!-- Navigation - Active item highlight uses border-r-4 -->
+                <nav class="space-y-4 pl-4">
+                    <h2 class="text-lg font-bold text-gray-700 uppercase tracking-wider mb-4">Navigation</h2>
+                    
+                    <!-- Default Active Link (About Me) -->
+                    <a href="#about" class="block text-lg font-bold text-indigo-700 hover:text-indigo-600 transition duration-150 border-r-4 border-indigo-500 pr-4 py-1">
+                        About Me
+                    </a>
+                    <!-- Standard Links -->
+                    <a href="#skills" class="block text-gray-600 hover:text-indigo-600 transition duration-150 py-1">Skills & Tech Stack</a>
+                    <a href="#experience" class="block text-gray-600 hover:text-indigo-600 transition duration-150 py-1">Experience</a>
+                    <a href="#projects" class="block text-gray-600 hover:text-indigo-600 transition duration-150 py-1">Projects</a>
+                    <a href="#education" class="block text-gray-600 hover:text-indigo-600 transition duration-150 py-1">Education</a>
+                </nav>
+
+                <!-- Project Panel Highlight -->
+                <div class="p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-lg">
+                    <h3 class="text-sm font-semibold text-indigo-700">Featured Project</h3>
+                    <p class="text-lg font-bold text-indigo-900">Goal Tracker</p>
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <main class="content-container">
 
-        <section id="about">
-            <h2>About Me</h2>
-            <p>
-                As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from Android app development, integrations, to getting insights from data that drive businesses. I thrive on solving problems and continuously learning new technologies.
-            </p>
-        </section>
+        <!-- ============================================== -->
+        <!-- CENTER PANEL: Primary Content (SCROLLABLE) -->
+        <!-- This is the 'page content' that users scroll through -->
+        <!-- ============================================== -->
+        <main class="lg:col-span-1 p-4 sm:p-8 lg:p-12 overflow-y-auto space-y-12">
 
-        <section id="skills">
-            <h2 class="toggle-header" data-target="skills-content">Skills <span class="arrow">▼</span></h2>
-            <div id="skills-content" class="collapsible-content">
-                <h3>Development & APIs</h3>
-                <ul>
-                    <li>Android Development (Java/Kotlin)</li>
-                    <li>Rest API </li>
-                    <li>GraphQL </li>
-                </ul>
-                <h3>Databases</h3>
-                <ul>
-                    <li>SQL & No SQL</li>
-                </ul>
-                <h3>Frameworks & Technologies</h3>
-                <ul>
-                    <li>Spring boot</li>
-                    <li>Node JS</li>
-                    <li>Elastic Search</li>
-                    <li>Docker & Containerization</li>
-                </ul>
-                <h3>Tools & Version Control</h3>
-                <ul>
-                    <li>PostMan/Insomnia/httpie</li>
-                    <li>Git/Gitlab/Github</li>
-                </ul>
-                <h3>Languages</h3>
-                <ul>
-                    <li>English: Fluent</li>
-                    <li>Swahili: Fluent</li>
-                </ul>
+            <!-- Mobile Header (Visible on small screens) -->
+            <div class="lg:hidden p-4 bg-white rounded-xl shadow-md mb-8">
+                 <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">BRIAN KIDIGA</h1>
+                <div class="text-sm font-medium text-indigo-600 h-6">
+                    <span id="tagline-text-mobile"></span>
+                </div>
             </div>
-        </section>
 
-        <section id="experience">
-            <h2 class="toggle-header" data-target="experience-content">Experience <span class="arrow">▼</span></h2>
-            <div id="experience-content" class="collapsible-content">
+            <!-- ABOUT ME / DARK SUMMARY BOX -->
+            <section id="about" class="bg-gray-900 p-6 sm:p-8 lg:p-10 rounded-xl shadow-2xl text-white space-y-4">
+                <h2 class="text-2xl font-bold tracking-tight text-indigo-400">About Me</h2>
+                <p class="text-gray-300 leading-relaxed">
+                    As a Computer Science graduate, I am passionate about crafting robust and user-friendly applications and building efficient solutions. My experience spans from Android app development, integrations, to getting insights from data that drive businesses. I thrive on solving problems and continuously learning new technologies.
+                </p>
+            </section>
+            
+            <!-- Social and Wakatime links -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Wakatime Placeholder (Diagram Element) -->
+                <div class="col-span-2 p-4 bg-white border border-gray-200 rounded-xl shadow-md flex items-center justify-center h-24 text-gray-500 font-mono">
+                    Wakatime Place Holder
+                </div>
+
+                <!-- GitHub -->
+                <a href="https://github.com/kdbrian" target="_blank" class="p-3 bg-gray-700 hover:bg-gray-800 text-white flex items-center justify-center rounded-xl shadow-md transition duration-150">
+                    <i class="fab fa-github mr-2"></i> GitHub
+                </a>
+
+                <!-- Medium -->
+                <a href="https://medium.com/@briankidiga.dev" target="_blank" class="p-3 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center rounded-xl shadow-md transition duration-150">
+                    <i class="fab fa-medium mr-2"></i> Medium
+                </a>
                 
-                <div class="job">
-                    <h3>Pseudo (Founder & CTO)</h3>
-                    <p class="period">2025</p>
-                    <ul>
-                        <li>Launched a start-up alias pseudo.</li>
-                        <li>Deployed a mobile tool for travelers Tow. Assured travelers and EV drivers access to vital services when needed.</li>
-                        <li>Initiated development of Menus, an online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
-                    </ul>
-                </div>
-
-                <div class="job">
-                    <h3>Android Developer Intern (Graph Tech)</h3>
-                    <p class="period">May - November 2024</p>
-                    <ul>
-                        <li>My milestone was translation, which had the app in native languages associated with different locales.</li>
-                        <li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales.</li>
-                        <li>Performed analysis on the app size and optimized to reduce it.</li>
-                        <li>Initially assisted in minor tasks like Documentation and testing.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="projects">
-            <h2>Projects</h2>
-            <p>All my projects are available from my Github profile.</p>
-
-            <div class="project-item">
-                <h3 class="toggle-header" data-target="project-menus">Menus <span class="arrow">▼</span></h3>
-                <div id="project-menus" class="collapsible-content">
-                    <p>An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
-                    <div class="carousel-container">
-                        <div class="carousel" data-project="menus">
-                            <img src="img/menus_1.jpg" alt="Menus Screenshot 1" class="carousel-slide active">
-                            <img src="img/menus_2.jpg" alt="Menus Screenshot 2" class="carousel-slide">
-                            <img src="img/menus_3.jpg" alt="Menus Screenshot 3" class="carousel-slide">
-                        </div>
-                        <button class="prev" onclick="moveSlide('menus', -1)">&#10094;</button>
-                        <button class="next" onclick="moveSlide('menus', 1)">&#10095;</button>
-                    </div>
-                </div>
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com/in/brian-kidiga/" target="_blank" class="p-3 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center rounded-xl shadow-md transition duration-150">
+                    <i class="fab fa-linkedin mr-2"></i> LinkedIn
+                </a>
             </div>
 
-            <div class="project-item">
-                <h3 class="toggle-header" data-target="project-sage">Sage <span class="arrow">▼</span></h3>
-                <div id="project-sage" class="collapsible-content">
-                    <p>A document repository that allows for online document sharing. While allowing users to fully interact with documents without having to read all of it.</p>
-                    <div class="carousel-container">
-                        <div class="carousel" data-project="sage">
-                            <img src="img/sage_1.jpg" alt="Sage Screenshot 1" class="carousel-slide active">
-                            <img src="img/sage_2.jpg" alt="Sage Screenshot 2" class="carousel-slide">
+            <!-- ============================================== -->
+            <!-- SKILLS SECTION -->
+            <!-- ============================================== -->
+            <section id="skills" class="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                <h2 class="toggle-header text-2xl font-bold mb-4 cursor-pointer flex justify-between items-center text-gray-900" data-target="skills-content">
+                    Skills
+                    <span class="arrow text-indigo-500">▼</span>
+                </h2>
+                <div id="skills-content" class="collapsible-content">
+                    <div class="space-y-6">
+                        <div class="border-b pb-4 border-gray-100">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Development & APIs</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge">Android Development (Java/Kotlin)</span>
+                                <span class="badge">Rest API</span>
+                                <span class="badge">GraphQL</span>
+                            </div>
                         </div>
-                        <button class="prev" onclick="moveSlide('sage', -1)">&#10094;</button>
-                        <button class="next" onclick="moveSlide('sage', 1)">&#10095;</button>
+                        <div class="border-b pb-4 border-gray-100">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Databases</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge">SQL & No SQL</span>
+                            </div>
+                        </div>
+                        <div class="border-b pb-4 border-gray-100">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Frameworks & Technologies</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge">Spring boot</span>
+                                <span class="badge">Node JS</span>
+                                <span class="badge">Elastic Search</span>
+                                <span class="badge">Docker & Containerization</span>
+                            </div>
+                        </div>
+                        <div class="border-b pb-4 border-gray-100">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Tools & Version Control</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge">PostMan/Insomnia/httpie</span>
+                                <span class="badge">Git/Gitlab/Github</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Languages</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge">English: Fluent</span>
+                                <span class="badge">Swahili: Fluent</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </section>
+            
+            <!-- ============================================== -->
+            <!-- EXPERIENCE SECTION -->
+            <!-- ============================================== -->
+            <section id="experience" class="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                <h2 class="toggle-header text-2xl font-bold mb-4 cursor-pointer flex justify-between items-center text-gray-900" data-target="experience-content">
+                    Experience
+                    <span class="arrow text-indigo-500">▼</span>
+                </h2>
+                <div id="experience-content" class="collapsible-content">
+                    <div class="space-y-6 border-l-2 border-indigo-200 pl-4">
+                        
+                        <div class="relative pb-6">
+                            <span class="absolute -left-3 top-0 h-6 w-6 bg-indigo-500 rounded-full ring-8 ring-white"></span>
+                            <h3 class="text-xl font-semibold text-gray-900">Pseudo (Founder & CTO)</h3>
+                            <p class="text-sm text-gray-500 period mb-3">2025</p>
+                            <ul class="list-disc ml-5 space-y-1 text-gray-700">
+                                <li>Launched a start-up alias pseudo.</li>
+                                <li>Deployed a mobile tool for travelers Tow. Assured travelers and EV drivers access to vital services when needed.</li>
+                                <li>Initiated development of Menus, an online application designed to help accelerate the online sale of restaurants and boost interactivity.</li>
+                            </ul>
+                        </div>
+
+                        <div class="relative pb-6">
+                            <span class="absolute -left-3 top-0 h-6 w-6 bg-indigo-500 rounded-full ring-8 ring-white"></span>
+                            <h3 class="text-xl font-semibold text-gray-900">Android Developer Intern (Graph Tech)</h3>
+                            <p class="text-sm text-gray-500 period mb-3">May - November 2024</p>
+                            <ul class="list-disc ml-5 space-y-1 text-gray-700">
+                                <li>My milestone was translation, which had the app in native languages associated with different locales.</li>
+                                <li>Integrated a currency conversion feature into the main app to allow clients to easily make payments from different locales.</li>
+                                <li>Performed analysis on the app size and optimized to reduce it.</li>
+                                <li>Initially assisted in minor tasks like Documentation and testing.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- PROJECTS SECTION -->
+            <!-- ============================================== -->
+            <section id="projects" class="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Projects</h2>
+                <p class="text-gray-600 mb-8">All my projects are available from my Github profile.</p>
+
+                <div class="space-y-10">
+                    
+                    <!-- Menus Project -->
+                    <div class="project-item border-b pb-6 border-gray-100">
+                        <h3 class="toggle-header text-xl font-semibold mb-2 cursor-pointer flex justify-between items-center text-gray-900" data-target="project-menus">
+                            Menus
+                            <span class="arrow text-indigo-500">▼</span>
+                        </h3>
+                        <div id="project-menus" class="collapsible-content">
+                            <p class="mb-4 text-gray-600">An online application aimed to streamline restaurant sales by integration with famous social media apps for marketing.</p>
+                            <div class="carousel-container relative">
+                                <div class="carousel flex overflow-hidden rounded-lg shadow-lg relative" data-project="menus">
+                                    <div class="h-64 w-full bg-indigo-100 flex items-center justify-center text-sm text-indigo-800 flex-shrink-0 transition-transform duration-500 ease-in-out" style="transform: translateX(0%);">Menus Screenshot 1 Placeholder</div>
+                                    <div class="h-64 w-full bg-indigo-200 flex items-center justify-center text-sm text-indigo-800 flex-shrink-0 transition-transform duration-500 ease-in-out">Menus Screenshot 2 Placeholder</div>
+                                    <div class="h-64 w-full bg-indigo-300 flex items-center justify-center text-sm text-indigo-800 flex-shrink-0 transition-transform duration-500 ease-in-out">Menus Screenshot 3 Placeholder</div>
+                                </div>
+                                <button class="prev absolute top-1/2 -translate-y-1/2 left-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('menus', -1)">&#10094;</button>
+                                <button class="next absolute top-1/2 -translate-y-1/2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('menus', 1)">&#10095;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sage Project -->
+                    <div class="project-item border-b pb-6 border-gray-100">
+                        <h3 class="toggle-header text-xl font-semibold mb-2 cursor-pointer flex justify-between items-center text-gray-900" data-target="project-sage">
+                            Sage
+                            <span class="arrow text-indigo-500">▼</span>
+                        </h3>
+                        <div id="project-sage" class="collapsible-content">
+                            <p class="mb-4 text-gray-600">A document repository that allows for online document sharing. While allowing users to fully interact with documents without having to read all of it.</p>
+                            <div class="carousel-container relative">
+                                <div class="carousel flex overflow-hidden rounded-lg shadow-lg relative" data-project="sage">
+                                    <div class="h-64 w-full bg-teal-100 flex items-center justify-center text-sm text-teal-800 flex-shrink-0 transition-transform duration-500 ease-in-out" style="transform: translateX(0%);">Sage Screenshot 1 Placeholder</div>
+                                    <div class="h-64 w-full bg-teal-200 flex items-center justify-center text-sm text-teal-800 flex-shrink-0 transition-transform duration-500 ease-in-out">Sage Screenshot 2 Placeholder</div>
+                                </div>
+                                <button class="prev absolute top-1/2 -translate-y-1/2 left-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('sage', -1)">&#10094;</button>
+                                <button class="next absolute top-1/2 -translate-y-1/2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('sage', 1)">&#10095;</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tow Project -->
+                    <div class="project-item">
+                        <h3 class="toggle-header text-xl font-semibold mb-2 cursor-pointer flex justify-between items-center text-gray-900" data-target="project-tow">
+                            Tow
+                            <span class="arrow text-indigo-500">▼</span>
+                        </h3>
+                        <div id="project-tow" class="collapsible-content">
+                            <p class="mb-4 text-gray-600">An online application used as a toolkit for drivers and travelers. It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries.</p>
+                            <div class="carousel-container relative">
+                                <div class="carousel flex overflow-hidden rounded-lg shadow-lg relative" data-project="tow">
+                                    <div class="h-64 w-full bg-red-100 flex items-center justify-center text-sm text-red-800 flex-shrink-0 transition-transform duration-500 ease-in-out" style="transform: translateX(0%);">Tow Screenshot 1 Placeholder</div>
+                                    <div class="h-64 w-full bg-red-200 flex items-center justify-center text-sm text-red-800 flex-shrink-0 transition-transform duration-500 ease-in-out">Tow Screenshot 2 Placeholder</div>
+                                </div>
+                                <button class="prev absolute top-1/2 -translate-y-1/2 left-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('tow', -1)">&#10094;</button>
+                                <button class="next absolute top-1/2 -translate-y-1/2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-80 transition" onclick="moveSlide('tow', 1)">&#10095;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ============================================== -->
+            <!-- EDUCATION SECTION -->
+            <!-- ============================================== -->
+            <section id="education" class="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Education</h2>
+                <ul class="list-disc ml-5 space-y-2 text-gray-700">
+                    <li><strong class="font-semibold text-indigo-600">BSc. Computer Science</strong> - Graduated with honors.</li>
+                    <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
+                </ul>
+            </section>
+            
+        </main>
+        
+        <!-- ============================================== -->
+        <!-- RIGHT PANEL: Fixed Media/Contact (FIXED) -->
+        <!-- The shadow and rounded edge clearly separate it from the main content -->
+        <!-- ============================================== -->
+        <aside class="hidden lg:block p-8 bg-white shadow-2xl h-screen sticky top-0 space-y-12 rounded-l-3xl z-10">
+            
+            <!-- Image Placeholder (Large Circle) -->
+            <div class="flex justify-center">
+                <div class="h-40 w-40 rounded-full bg-gray-300 border-4 border-indigo-400 flex items-center justify-center text-xs text-gray-600 font-bold shadow-lg">
+                    Profile Image
+                </div>
+            </div>
+
+            <!-- Spotify Podcast Placeholder -->
+            <div class="p-6 bg-gray-50 border border-gray-200 rounded-xl shadow-inner space-y-4">
+                <h3 class="text-lg font-bold text-gray-700">Podcast Link Facilitation</h3>
+                <div class="h-32 bg-green-100 border border-green-300 rounded-lg flex items-center justify-center text-sm text-green-700">
+                    <i class="fab fa-spotify mr-2 text-2xl"></i> Spotify Place Holder
+                </div>
+                <p class="text-xs text-gray-500">Space reserved for embedding a future Spotify podcast or audio content.</p>
             </div>
             
-            <div class="project-item">
-                <h3 class="toggle-header" data-target="project-tow">Tow <span class="arrow">▼</span></h3>
-                <div id="project-tow" class="collapsible-content">
-                    <p>An online application used as a toolkit for drivers and travelers. It allows for discovery of the closest Tow trucks services, mechanic services, and Eateries.</p>
-                    <div class="carousel-container">
-                        <div class="carousel" data-project="tow">
-                            <img src="img/tow_1.jpg" alt="Tow Screenshot 1" class="carousel-slide active">
-                            <img src="img/tow_2.jpg" alt="Tow Screenshot 2" class="carousel-slide">
-                        </div>
-                        <button class="prev" onclick="moveSlide('tow', -1)">&#10094;</button>
-                        <button class="next" onclick="moveSlide('tow', 1)">&#10095;</button>
-                    </div>
-                </div>
+            <!-- Contact/Email -->
+            <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                <h3 class="text-lg font-bold text-indigo-700 mb-2">Get in Touch</h3>
+                <p class="text-sm text-indigo-800">briankidiga.dev@email.com</p>
             </div>
-        </section>
 
-        <section id="education">
-            <h2>Education</h2>
-            <ul>
-                <li>BSc. Computer Science,(2020-2024)</li>
-                <li>Relevant Coursework: Data Structures and Algorithms, Database Management Systems, Software Engineering, Mobile Application Development.</li>
-            </ul>
-        </section>
-
-    </main>
-    
-    <div class="scroll-indicator" id="scroll-indicator">
-        <svg viewBox="0 0 100 100">
-            <circle class="track" cx="50" cy="50" r="46"></circle>
-            <circle class="progress" cx="50" cy="50" r="46"></circle>
-        </svg>
-        <i class="fas fa-arrow-up"></i>
+        </aside>
     </div>
 
-    <footer>
-        <div class="footer-links">
-            <a href="https://www.linkedin.com/in/brian-kidiga/" target="_blank" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/kdbrian" target="_blank" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
-            <a href="https://medium.com/@briankidiga.dev" target="_blank" aria-label="Medium Profile"><i class="fab fa-medium"></i></a>
-        </div>
-    </footer>
-
+    <!-- ============================================== -->
+    <!-- JavaScript Logic -->
+    <!-- ============================================== -->
     <script>
-        // === SCROLL INDICATOR JAVASCRIPT ===
-        const scrollIndicator = document.getElementById('scroll-indicator');
-        const progressCircle = scrollIndicator.querySelector('.progress');
-        const circumference = 2 * Math.PI * 46; // 2 * pi * r (r=46 from CSS)
-        progressCircle.style.strokeDasharray = circumference;
-
-        const SCROLL_THRESHOLD = 95; // Percentage of scroll at which to switch to 'Move to Top' mode
-
-        function updateScrollIndicator() {
-            const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = window.scrollY;
-            
-            // Calculate scroll percentage
-            const scrollPercentage = (scrolled / scrollTotal) * 100;
-            
-            // Determine dash offset for progress circle
-            const dashOffset = circumference - (scrollPercentage / 100) * circumference;
-            progressCircle.style.strokeDashoffset = dashOffset;
-
-            // Visibility (hide when at the very top)
-            if (scrolled > 50) {
-                scrollIndicator.classList.add('visible');
-            } else {
-                scrollIndicator.classList.remove('visible');
-            }
-
-            // 'Move to Top' mode logic
-            if (scrollPercentage >= SCROLL_THRESHOLD) {
-                scrollIndicator.classList.add('at-bottom');
-            } else {
-                scrollIndicator.classList.remove('at-bottom');
-            }
-        }
-        
-        // Click handler for scrolling to top
-        scrollIndicator.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // === ALL OTHER SCRIPTS ===
-        function moveSlide(projectName, step) {
-            const carousel = document.querySelector(`.carousel[data-project="${projectName}"]`);
-            if (!carousel) return;
-            const slides = carousel.querySelectorAll('.carousel-slide');
-            let currentIndex = -1;
-
-            slides.forEach((slide, index) => {
-                if (slide.classList.contains('active')) {
-                    currentIndex = index;
-                    slide.classList.remove('active');
-                }
-            });
-
-            let newIndex = currentIndex + step;
-            if (newIndex >= slides.length) {
-                newIndex = 0;
-            } else if (newIndex < 0) {
-                newIndex = slides.length - 1;
-            }
-
-            slides.forEach(slide => slide.classList.remove('active'));
-            slides[newIndex].classList.add('active');
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial scroll position check
-            updateScrollIndicator();
-            window.addEventListener('scroll', updateScrollIndicator);
+            // --- 1. Tagline Typing Effect ---
+            const taglines = [
+                "Backend Developer", 
+                "Computer Science Graduate", 
+                "Problem Solver", 
+                "Spring Boot | Node.js | Android"
+            ];
+            let tagIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let delay = 100;
 
-            // Collapsible functionality
+            const taglineElements = document.querySelectorAll('#tagline-text, #tagline-text-mobile');
+
+            function typeTagline() {
+                const currentTag = taglines[tagIndex];
+                const displayTag = currentTag.substring(0, charIndex);
+
+                taglineElements.forEach(el => el.textContent = displayTag);
+
+                if (!isDeleting) {
+                    // Typing forward
+                    charIndex++;
+                    if (charIndex > currentTag.length) {
+                        isDeleting = true;
+                        delay = 2000; // Pause at end of sentence
+                    } else {
+                        delay = 75;
+                    }
+                } else {
+                    // Deleting
+                    charIndex--;
+                    if (charIndex < 0) {
+                        isDeleting = false;
+                        tagIndex = (tagIndex + 1) % taglines.length;
+                        delay = 500; // Pause before starting next sentence
+                    } else {
+                        delay = 30;
+                    }
+                }
+
+                setTimeout(typeTagline, delay);
+            }
+
+            typeTagline();
+
+            // --- 2. Expand/Collapse Logic ---
             document.querySelectorAll('.toggle-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const targetId = header.getAttribute('data-target');
-                    const content = document.getElementById(targetId);
+                    const targetContent = document.getElementById(targetId);
+                    const arrow = header.querySelector('.arrow');
 
-                    content.classList.toggle('active');
-                    header.classList.toggle('active');
-                });
-            });
-
-            // Carousel setup
-            document.querySelectorAll('.carousel').forEach(carousel => {
-                const slides = carousel.querySelectorAll('.carousel-slide');
-                slides.forEach((slide, index) => {
-                    slide.classList.remove('active');
-                    if (index === 0 && slides.length > 0) {
-                        slide.classList.add('active');
+                    if (targetContent && arrow) {
+                        const isOpen = targetContent.classList.toggle('open');
+                        arrow.classList.toggle('rotate', isOpen);
                     }
                 });
             });
-            
-            // Gradient fluid effect
-            const body = document.body;
-            function updateGradientPosition(e) {
-                const x = (e.clientX / window.innerWidth) * 100;
-                const y = (e.clientY / window.innerHeight) * 100;
+
+            // --- 3. Carousel Logic ---
+            window.moveSlide = (projectId, direction) => {
+                const carousel = document.querySelector(`.carousel[data-project="${projectId}"]`);
+                if (!carousel) return;
+
+                const slides = Array.from(carousel.children);
+                const totalSlides = slides.length;
+
+                // Find the index of the currently visible slide (via inline style transform: translateX)
+                let currentIndex = 0;
+                // This logic needs to check the parent's transform, as all children move together
+                const firstSlideTransform = carousel.children[0].style.transform;
+                if (firstSlideTransform) {
+                    const match = firstSlideTransform.match(/translateX\((-?\d+)%\)/);
+                    if (match) {
+                        // The translation percentage is used to find the current index
+                        currentIndex = Math.abs(parseInt(match[1]) / 100);
+                    }
+                }
                 
-                body.style.background = `radial-gradient(circle at ${x}% ${y}%, var(--gradient-light) 0%, var(--gradient-dark) 100%)`;
-            }
-            
-            body.addEventListener('mousemove', updateGradientPosition);
-
-            // Dynamic tagline swapper
-            const taglines = ["Backend Developer👩‍💻️", "Android Developer👨‍💻️", "Retired Vibe coder👮‍♂️️", "Cooker😎️", "Tech Enthusiast🕵️‍♂️️", "Problem Solver💂‍♂️️", "Bookmarker👨‍🎤️", "Patient Listener✍️", "Alot of things🏎️", "Learner", "Personal Favourite🤟️", "My-personal-best"];
-            const taglineElement = document.getElementById('tagline-text');
-            let taglineIndex = 0;
-
-            function swapTagline() {
-                taglineElement.classList.remove('active');
-                taglineElement.style.transform = 'translateY(20px)';
-
-                setTimeout(() => {
-                    taglineElement.textContent = taglines[taglineIndex];
-                    taglineElement.classList.add('active');
-                    taglineElement.style.transform = 'translateY(0)';
-                    taglineIndex = (taglineIndex + 1) % taglines.length;
-                }, 800);
-            }
-
-            swapTagline();
-            setInterval(swapTagline, 3000); 
+                let newIndex = (currentIndex + direction + totalSlides) % totalSlides;
+                
+                // Update the transform style for ALL slides based on the new index
+                // This ensures the visual shift inside the flex container
+                const newTransformValue = `translateX(-${newIndex * 100}%)`;
+                
+                slides.forEach(slide => {
+                    slide.style.transform = newTransformValue;
+                });
+            };
         });
     </script>
 </body>
