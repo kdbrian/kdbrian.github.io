@@ -10,10 +10,10 @@
 </head>
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-300 via-zinc-200 to-slate-400">
 
-<div class="w-[95%] h-[90vh] rounded-3xl border border-zinc-500 bg-white/30 backdrop-blur-md flex p-10 gap-10 overflow-hidden">
+<div class="w-[95%] h-[90vh] rounded-3xl border border-zinc-400 bg-white/30 backdrop-blur-md flex p-10 gap-10 overflow-hidden">
 
-<div class="w-1/4 flex flex-col items-center justify-start gap-6 border-r border-zinc-500 pr-8">
-<img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12" class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl">
+<div class="w-1/4 flex flex-col items-center gap-6 border-r border-zinc-400 pr-8">
+<img src="profile.jpg" class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl">
 <div class="text-center">
 <h2 class="text-2xl font-semibold tracking-wide">Alex Carter</h2>
 <p class="text-zinc-700">Frontend Developer</p>
@@ -27,50 +27,76 @@
 </div>
 
 <div class="w-2/4 flex flex-col items-center justify-center relative overflow-hidden">
-<h1 id="projectTitle" class="text-6xl wobble mb-6 text-center">Project One</h1>
-<div id="stack" class="relative w-80 h-[420px]">
-<div class="projectCard absolute w-full h-full rounded-2xl bg-white shadow-2xl transition-all duration-700" style="background-image:url('https://images.unsplash.com/photo-1509395176047-4a66953fd231'); background-size:cover;"></div>
-<div class="projectCard absolute w-full h-full rounded-2xl bg-white shadow-2xl transition-all duration-700 translate-x-4 translate-y-4 opacity-70" style="background-image:url('https://images.unsplash.com/photo-1492724441997-5dc865305da7'); background-size:cover;"></div>
-<div class="projectCard absolute w-full h-full rounded-2xl bg-white shadow-2xl transition-all duration-700 translate-x-8 translate-y-8 opacity-40" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'); background-size:cover;"></div>
-</div>
+<h1 id="projectTitle" class="text-6xl wobble mb-6 text-center transition-all duration-500"></h1>
+<div id="stack" class="relative w-80 h-[420px]"></div>
 </div>
 
 <div class="w-1/4 flex items-center justify-center">
-<div id="preview" class="w-72 h-[420px] rounded-2xl shadow-2xl bg-cover bg-center transition-all duration-700"></div>
+<div id="preview" class="w-72 h-[420px] rounded-2xl shadow-2xl bg-cover bg-center transition-all duration-700 cursor-pointer"></div>
 </div>
 
 </div>
 
 <script>
 const projects = [
-{title:"Project One",image:"https://images.unsplash.com/photo-1509395176047-4a66953fd231"},
-{title:"Project Two",image:"https://images.unsplash.com/photo-1492724441997-5dc865305da7"},
-{title:"Project Three",image:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"}
+"project-one",
+"project-two",
+"project-three"
 ]
 
 let index = 0
+let projectData = []
+const stack = document.getElementById("stack")
 const preview = document.getElementById("preview")
 const title = document.getElementById("projectTitle")
 
+async function loadProjects(){
+for(const name of projects){
+const res = await fetch(`projects/${name}/project.json`)
+const data = await res.json()
+projectData.push(data)
+}
+render()
+}
+
+function render(){
+stack.innerHTML=""
+const current = projectData[index]
+title.textContent = current.title
+
+current.images.forEach((img, i)=>{
+const card = document.createElement("div")
+card.className="absolute w-full h-full rounded-2xl shadow-2xl bg-cover bg-center transition-all duration-700"
+card.style.backgroundImage=`url(projects/${current.slug}/art/${img})`
+card.style.zIndex = current.images.length - i
+card.style.transform = `translateY(${i*12}px) scale(${1 - i*0.05})`
+card.style.opacity = i === 0 ? 1 : 0.5
+card.style.filter = i === 0 ? "blur(0px)" : "blur(2px)"
+stack.appendChild(card)
+})
+
+updatePreview()
+}
+
 function updatePreview(){
+const next = projectData[(index+1)%projectData.length]
 preview.style.opacity=0
 setTimeout(()=>{
-preview.style.backgroundImage=`url(${projects[(index+1)%projects.length].image})`
+preview.style.backgroundImage=`url(projects/${next.slug}/art/${next.images[0]})`
 preview.style.opacity=1
 },300)
 }
 
 function rotateProjects(){
-index=(index+1)%projects.length
+index=(index+1)%projectData.length
 title.classList.remove("animateTitle")
 void title.offsetWidth
-title.textContent=projects[index].title
 title.classList.add("animateTitle")
-updatePreview()
+render()
 }
 
 preview.addEventListener("click",rotateProjects)
-updatePreview()
+loadProjects()
 </script>
 
 </body>
