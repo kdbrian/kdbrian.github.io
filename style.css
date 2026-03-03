@@ -1,0 +1,24 @@
+body{
+font-family:'Inter',sans-serif;
+}
+
+.wobble{
+font-family:'Rubik Wet Paint',cursive;
+letter-spacing:4px;
+color:#1f2937;
+animation:wobble 3s ease-in-out infinite;
+}
+
+@keyframes wobble{
+0%,100%{transform:rotate(-2deg);}
+50%{transform:rotate(2deg);}
+}
+
+.animateTitle{
+animation:pop 0.6s ease;
+}
+
+@keyframes pop{
+0%{transform:scale(0.6);opacity:0;}
+100%{transform:scale(1);opacity:1;}
+}
