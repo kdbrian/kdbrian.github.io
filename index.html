@@ -1,103 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-300 via-zinc-200 to-slate-400">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kidiga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Caveat:wght@700&family=Lora:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
 
-<div class="w-[95%] h-[90vh] rounded-3xl border border-zinc-400 bg-white/30 backdrop-blur-md flex p-10 gap-10 overflow-hidden">
+      <!-- ══ TOP HEADER ══ -->
+      <header class="top-header">
+        <!-- Desktop-only animated orb, top-left -->
+        <div class="header-orb" aria-hidden="true">
+          <div class="orb-inner">
+            <div class="orb-ring r1"></div>
+            <div class="orb-ring r2"></div>
+            <div class="orb-ring r3"></div>
+            <span class="orb-core"></span>
+          </div>
+        </div>
 
-<div class="w-1/4 flex flex-col items-center gap-6 border-r border-zinc-400 pr-8">
-<img src="profile.jpg" class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl">
-<div class="text-center">
-<h2 class="text-2xl font-semibold tracking-wide">Alex Carter</h2>
-<p class="text-zinc-700">Frontend Developer</p>
-<p class="text-zinc-600 text-sm">Age: 25</p>
-<p class="text-zinc-600 text-sm">Sex: Male</p>
-</div>
-<div class="flex gap-4 mt-4">
-<a href="#" class="px-4 py-2 rounded-full bg-black text-white hover:scale-110 transition">GitHub</a>
-<a href="#" class="px-4 py-2 rounded-full bg-green-600 text-white hover:scale-110 transition">Linktree</a>
-</div>
-</div>
+        <!-- Centred nav pill -->
+        <nav class="nav-pill" role="navigation" aria-label="Main sections">
+          <button class="nav-btn active" data-section="about">About Me</button>
+          <button class="nav-btn" data-section="education">Education</button>
+          <button class="nav-btn" data-section="projects">Projects</button>
+        </nav>
 
-<div class="w-2/4 flex flex-col items-center justify-center relative overflow-hidden">
-<h1 id="projectTitle" class="text-6xl wobble mb-6 text-center transition-all duration-500"></h1>
-<div id="stack" class="relative w-80 h-[420px]"></div>
-</div>
+        <!-- Mirror spacer so nav stays centred -->
+        <div class="header-spacer" aria-hidden="true"></div>
+      </header>
 
-<div class="w-1/4 flex items-center justify-center">
-<div id="preview" class="w-72 h-[420px] rounded-2xl shadow-2xl bg-cover bg-center transition-all duration-700 cursor-pointer"></div>
-</div>
+      <!-- ══ MAIN CARD ══ -->
+      <main class="main-card">
 
-</div>
+        <!-- Profile sidebar -->
+        <aside class="profile-sidebar">
+          <div class="profile-ring-wrap">
+            <img src="profile.jpg" class="profile-img" alt="Brian Kidiga" />
+          </div>
 
-<script>
-const projects = [
-"project-one",
-"project-two",
-"project-three"
-]
+          <div class="profile-info">
+            <h2 class="profile-name">Brian Kidiga</h2>
+            <p class="profile-role">Android Developer</p>
 
-let index = 0
-let projectData = []
-const stack = document.getElementById("stack")
-const preview = document.getElementById("preview")
-const title = document.getElementById("projectTitle")
+            <div class="chip-row">
+              <span class="chip chip-teal">Location <strong>Earth 🌍</strong></span>
+              <span class="chip chip-orange age-chip" id="ageChip">Age <strong class="age-val" id="ageVal">••</strong></span>
+              <span class="chip chip-sky">Sex <strong>Male</strong></span>
+            </div>
 
-async function loadProjects(){
-for(const name of projects){
-const res = await fetch(`projects/${name}/project.json`)
-const data = await res.json()
-projectData.push(data)
-}
-render()
-}
+            <div class="socials">
+              <a href="#" aria-label="LinkedIn" class="social-link"><i class="fa fa-linkedin-square"></i></a>
+              <a href="#" aria-label="GitHub" class="social-link"><i class="fa-brands fa-github"></i></a>
+            </div>
+          </div>
+        </aside>
 
-function render(){
-stack.innerHTML=""
-const current = projectData[index]
-title.textContent = current.title
+        <!-- Content area -->
+        <div class="content-area">
 
-current.images.forEach((img, i)=>{
-const card = document.createElement("div")
-card.className="absolute w-full h-full rounded-2xl shadow-2xl bg-cover bg-center transition-all duration-700"
-card.style.backgroundImage=`url(projects/${current.slug}/art/${img})`
-card.style.zIndex = current.images.length - i
-card.style.transform = `translateY(${i*12}px) scale(${1 - i*0.05})`
-card.style.opacity = i === 0 ? 1 : 0.5
-card.style.filter = i === 0 ? "blur(0px)" : "blur(2px)"
-stack.appendChild(card)
-})
+          <!-- ABOUT ME -->
+          <section id="section-about" class="section-panel active">
+            <h1 class="section-title about-line">Hey, I'm Brian 👋</h1>
+            <p class="body-lg about-line">
+              A passionate <strong class="text-orange-600">Android Developer</strong> who loves crafting smooth, elegant mobile experiences — from pixel-perfect UIs to rock-solid architectures.
+            </p>
+            <p class="body-sm about-line">
+              I live and breathe Kotlin, Jetpack Compose, and everything in the Android ecosystem. When I'm not pushing commits, you'll find me exploring AI integrations, tinkering with backends, or making my apps a little more delightful.
+            </p>
+            <div class="about-line">
+              <p class="pills-label">Stack &amp; Tools</p>
+              <div class="skill-pills" id="skillPills"></div>
+            </div>
+            <div class="stat-row about-line">
+              <div class="stat-card"><p class="stat-num clr-orange">3+</p><p class="stat-lbl">Yrs Exp</p></div>
+            </div>
+          </section>
 
-updatePreview()
-}
+          <!-- EDUCATION -->
+          <section id="section-education" class="section-panel">
+            <!-- <h1 class="section-title">The Journey 📚</h1> -->
+            <div class="edu-card glass-card">
+              <span class="edu-icon">🎓</span>
+              <div>
+                <p class="edu-deg">B.Sc. Computer Science</p>
+                <p class="edu-school clr-orange">Karatina University</p>
+                <p class="edu-yr">2020 – 2024</p>
+                <p class="edu-desc">Graduated with honours. Focused on software engineering, algorithms, and distributed systems.</p>
+              </div>
+            </div>
+            </div>
+          </section>
 
-function updatePreview(){
-const next = projectData[(index+1)%projectData.length]
-preview.style.opacity=0
-setTimeout(()=>{
-preview.style.backgroundImage=`url(projects/${next.slug}/art/${next.images[0]})`
-preview.style.opacity=1
-},300)
-}
+          <!-- PROJECTS -->
+          <section id="section-projects" class="section-panel projects-layout">
+            <div class="stack-col">
+              <h1 id="projectTitle" class="wobble lora-font">Project Title</h1>
+              <div id="stack" class="stack-area"></div>
+            </div>
+            <div class="preview-col">
+              <div id="preview" class="preview-card glass-card"></div>
+            </div>
+          </section>
 
-function rotateProjects(){
-index=(index+1)%projectData.length
-title.classList.remove("animateTitle")
-void title.offsetWidth
-title.classList.add("animateTitle")
-render()
-}
-
-preview.addEventListener("click",rotateProjects)
-loadProjects()
-</script>
-
-</body>
+        </div>
+      </main>
+    </div>
+    <script src="index.js"></script>
+  </body>
 </html>
