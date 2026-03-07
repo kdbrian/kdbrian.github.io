@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DevRate — Freelance Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f4f1ea;--paper:#fdfcf8;--ink:#1a1a18;--faint:#e5e1d6;--mid:#a09080;--accent:#c84b2f;--accent-light:#fdf0ed;--green:#2a6b3c;--green-light:#eaf3ed;--hbg:#1a1a18;--hfg:#fdfcf8;--hacc:#c84b2f;--mono:'IBM Plex Mono',monospace;--sans:'Space Grotesk',sans-serif;--disp:'Bebas Neue',cursive;}
+[data-theme="slate"]{--bg:#1e2130;--paper:#252a3a;--ink:#e8e4d8;--faint:#2e3448;--mid:#6a7090;--accent:#7eb8f7;--accent-light:#1a2540;--green:#4caf70;--green-light:#1a3025;--hbg:#0f1120;--hfg:#e8e4d8;--hacc:#7eb8f7;}
+[data-theme="forest"]{--bg:#1a2420;--paper:#1f2e28;--ink:#d8e8d0;--faint:#253328;--mid:#5a7a60;--accent:#7ecf90;--accent-light:#1a2e20;--green:#7ecf90;--green-light:#1a2e20;--hbg:#0f1810;--hfg:#d8e8d0;--hacc:#7ecf90;}
+[data-theme="rose"]{--bg:#fef0f4;--paper:#fff8fa;--ink:#2a1820;--faint:#f5dde5;--mid:#c08090;--accent:#d63060;--accent-light:#fde8ee;--green:#2a6b3c;--green-light:#eaf3ed;--hbg:#2a1820;--hfg:#fff8fa;--hacc:#d63060;}
+[data-theme="ink"]{--bg:#0a0a08;--paper:#111110;--ink:#e8e4d8;--faint:#1a1a18;--mid:#505048;--accent:#f5c842;--accent-light:#1a1800;--green:#60c070;--green-light:#0a180e;--hbg:#000;--hfg:#e8e4d8;--hacc:#f5c842;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:var(--mono);color:var(--ink);font-size:13px;line-height:1.6;transition:background .3s,color .3s;}
+
+/* HERO */
+.hero{background:var(--hbg);position:relative;overflow:hidden;}
+.hero-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 40px);pointer-events:none;}
+.hero-ghost{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-family:var(--disp);font-size:min(22vw,180px);color:rgba(255,255,255,.03);line-height:1;pointer-events:none;white-space:nowrap;letter-spacing:.04em;}
+.hero-inner{position:relative;z-index:2;padding:28px 28px 0;}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.hero-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.hero-word{font-family:var(--disp);font-size:min(10vw,68px);color:var(--hfg);letter-spacing:.05em;line-height:1;}
+.hero-word em{color:var(--hacc);font-style:normal;}
+.hero-sub{font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);border-left:2px solid var(--hacc);padding-left:10px;line-height:1.4;}
+.hero-right{display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.theme-row{display:flex;align-items:center;gap:7px;}
+.th-lbl{font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-right:2px;}
+.sw{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
+.sw:hover{transform:scale(1.25);}
+.sw.on{border-color:#fff;}
+.sw[data-t="default"]{background:linear-gradient(135deg,#f4f1ea,#c84b2f);}
+.sw[data-t="slate"]{background:linear-gradient(135deg,#1e2130,#7eb8f7);}
+.sw[data-t="forest"]{background:linear-gradient(135deg,#1a2420,#7ecf90);}
+.sw[data-t="rose"]{background:linear-gradient(135deg,#fef0f4,#d63060);}
+.sw[data-t="ink"]{background:linear-gradient(135deg,#0a0a08,#f5c842);}
+.cur-bar{display:flex;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);overflow:hidden;}
+.cb{font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 11px;border:none;background:transparent;cursor:pointer;color:rgba(255,255,255,.4);border-right:1px solid rgba(255,255,255,.1);transition:all .15s;}
+.cb:last-child{border-right:none;}
+.cb:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);}
+.cb.on{background:var(--hacc);color:#fff;}
+.hero-title-row{padding:18px 28px 22px;display:flex;align-items:center;gap:14px;border-top:1px solid rgba(255,255,255,.08);margin-top:18px;}
+.title-glyph{font-family:var(--disp);font-size:26px;color:var(--hacc);line-height:1;flex-shrink:0;}
+#doc-title{font-family:var(--disp);font-size:min(5vw,34px);color:var(--hfg);border:none;background:transparent;outline:none;width:100%;letter-spacing:.06em;border-bottom:1.5px dashed rgba(255,255,255,.15);padding-bottom:3px;transition:border-color .2s;}
+#doc-title:focus{border-bottom-color:var(--hacc);}
+#doc-title::placeholder{color:rgba(255,255,255,.2);}
+.hero-strip{background:var(--hacc);padding:7px 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.strip-item{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);}
+.strip-v{color:#fff;}
+
+/* TABS */
+.mode-tabs{display:flex;background:var(--paper);border:1.5px solid var(--ink);border-top:none;}
+.mode-tab{flex:1;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;cursor:pointer;border-right:1px solid var(--faint);color:var(--mid);transition:all .15s;}
+.mode-tab:last-child{border-right:none;}
+.mode-tab:hover{background:var(--accent-light);color:var(--ink);}
+.mode-tab.on{background:var(--ink);color:var(--paper);}
+
+/* SECTIONS */
+.sec{background:var(--paper);border:1.5px solid var(--ink);border-top:none;}
+.sec-head{display:flex;align-items:center;gap:8px;padding:9px 20px;border-bottom:1px solid var(--faint);cursor:pointer;user-select:none;}
+.sec-head:hover{background:var(--accent-light);}
+.sec-num{font-family:var(--sans);font-size:9px;color:var(--mid);font-weight:700;min-width:24px;letter-spacing:.08em;}
+.sec-title{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;flex:1;}
+.sec-tog{font-size:12px;color:var(--mid);transition:transform .2s;display:inline-block;}
+.sec-tog.o{transform:rotate(90deg);}
+.sec-body{padding:16px 20px;}
+
+/* FIELD GRID */
+.fg{display:grid;gap:0;border:1px solid var(--faint);}
+.fg2{grid-template-columns:repeat(2,1fr);}
+.fg3{grid-template-columns:repeat(3,1fr);}
+.fg4{grid-template-columns:repeat(4,1fr);}
+.fc{border-right:1px solid var(--faint);border-bottom:1px solid var(--faint);padding:9px 12px;}
+.fg2 .fc:nth-child(2n){border-right:none;}
+.fg3 .fc:nth-child(3n){border-right:none;}
+.fg4 .fc:nth-child(4n){border-right:none;}
+.fl{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:5px;font-weight:600;}
+.fi{width:100%;border:none;background:transparent;font-family:var(--mono);font-size:13px;color:var(--ink);outline:none;padding:2px 0;border-bottom:1px solid transparent;transition:border-color .15s;}
+.fi:focus{border-bottom-color:var(--accent);}
+select.fi{cursor:pointer;}
+textarea.fi{resize:vertical;min-height:58px;line-height:1.5;}
+
+/* TABLES */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.et{width:100%;border-collapse:collapse;font-size:12px;min-width:360px;}
+.et thead tr{border-bottom:1.5px solid var(--ink);}
+.et th{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);padding:5px 8px;font-weight:700;text-align:left;}
+.et td{padding:4px 6px;border-bottom:1px solid var(--faint);vertical-align:middle;}
+.et tr:last-child td{border-bottom:none;}
+.ti{width:100%;border:none;background:transparent;font-family:var(--mono);font-size:12px;color:var(--ink);outline:none;border-bottom:1px solid transparent;transition:border-color .15s;min-width:50px;}
+.ti:focus{border-bottom-color:var(--accent);}
+.ti.n{text-align:right;}
+.ck{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;}
+.db{background:none;border:none;cursor:pointer;color:var(--mid);font-size:16px;padding:2px 4px;line-height:1;transition:color .15s;}
+.db:hover{color:var(--accent);}
+.arb{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border:1px dashed var(--mid);background:transparent;cursor:pointer;color:var(--mid);margin-top:10px;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
+.arb:hover{border-color:var(--accent);color:var(--accent);}
+.feat-row.on td{background:var(--accent-light);}
+.feat-row.on .fnc{font-weight:700;color:var(--accent);}
+.r{text-align:right;}
+
+/* PLATFORM */
+.plat-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));border:1px solid var(--faint);}
+.plat-o{display:flex;align-items:center;gap:8px;padding:9px 12px;border-right:1px solid var(--faint);border-bottom:1px solid var(--faint);cursor:pointer;transition:background .1s;}
+.plat-o:hover{background:var(--faint);}
+.plat-o.on{background:var(--accent-light);}
+.plat-o input{accent-color:var(--accent);flex-shrink:0;}
+.plat-lbl{font-family:var(--sans);font-size:12px;font-weight:500;}
+.plat-m{font-size:10px;color:var(--mid);margin-left:auto;font-weight:700;}
+
+/* INFRA */
+.inf-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));border:1px solid var(--faint);}
+.inf-o{display:flex;align-items:center;gap:8px;padding:9px 12px;border-right:1px solid var(--faint);border-bottom:1px solid var(--faint);cursor:pointer;transition:background .15s;}
+.inf-o:hover{background:var(--faint);}
+.inf-o.on{background:var(--accent-light);}
+.inf-o input{accent-color:var(--accent);flex-shrink:0;}
+.inf-lbl{font-family:var(--sans);font-size:12px;font-weight:500;flex:1;}
+.inf-cost{font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap;}
+
+/* SLIDER */
+.sl-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.sl-lbl{font-family:var(--sans);font-size:10px;color:var(--mid);font-weight:600;white-space:nowrap;}
+input[type=range]{flex:1;min-width:100px;accent-color:var(--accent);height:4px;cursor:pointer;}
+.sl-v{font-size:18px;font-weight:700;color:var(--accent);min-width:44px;text-align:right;font-family:var(--mono);}
+
+/* BUDGET */
+.bbar-w{height:22px;background:var(--faint);border:1.5px solid var(--ink);overflow:hidden;margin:10px 0;}
+.bbar-f{height:100%;transition:width .5s,background .4s;}
+.bstats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--faint);margin-top:12px;}
+.bst{padding:12px 14px;border-right:1px solid var(--faint);text-align:center;}
+.bst:last-child{border-right:none;}
+.bst-v{font-size:19px;font-weight:700;line-height:1.2;font-family:var(--mono);}
+.bst-l{font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-top:3px;font-weight:600;}
+.bst-v.ov{color:var(--accent);}
+.bst-v.un{color:var(--green);}
+.dev-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12px;font-weight:700;padding:5px 14px;border:2px solid;margin-top:12px;}
+.dev-badge.ov{color:var(--accent);border-color:var(--accent);background:var(--accent-light);}
+.dev-badge.un{color:var(--green);border-color:var(--green);background:var(--green-light);}
+.dev-badge.mt{color:var(--ink);border-color:var(--ink);background:var(--faint);}
+
+/* SUMMARY */
+.sum-sec{background:var(--paper);border:2.5px solid var(--ink);border-top:none;}
+.sum-body{padding:20px;}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--faint);font-size:12px;gap:8px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-lbl{color:var(--mid);font-family:var(--sans);font-weight:500;}
+.sum-val{font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.sum-div{border:none;border-top:1.5px solid var(--ink);margin:12px 0;}
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px;flex-wrap:wrap;gap:8px;}
+.tot-lbl{font-family:var(--disp);font-size:28px;letter-spacing:.06em;}
+.tot-amt{font-family:var(--disp);font-size:min(8vw,52px);color:var(--accent);letter-spacing:.02em;line-height:1;}
+.tl-stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;border:2px solid var(--ink);}
+.tls{text-align:center;padding:12px 8px;border-right:1px solid var(--faint);}
+.tls:last-child{border-right:none;}
+.tls-v{font-family:var(--disp);font-size:min(6vw,40px);line-height:1;letter-spacing:.04em;}
+.tls-l{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);font-weight:700;margin-top:2px;}
+
+/* EXPORT */
+.exp-sec{background:var(--paper);border:1.5px solid var(--ink);border-top:none;}
+.exp-body{padding:14px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.btn{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.08em;padding:8px 16px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer;text-transform:uppercase;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn.pr{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.pr:hover{filter:brightness(.88);}
+.btn.gr{background:var(--green);color:#fff;border-color:var(--green);}
+.btn.gr:hover{filter:brightness(.88);}
+.bsep{border-left:1px solid var(--faint);height:26px;margin:0 2px;}
+.exp-grp{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+
+/* FOOTER */
+.pg-foot{border:1.5px solid var(--ink);border-top:none;background:var(--paper);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--mid);flex-wrap:wrap;gap:6px;}
+
+/* MISC */
+.cn{font-size:10px;color:var(--mid);margin-top:8px;font-family:var(--sans);}
+.tag{display:inline-block;font-family:var(--sans);font-size:9px;background:var(--faint);border:1px solid var(--mid);color:var(--mid);padding:1px 6px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;}
+.tag.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+hr.rule{border:none;border-top:1px solid var(--faint);margin:10px 0;}
+
+/* INVOICE */
+.inv-page{background:#fff;padding:clamp(20px,4vw,44px);font-family:'IBM Plex Mono',monospace;color:#1a1a18;font-size:11px;line-height:1.65;}
+.inv-hdr{display:grid;grid-template-columns:1fr auto;gap:16px;margin-bottom:22px;border-bottom:2.5px solid #1a1a18;padding-bottom:18px;}
+.inv-brand{font-family:'Bebas Neue',cursive;font-size:min(7vw,42px);letter-spacing:.04em;line-height:1;}
+.inv-brand-sub{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#b0a898;margin-top:2px;}
+.inv-num-d{font-family:'Bebas Neue',cursive;font-size:min(5vw,26px);color:#c84b2f;letter-spacing:.05em;text-align:right;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.inv-pl{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#b0a898;margin-bottom:4px;font-weight:700;}
+.inv-pn{font-size:13px;font-weight:700;}
+.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:14px;}
+.inv-tbl th{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#b0a898;padding:5px 8px;border-bottom:2px solid #1a1a18;text-align:left;font-weight:700;}
+.inv-tbl th.r,.inv-tbl td.r{text-align:right;}
+.inv-tbl td{padding:5px 8px;border-bottom:1px solid #e5e1d6;font-size:11px;}
+.inv-tbl tr:last-child td{border-bottom:none;}
+.inv-tots-w{display:flex;justify-content:flex-end;margin-top:8px;}
+.inv-tots{width:min(260px,100%);}
+.inv-tr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #e5e1d6;font-size:11px;gap:8px;}
+.inv-grand{display:flex;justify-content:space-between;padding:10px;background:#1a1a18;color:#fff;font-weight:700;font-size:14px;margin-top:8px;gap:8px;}
+.inv-bank{margin-top:14px;padding:10px 12px;border:1px solid #e5e1d6;background:#f7f5f0;}
+.inv-bank-t{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#b0a898;margin-bottom:6px;font-weight:700;}
+.inv-foot{margin-top:18px;padding-top:12px;border-top:1px solid #e5e1d6;font-size:9px;color:#b0a898;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.inv-st{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border:2px solid;font-weight:700;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:12px;font-weight:600;padding:10px 20px;border:2px solid var(--accent);z-index:9000;opacity:0;transform:translateY(12px);transition:all .25s;pointer-events:none;max-width:280px;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(max-width:720px){
+  .hero-inner,.hero-title-row,.hero-strip{padding-left:14px;padding-right:14px;}
+  .hero-sub{display:none;}
+  .hero-right{align-items:flex-start;width:100%;}
+  .cur-bar{flex-wrap:wrap;}
+  .mode-tabs{flex-wrap:wrap;}
+  .mode-tab{min-width:50%;border-bottom:1px solid var(--faint);}
+  .fg3,.fg4{grid-template-columns:1fr 1fr;}
+  .fg3 .fc:nth-child(3n){border-right:1px solid var(--faint);}
+  .fg3 .fc:nth-child(2n){border-right:none;}
+  .fg4 .fc:nth-child(4n){border-right:1px solid var(--faint);}
+  .fg4 .fc:nth-child(2n){border-right:none;}
+  .bstats{grid-template-columns:1fr;}
+  .bst{border-right:none;border-bottom:1px solid var(--faint);}
+  .tl-stats{grid-template-columns:1fr;}
+  .tls{border-right:none;border-bottom:1px solid var(--faint);}
+  .tls:last-child{border-bottom:none;}
+  .exp-body{flex-direction:column;}
+  .exp-grp,.btn{width:100%;justify-content:center;}
+  .bsep{display:none;}
+  .inv-parties{grid-template-columns:1fr;}
+  .inv-hdr{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .fg2{grid-template-columns:1fr;}
+  .fg2 .fc{border-right:none;}
+  .plat-g{grid-template-columns:1fr 1fr;}
+  .inf-g{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body data-theme="default">
+<div style="max-width:920px;margin:0 auto;padding:0 16px 80px;">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-ghost">DEVRATE</div>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="hero-left">
+        <div class="hero-word">DEV<em>RATE</em></div>
+        <div class="hero-sub"><span>Freelance</span><br><span>Calculator</span></div>
+      </div>
+      <div class="hero-right">
+        <div class="theme-row">
+          <span class="th-lbl">Theme</span>
+          <button class="sw on" data-t="default" onclick="setTheme('default')" title="Parchment"></button>
+          <button class="sw" data-t="slate" onclick="setTheme('slate')" title="Slate"></button>
+          <button class="sw" data-t="forest" onclick="setTheme('forest')" title="Forest"></button>
+          <button class="sw" data-t="rose" onclick="setTheme('rose')" title="Rose"></button>
+          <button class="sw" data-t="ink" onclick="setTheme('ink')" title="Ink"></button>
+        </div>
+        <div class="cur-bar">
+          <button class="cb on" data-c="USD" onclick="setCur('USD')">$ USD</button>
+          <button class="cb" data-c="EUR" onclick="setCur('EUR')">€ EUR</button>
+          <button class="cb" data-c="GBP" onclick="setCur('GBP')">£ GBP</button>
+          <button class="cb" data-c="KES" onclick="setCur('KES')">Ksh KES</button>
+          <button class="cb" data-c="CAD" onclick="setCur('CAD')">C$ CAD</button>
+          <button class="cb" data-c="AUD" onclick="setCur('AUD')">A$ AUD</button>
+        </div>
+      </div>
+    </div>
+    <div class="hero-title-row">
+      <div class="title-glyph">⬡</div>
+      <input id="doc-title" type="text" value="Project Estimate" spellcheck="false" placeholder="Your Estimate Title"/>
+    </div>
+  </div>
+  <div class="hero-strip">
+    <span class="strip-item">Total: <span class="strip-v" id="s-tot">—</span></span>
+    <span class="strip-item">Hours: <span class="strip-v" id="s-hrs">—</span></span>
+    <span class="strip-item">Days: <span class="strip-v" id="s-days">—</span></span>
+    <span class="strip-item">Currency: <span class="strip-v" id="s-cur">USD</span></span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="mode-tabs">
+  <button class="mode-tab on" onclick="setMode('est')">▤ Estimate Builder</button>
+  <button class="mode-tab" onclick="setMode('inv')">⊞ Invoice Generator</button>
+</div>
+
+<!-- ESTIMATE MODE -->
+<div id="m-est">
+
+<div class="sec" id="s1"><div class="sec-head" onclick="tog('s1')"><span class="sec-num">01</span><span class="sec-title">Client &amp; Project Details</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="fg fg4">
+    <div class="fc"><div class="fl">Project Name</div><input class="fi" id="proj-name" type="text" placeholder="My App" oninput="calc()"/></div>
+    <div class="fc"><div class="fl">Client Name</div><input class="fi" id="client-name" type="text" placeholder="Acme Corp"/></div>
+    <div class="fc"><div class="fl">Issue Date</div><input class="fi" id="proj-date" type="date"/></div>
+    <div class="fc"><div class="fl">Due / Delivery Date</div><input class="fi" id="due-date" type="date"/></div>
+  </div>
+  <div class="fg fg4">
+    <div class="fc"><div class="fl">Client Email</div><input class="fi" id="client-email" type="email" placeholder="client@co.com"/></div>
+    <div class="fc"><div class="fl">Client Address</div><input class="fi" id="client-addr" type="text" placeholder="123 Main St"/></div>
+    <div class="fc"><div class="fl">Your Name / Company</div><input class="fi" id="your-name" type="text" placeholder="Your Name"/></div>
+    <div class="fc"><div class="fl">Your Email</div><input class="fi" id="your-email" type="email" placeholder="you@email.com"/></div>
+  </div>
+  <div style="border:1px solid var(--faint);border-top:none;">
+    <div class="fc"><div class="fl">Project Notes / Scope / Payment Terms</div>
+    <textarea class="fi" id="proj-notes" rows="3" placeholder="Scope, payment terms, milestones…"></textarea></div>
+  </div>
+</div></div>
+
+<div class="sec" id="s2"><div class="sec-head" onclick="tog('s2')"><span class="sec-num">02</span><span class="sec-title">Base Rate Settings</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="fg fg3">
+    <div class="fc"><div class="fl">Hourly Rate (<span class="cs">$</span>)</div><input class="fi" id="hourly-rate" type="number" value="60" min="1" oninput="calc()"/></div>
+    <div class="fc"><div class="fl">Hours Per Day</div><input class="fi" id="hours-per-day" type="number" value="6" min="1" max="24" oninput="calc()"/></div>
+    <div class="fc"><div class="fl">Base Project Hours</div><input class="fi" id="base-hours" type="number" value="120" min="0" oninput="calc()"/></div>
+  </div>
+</div></div>
+
+<div class="sec" id="s3"><div class="sec-head" onclick="tog('s3')"><span class="sec-num">03</span><span class="sec-title">Platform Selection</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="plat-g" id="plat-grid"></div>
+  <div class="cn">Multiplier: <span id="plat-badge" class="tag on">×1.0</span></div>
+</div></div>
+
+<div class="sec" id="s4"><div class="sec-head" onclick="tog('s4')"><span class="sec-num">04</span><span class="sec-title">Feature Selection</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="tw"><table class="et">
+    <thead><tr><th style="width:28px"></th><th>Feature</th><th style="width:80px" class="r">Hours</th><th style="width:120px" class="r">Cost (<span class="cs">$</span>)</th><th style="width:28px"></th></tr></thead>
+    <tbody id="feat-tbody"></tbody>
+  </table></div>
+  <button class="arb" onclick="addFeat()">＋ Add Custom Feature</button>
+  <div class="cn">Feature total: <strong id="feat-h">0</strong> hrs · <strong id="feat-c">$0</strong></div>
+</div></div>
+
+<div class="sec" id="s5"><div class="sec-head" onclick="tog('s5')"><span class="sec-num">05</span><span class="sec-title">Complexity Multipliers</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="fg fg2">
+    <div class="fc"><div class="fl">Backend Complexity</div>
+      <select class="fi" id="back-mult" onchange="calc()">
+        <option value="1.0">Firebase basic ×1.0</option>
+        <option value="1.0">Supabase basic ×1.0</option>
+        <option value="1.3">Custom backend APIs ×1.3</option>
+        <option value="1.6">Microservices ×1.6</option>
+      </select>
+    </div>
+    <div class="fc"><div class="fl">UI Complexity</div>
+      <select class="fi" id="ui-mult" onchange="calc()">
+        <option value="1.0">Basic UI ×1.0</option>
+        <option value="1.2">Custom animations ×1.2</option>
+        <option value="1.4">Polished UI ×1.4</option>
+        <option value="1.5">Complex dashboards ×1.5</option>
+      </select>
+    </div>
+  </div>
+</div></div>
+
+<div class="sec" id="s6"><div class="sec-head" onclick="tog('s6')"><span class="sec-num">06</span><span class="sec-title">Integrations &amp; Fixed Costs</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="tw"><table class="et">
+    <thead><tr><th style="width:28px"></th><th>Integration / Service</th><th style="width:130px">Provider</th><th style="width:120px" class="r">Cost (<span class="cs">$</span>)</th><th style="width:28px"></th></tr></thead>
+    <tbody id="integ-tbody"></tbody>
+  </table></div>
+  <button class="arb" onclick="addInteg()">＋ Add Integration</button>
+  <div class="cn">Integration total: <strong id="integ-tot">$0</strong></div>
+</div></div>
+
+<div class="sec" id="s7"><div class="sec-head" onclick="tog('s7')"><span class="sec-num">07</span><span class="sec-title">Infrastructure Setup</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="inf-g" id="inf-grid"></div>
+  <div class="cn">Infrastructure total: <strong id="infra-tot">$0</strong></div>
+</div></div>
+
+<div class="sec" id="s8"><div class="sec-head" onclick="tog('s8')"><span class="sec-num">08</span><span class="sec-title">Risk Buffer</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="sl-row">
+    <span class="sl-lbl">10%</span>
+    <input type="range" id="risk-sl" min="10" max="25" value="15" oninput="upRisk();calc();"/>
+    <span class="sl-lbl">25%</span>
+    <div class="sl-v"><span id="risk-v">15</span>%</div>
+  </div>
+  <div class="cn">Applied to subtotal — covers scope creep, revisions, unknowns.</div>
+</div></div>
+
+<div class="sec" id="s9"><div class="sec-head" onclick="tog('s9')"><span class="sec-num">09</span><span class="sec-title">Client Budget vs. Estimate</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="fg fg2">
+    <div class="fc"><div class="fl">Client Budget (<span class="cs">$</span>)</div><input class="fi" id="cli-budget" type="number" min="0" placeholder="Enter client budget" oninput="calc()"/></div>
+    <div class="fc"><div class="fl">Budget Note</div><input class="fi" id="bud-note" type="text" placeholder="Phase 1 only, max approved…"/></div>
+  </div>
+  <div id="bud-gauge" style="display:none;margin-top:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span style="font-size:10px;color:var(--mid);font-family:var(--sans);font-weight:600;">Budget utilisation</span>
+      <span id="bud-pct" style="font-size:13px;font-weight:700;font-family:var(--mono);"></span>
+    </div>
+    <div class="bbar-w"><div class="bbar-f" id="bbar"></div></div>
+    <div class="bstats">
+      <div class="bst"><div class="bst-v" id="b-budget">—</div><div class="bst-l">Client Budget</div></div>
+      <div class="bst"><div class="bst-v" id="b-est">—</div><div class="bst-l">Your Estimate</div></div>
+      <div class="bst"><div class="bst-v" id="b-diff">—</div><div class="bst-l">Difference</div></div>
+    </div>
+    <div id="dev-wrap" style="margin-top:4px;"></div>
+  </div>
+  <div id="bud-ph" style="padding:12px 0;color:var(--mid);font-size:11px;font-family:var(--sans);">Enter a client budget above to see deviation analysis.</div>
+</div></div>
+
+<div class="sum-sec" id="s10">
+  <div class="sec-head" style="background:var(--ink);border-bottom:none;" onclick="tog('s10')">
+    <span class="sec-num" style="color:var(--mid);">10</span>
+    <span class="sec-title" style="color:var(--paper);">Final Estimate Summary</span>
+    <span class="sec-tog o" style="color:var(--mid);">▶</span>
+  </div>
+  <div class="sum-body">
+    <div class="sum-row"><span class="sum-lbl">Base Hours</span><span class="sum-val" id="x-bh">120 hrs</span></div>
+    <div class="sum-row"><span class="sum-lbl">Feature Hours</span><span class="sum-val" id="x-fh">0 hrs</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Hours</span><span class="sum-val" id="x-th">120 hrs</span></div>
+    <div class="sum-row"><span class="sum-lbl">Base Cost</span><span class="sum-val" id="x-bc">$7,200</span></div>
+    <hr class="rule"/>
+    <div class="sum-row"><span class="sum-lbl">Platform ×</span><span class="sum-val" id="x-pm">×1.0</span></div>
+    <div class="sum-row"><span class="sum-lbl">Backend ×</span><span class="sum-val" id="x-bm">×1.0</span></div>
+    <div class="sum-row"><span class="sum-lbl">UI ×</span><span class="sum-val" id="x-um">×1.0</span></div>
+    <div class="sum-row"><span class="sum-lbl">Adjusted Dev Cost</span><span class="sum-val" id="x-ac">$7,200</span></div>
+    <hr class="rule"/>
+    <div class="sum-row"><span class="sum-lbl">Integrations</span><span class="sum-val" id="x-int">$0</span></div>
+    <div class="sum-row"><span class="sum-lbl">Infrastructure</span><span class="sum-val" id="x-inf">$0</span></div>
+    <div class="sum-row"><span class="sum-lbl">Subtotal</span><span class="sum-val" id="x-sub">$7,200</span></div>
+    <div class="sum-row"><span class="sum-lbl">Risk Buffer</span><span class="sum-val" id="x-risk">+$1,080</span></div>
+    <hr class="sum-div"/>
+    <div class="tot-row">
+      <div class="tot-lbl">TOTAL</div>
+      <div class="tot-amt" id="grand-tot">$8,280</div>
+    </div>
+    <div style="font-size:10px;color:var(--mid);font-family:var(--sans);text-align:right;margin-top:2px;" id="cur-note">USD</div>
+    <div class="tl-stats">
+      <div class="tls"><div class="tls-v" id="tl-h">120</div><div class="tls-l">Total Hours</div></div>
+      <div class="tls"><div class="tls-v" id="tl-d">20</div><div class="tls-l">Work Days</div></div>
+      <div class="tls"><div class="tls-v" id="tl-w">4.0</div><div class="tls-l">Weeks</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /m-est -->
+
+<!-- INVOICE MODE -->
+<div id="m-inv" style="display:none;">
+<div class="sec" id="si1"><div class="sec-head" onclick="tog('si1')"><span class="sec-num">INV</span><span class="sec-title">Invoice Configuration</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body">
+  <div class="fg fg4">
+    <div class="fc"><div class="fl">Invoice Number</div><input class="fi" id="inv-num" type="text" placeholder="INV-0001"/></div>
+    <div class="fc"><div class="fl">Status</div>
+      <select class="fi" id="inv-status" onchange="renderInv()">
+        <option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid</option>
+      </select>
+    </div>
+    <div class="fc"><div class="fl">Tax Rate (%)</div><input class="fi" id="inv-tax" type="number" value="0" min="0" max="100" oninput="renderInv()"/></div>
+    <div class="fc"><div class="fl">Discount (%)</div><input class="fi" id="inv-disc" type="number" value="0" min="0" max="100" oninput="renderInv()"/></div>
+  </div>
+  <div class="fg fg2">
+    <div class="fc"><div class="fl">Payment / Bank Details</div><input class="fi" id="inv-bank" type="text" placeholder="Bank, IBAN, M-Pesa, PayPal…" oninput="renderInv()"/></div>
+    <div class="fc"><div class="fl">Footer Note</div><input class="fi" id="inv-foot" type="text" value="Thank you for your business!" oninput="renderInv()"/></div>
+  </div>
+  <div style="margin-top:14px;">
+    <div class="fl" style="margin-bottom:8px;">Additional Line Items</div>
+    <div class="tw"><table class="et">
+      <thead><tr><th>Description</th><th style="width:60px" class="r">Qty</th><th style="width:130px" class="r">Unit Price (<span class="cs">$</span>)</th><th style="width:28px"></th></tr></thead>
+      <tbody id="invl-tbody"></tbody>
+    </table></div>
+    <button class="arb" onclick="addInvLine()">＋ Add Line Item</button>
+  </div>
+  <div style="margin-top:14px;"><button class="btn pr" onclick="renderInv()">⟳ Refresh Preview</button></div>
+</div></div>
+<div class="sec" id="si2"><div class="sec-head" onclick="tog('si2')"><span class="sec-num">PRV</span><span class="sec-title">Invoice Preview</span><span class="sec-tog o">▶</span></div>
+<div class="sec-body" style="padding:0;"><div id="inv-preview"></div></div></div>
+</div><!-- /m-inv -->
+
+<!-- EXPORT BAR -->
+<div class="exp-sec">
+  <div class="sec-head" style="border-bottom:1px solid var(--faint);cursor:default;">
+    <span class="sec-num">⊞</span><span class="sec-title">Export &amp; Share</span>
+  </div>
+  <div class="exp-body">
+    <div class="exp-grp">
+      <button class="btn pr" onclick="dlEstPDF()">⬇ Estimate PDF</button>
+      <button class="btn gr" onclick="dlInvPDF()">⬇ Invoice PDF</button>
+      <button class="btn" onclick="window.print()">⎙ Print</button>
+    </div>
+    <div class="bsep"></div>
+    <div class="exp-grp">
+      <button class="btn" onclick="dlJSON()">⬇ JSON</button>
+      <button class="btn" onclick="dlCSV()">⬇ CSV</button>
+      <button class="btn" onclick="document.getElementById('imp-file').click()">↑ Import</button>
+      <input type="file" id="imp-file" accept=".json,.csv" style="display:none;" onchange="doImport(event)"/>
+    </div>
+    <div class="bsep"></div>
+    <div class="exp-grp">
+      <button class="btn" onclick="copyLink()">⧉ Copy Link</button>
+      <button class="btn" onclick="shareWA()">WhatsApp</button>
+      <button class="btn" onclick="shareEM()">Email</button>
+      <button class="btn" onclick="shareTG()">Telegram</button>
+    </div>
+    <div class="bsep"></div>
+    <div class="exp-grp" style="margin-left:auto;">
+      <button class="btn" onclick="saveLoc()">💾 Save</button>
+      <button class="btn" onclick="loadLoc()">↩ Load</button>
+    </div>
+  </div>
+</div>
+<div class="pg-foot">
+  <span>DevRate — Freelance Calculator &amp; Invoice Generator</span>
+  <span id="foot-date"></span>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PLATS=[{id:'android',lbl:'Android',m:1.0},{id:'ios',lbl:'iOS',m:1.0},{id:'flutter',lbl:'Flutter (A+iOS)',m:1.2},{id:'web',lbl:'Web',m:1.4},{id:'desktop',lbl:'Desktop',m:1.5}];
+const CSYM={USD:'$',EUR:'€',GBP:'£',KES:'Ksh ',CAD:'C$',AUD:'A$'};
+const FX={USD:1,EUR:0.92,GBP:0.79,KES:130,CAD:1.36,AUD:1.54};
+const INFRA=[{id:'firebase',lbl:'Firebase Setup',c:200},{id:'supabase',lbl:'Supabase Setup',c:200},{id:'cicd',lbl:'CI/CD Pipeline',c:300},{id:'cloud',lbl:'Cloud Deployment',c:500},{id:'appstore',lbl:'App Store Release',c:200},{id:'playstore',lbl:'Play Store Release',c:200}];
+let CUR='USD',THEME='default',PLAT=null,ISEL=new Set(),CC={};
+let FEATS=[
+  {id:'auth',lbl:'Authentication',h:12,on:false},{id:'social',lbl:'Social Login',h:8,on:false},
+  {id:'push',lbl:'Push Notifications',h:15,on:false},{id:'chat',lbl:'Chat / Messaging',h:40,on:false},
+  {id:'pay',lbl:'Payments',h:30,on:false},{id:'maps',lbl:'Maps / Location',h:25,on:false},
+  {id:'offline',lbl:'Offline Sync',h:35,on:false},{id:'admin',lbl:'Admin Dashboard',h:60,on:false},
+  {id:'rt',lbl:'Realtime Updates',h:20,on:false},{id:'upload',lbl:'File Uploads',h:15,on:false},
+  {id:'analytics',lbl:'Analytics',h:10,on:false}
+];
+let INTEG=[
+  {id:'pg',lbl:'Payment Gateway',prov:'Stripe',c:1000,on:false},{id:'sms',lbl:'SMS Service',prov:'Twilio',c:300,on:false},
+  {id:'maps',lbl:'Maps API',prov:'Google',c:500,on:false},{id:'ai',lbl:'AI API',prov:'OpenAI',c:900,on:false},
+  {id:'tp',lbl:'Third-party API',prov:'Various',c:600,on:false},{id:'psh',lbl:'Push Notifications',prov:'Firebase',c:200,on:false},
+  {id:'em',lbl:'Email Service',prov:'SendGrid',c:150,on:false},{id:'s3',lbl:'Cloud Storage',prov:'AWS S3',c:300,on:false}
+];
+let INVL=[];
+
+function init(){
+  const t=new Date().toISOString().slice(0,10);
+  const d=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+  document.getElementById('proj-date').value=t;
+  document.getElementById('due-date').value=d;
+  document.getElementById('foot-date').textContent=t;
+  document.getElementById('inv-num').value='INV-'+String(Math.floor(Math.random()*9000)+1000);
+  rPlat();rFeat();rInteg();rInfra();calc();
+}
+function setTheme(t){THEME=t;document.body.setAttribute('data-theme',t);document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s.dataset.t===t));}
+function setCur(c){CUR=c;document.querySelectorAll('.cb').forEach(b=>b.classList.toggle('on',b.dataset.c===c));document.querySelectorAll('.cs').forEach(e=>e.textContent=CSYM[c]||'$');document.getElementById('cur-note').textContent=c;document.getElementById('s-cur').textContent=c;calc();}
+const sym=()=>CSYM[CUR]||'$';
+const fC=v=>sym()+Math.round(v*(FX[CUR]||1)).toLocaleString();
+const toUSD=v=>v/(FX[CUR]||1);
+function setMode(m){document.getElementById('m-est').style.display=m==='est'?'':'none';document.getElementById('m-inv').style.display=m==='inv'?'':'none';document.querySelectorAll('.mode-tab').forEach((t,i)=>t.classList.toggle('on',(m==='est'&&i===0)||(m==='inv'&&i===1)));if(m==='inv')renderInv();}
+function tog(id){const s=document.getElementById(id);const b=s.querySelector('.sec-body');const t=s.querySelector('.sec-tog');if(!b)return;const h=b.style.display==='none';b.style.display=h?'':'none';if(t)t.classList.toggle('o',h);}
+function rPlat(){document.getElementById('plat-grid').innerHTML=PLATS.map(p=>`<label class="plat-o ${PLAT===p.id?'on':''}" onclick="selPlat('${p.id}')"><input type="radio" name="plat" style="display:none" ${PLAT===p.id?'checked':''}/><span class="plat-lbl">${p.lbl}</span><span class="plat-m">×${p.m.toFixed(1)}</span></label>`).join('');}
+function selPlat(id){PLAT=PLAT===id?null:id;rPlat();calc();}
+function rFeat(){const rate=parseFloat(document.getElementById('hourly-rate').value)||60;document.getElementById('feat-tbody').innerHTML=FEATS.map((f,i)=>`<tr class="feat-row ${f.on?'on':''}" id="fr${i}"><td><input type="checkbox" class="ck" ${f.on?'checked':''} onchange="FEATS[${i}].on=this.checked;document.getElementById('fr${i}').className='feat-row '+(this.checked?'on':'');calc()"/></td><td><input class="ti fnc" value="${eh(f.lbl)}" oninput="FEATS[${i}].lbl=this.value"/></td><td><input class="ti n" type="number" value="${f.h}" min="0" style="width:70px" oninput="FEATS[${i}].h=parseFloat(this.value)||0;calc()"/></td><td class="r" style="color:var(--mid);font-size:11px;">${fC(f.h*rate)}</td><td><button class="db" onclick="FEATS.splice(${i},1);rFeat();calc()">×</button></td></tr>`).join('');}
+function addFeat(){FEATS.push({id:'c'+Date.now(),lbl:'Custom Feature',h:10,on:true});rFeat();calc();}
+function rInteg(){document.getElementById('integ-tbody').innerHTML=INTEG.map((r,i)=>`<tr><td><input type="checkbox" class="ck" ${r.on?'checked':''} onchange="INTEG[${i}].on=this.checked;calc()"/></td><td><input class="ti" value="${eh(r.lbl)}" oninput="INTEG[${i}].lbl=this.value"/></td><td><input class="ti" value="${eh(r.prov)}" oninput="INTEG[${i}].prov=this.value"/></td><td><input class="ti n" type="number" value="${r.c}" min="0" style="width:100px" oninput="INTEG[${i}].c=parseFloat(this.value)||0;calc()"/></td><td><button class="db" onclick="INTEG.splice(${i},1);rInteg();calc()">×</button></td></tr>`).join('');}
+function addInteg(){INTEG.push({id:'i'+Date.now(),lbl:'New Integration',prov:'',c:500,on:true});rInteg();calc();}
+function rInfra(){document.getElementById('inf-grid').innerHTML=INFRA.map(i=>`<label class="inf-o ${ISEL.has(i.id)?'on':''}" onclick="togInfra('${i.id}')"><input type="checkbox" class="ck" ${ISEL.has(i.id)?'checked':''} style="pointer-events:none"/><span class="inf-lbl">${i.lbl}</span><span class="inf-cost">+${fC(i.c)}</span></label>`).join('');}
+function togInfra(id){if(ISEL.has(id))ISEL.delete(id);else ISEL.add(id);rInfra();calc();}
+function addInvLine(){INVL.push({desc:'Consulting',qty:1,price:500});rInvL();}
+function rInvL(){document.getElementById('invl-tbody').innerHTML=INVL.map((l,i)=>`<tr><td><input class="ti" value="${eh(l.desc)}" oninput="INVL[${i}].desc=this.value;renderInv()"/></td><td><input class="ti n" type="number" value="${l.qty}" min="1" style="width:50px" oninput="INVL[${i}].qty=parseFloat(this.value)||1;renderInv()"/></td><td><input class="ti n" type="number" value="${l.price}" min="0" style="width:100px" oninput="INVL[${i}].price=parseFloat(this.value)||0;renderInv()"/></td><td><button class="db" onclick="INVL.splice(${i},1);rInvL();renderInv()">×</button></td></tr>`).join('');}
+function upRisk(){document.getElementById('risk-v').textContent=document.getElementById('risk-sl').value;}
+function calc(){
+  const rate=parseFloat(document.getElementById('hourly-rate').value)||60;
+  const hpd=parseFloat(document.getElementById('hours-per-day').value)||6;
+  const bh=parseFloat(document.getElementById('base-hours').value)||120;
+  const bm=parseFloat(document.getElementById('back-mult').value)||1;
+  const um=parseFloat(document.getElementById('ui-mult').value)||1;
+  const rp=parseFloat(document.getElementById('risk-sl').value)/100;
+  let pm=1;if(PLAT){const p=PLATS.find(x=>x.id===PLAT);if(p)pm=p.m;}
+  let fh=0;FEATS.forEach(f=>{if(f.on)fh+=f.h;});
+  let it=0;INTEG.forEach(r=>{if(r.on)it+=r.c;});
+  let inf=0;INFRA.forEach(i=>{if(ISEL.has(i.id))inf+=i.c;});
+  const th=bh+fh,bc=th*rate,ac=bc*pm*bm*um,sub=ac+it+inf,ra=sub*rp,fin=sub+ra;
+  const days=hpd>0?th/hpd:0,wks=days/5;
+  CC={rate,hpd,bh,fh,th,bc,pm,bm,um,ac,it,inf,sub,ra,rp,fin,days,wks};
+  document.getElementById('s-tot').textContent=fC(fin);
+  document.getElementById('s-hrs').textContent=th;
+  document.getElementById('s-days').textContent=Math.ceil(days);
+  document.getElementById('plat-badge').textContent='×'+pm.toFixed(1);
+  document.getElementById('feat-h').textContent=fh;
+  document.getElementById('feat-c').textContent=fC(fh*rate);
+  document.getElementById('integ-tot').textContent=fC(it);
+  document.getElementById('infra-tot').textContent=fC(inf);
+  document.getElementById('x-bh').textContent=bh+' hrs';
+  document.getElementById('x-fh').textContent=fh+' hrs';
+  document.getElementById('x-th').textContent=th+' hrs';
+  document.getElementById('x-bc').textContent=fC(bc);
+  document.getElementById('x-pm').textContent='×'+pm.toFixed(1);
+  document.getElementById('x-bm').textContent='×'+bm.toFixed(1);
+  document.getElementById('x-um').textContent='×'+um.toFixed(1);
+  document.getElementById('x-ac').textContent=fC(ac);
+  document.getElementById('x-int').textContent=fC(it);
+  document.getElementById('x-inf').textContent=fC(inf);
+  document.getElementById('x-sub').textContent=fC(sub);
+  document.getElementById('x-risk').textContent='+'+fC(ra)+' ('+Math.round(rp*100)+'%)';
+  document.getElementById('grand-tot').textContent=fC(fin);
+  document.getElementById('cur-note').textContent=CUR;
+  document.getElementById('tl-h').textContent=th;
+  document.getElementById('tl-d').textContent=Math.ceil(days);
+  document.getElementById('tl-w').textContent=wks.toFixed(1);
+  rFeat();rInfra();calcBud(fin);
+}
+function calcBud(fin){
+  const bl=parseFloat(document.getElementById('cli-budget').value);
+  const g=document.getElementById('bud-gauge'),ph=document.getElementById('bud-ph');
+  if(!bl||isNaN(bl)){g.style.display='none';ph.style.display='';return;}
+  g.style.display='';ph.style.display='none';
+  const bu=toUSD(bl),diff=fin-bu,dp=bu>0?((fin-bu)/bu*100):0,up=bu>0?(fin/bu*100):0;
+  const bar=document.getElementById('bbar');
+  bar.style.width=Math.min(up,100)+'%';
+  bar.style.background=up>110?'var(--accent)':up>90?'#d4862a':'var(--green)';
+  const pl=document.getElementById('bud-pct');
+  pl.textContent=up.toFixed(1)+'%';pl.style.color=up>100?'var(--accent)':'var(--green)';
+  document.getElementById('b-budget').textContent=fC(bu);
+  document.getElementById('b-budget').className='bst-v';
+  document.getElementById('b-est').textContent=fC(fin);
+  document.getElementById('b-est').className='bst-v';
+  const dv=document.getElementById('b-diff');
+  dv.textContent=(diff>0?'+':'')+fC(diff);
+  dv.className='bst-v '+(diff>0?'ov':diff<0?'un':'');
+  const w=document.getElementById('dev-wrap'),abs=Math.abs(dp).toFixed(1);
+  if(Math.abs(dp)<2)w.innerHTML=`<span class="dev-badge mt">✓ On budget (±${abs}%)</span>`;
+  else if(diff>0)w.innerHTML=`<span class="dev-badge ov">▲ Over by ${abs}% (+${fC(Math.abs(diff))})</span><div style="margin-top:8px;font-size:11px;color:var(--mid);font-family:var(--sans);">Tip: Reduce scope, phase delivery, or adjust rate.</div>`;
+  else w.innerHTML=`<span class="dev-badge un">▼ Under by ${abs}% (${fC(Math.abs(diff))} headroom)</span><div style="margin-top:8px;font-size:11px;color:var(--mid);font-family:var(--sans);">Estimate fits budget. Room for additions or buffer.</div>`;
+}
+function renderInv(){
+  if(!CC.fin){calc();return;}
+  const g=id=>document.getElementById(id).value;
+  const pn=g('proj-name')||'Untitled',cl=g('client-name')||'Client',ca=g('client-addr'),ce=g('client-email');
+  const yn=g('your-name')||'Freelancer',ye=g('your-email'),id=g('proj-date'),dd=g('due-date');
+  const notes=g('proj-notes'),bk=g('inv-bank'),fn=g('inv-foot')||'Thank you!';
+  const inum=g('inv-num')||'INV-0001',st=g('inv-status');
+  const tax=parseFloat(g('inv-tax'))||0,disc=parseFloat(g('inv-disc'))||0;
+  const sc={draft:'#b0a898',sent:'#c84b2f',paid:'#2a6b3c'};
+  const sb={draft:'#f0ece0',sent:'#fdf0ed',paid:'#eaf3ed'};
+  const rate=parseFloat(document.getElementById('hourly-rate').value)||60;
+  let lines=[];
+  lines.push({desc:`Development — ${CC.th} hrs (×${CC.pm.toFixed(1)} ×${CC.bm.toFixed(1)} ×${CC.um.toFixed(1)})`,qty:1,tot:CC.ac});
+  FEATS.filter(f=>f.on).forEach(f=>lines.push({desc:'Feature: '+f.lbl+' ('+f.h+' hrs)',qty:1,tot:f.h*rate}));
+  INTEG.filter(r=>r.on).forEach(r=>lines.push({desc:'Integration: '+r.lbl+(r.prov?' ('+r.prov+')':''),qty:1,tot:r.c}));
+  INFRA.filter(i=>ISEL.has(i.id)).forEach(i=>lines.push({desc:'Infrastructure: '+i.lbl,qty:1,tot:i.c}));
+  lines.push({desc:`Risk Buffer (${Math.round(CC.rp*100)}%)`,qty:1,tot:CC.ra});
+  INVL.forEach(l=>lines.push({desc:l.desc,qty:l.qty,tot:l.qty*l.price}));
+  const sub=lines.reduce((a,l)=>a+l.tot,0),d=sub*(disc/100),ad=sub-d,tx=ad*(tax/100),gr=ad+tx;
+  const lh=lines.map(l=>`<tr><td>${eh(l.desc)}</td><td class="r">${l.qty}</td><td class="r">${fC(l.tot/l.qty)}</td><td class="r">${fC(l.tot)}</td></tr>`).join('');
+  document.getElementById('inv-preview').innerHTML=`<div class="inv-page">
+    <div class="inv-hdr">
+      <div><div class="inv-brand">${eh(yn)||'DevRate'}</div>${ye?`<div class="inv-brand-sub">${eh(ye)}</div>`:''}</div>
+      <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#b0a898;margin-bottom:3px;">Invoice</div>
+      <div class="inv-num-d">${eh(inum)}</div>
+      <div style="font-size:9px;color:#b0a898;margin-top:6px;">Issued: ${id}</div>
+      <div style="font-size:9px;color:#b0a898;">Due: ${dd}</div>
+      <div><span class="inv-st" style="border-color:${sc[st]};color:${sc[st]};background:${sb[st]}">${st.toUpperCase()}</span></div></div>
+    </div>
+    <div class="inv-parties">
+      <div><div class="inv-pl">Bill To</div><div class="inv-pn">${eh(cl)}</div>
+      ${ca?`<div style="font-size:10px;color:#6a6258;margin-top:2px;">${eh(ca)}</div>`:''}
+      ${ce?`<div style="font-size:10px;color:#6a6258;">${eh(ce)}</div>`:''}</div>
+      <div><div class="inv-pl">Project</div><div class="inv-pn">${eh(pn)}</div>
+      ${notes?`<div style="font-size:10px;color:#6a6258;margin-top:2px;max-width:260px;white-space:pre-wrap;">${eh(notes)}</div>`:''}</div>
+    </div>
+    <table class="inv-tbl"><thead><tr><th>Description</th><th class="r" style="width:50px">Qty</th><th class="r" style="width:110px">Unit Price</th><th class="r" style="width:110px">Amount</th></tr></thead>
+    <tbody>${lh}</tbody></table>
+    <div class="inv-tots-w"><div class="inv-tots">
+      <div class="inv-tr"><span>Subtotal</span><span>${fC(sub)}</span></div>
+      ${disc>0?`<div class="inv-tr" style="color:#2a6b3c;"><span>Discount (${disc}%)</span><span>−${fC(d)}</span></div>`:''}
+      ${tax>0?`<div class="inv-tr"><span>Tax (${tax}%)</span><span>${fC(tx)}</span></div>`:''}
+      <div class="inv-grand"><span>TOTAL DUE</span><span>${fC(gr)}</span></div>
+    </div></div>
+    ${bk?`<div class="inv-bank"><div class="inv-bank-t">Payment Details</div><div style="font-size:10px;white-space:pre-wrap;">${eh(bk)}</div></div>`:''}
+    <div class="inv-foot"><span>${eh(fn)}</span><span>Currency: ${CUR} · Due: ${dd}</span></div>
+  </div>`;}
+
+function dlEstPDF(){
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});const W=doc.internal.pageSize.getWidth();
+  let y=0;const c=CC;
+  const title=document.getElementById('doc-title').value||'Project Estimate';
+  const pn=document.getElementById('proj-name').value||'—';
+  const cl=document.getElementById('client-name').value||'—';
+  const dt=document.getElementById('proj-date').value;
+  const notes=document.getElementById('proj-notes').value;
+  const bl=parseFloat(document.getElementById('cli-budget').value);
+  doc.setFillColor(253,252,248);doc.rect(0,0,W,842,'F');
+  doc.setFillColor(26,26,24);doc.rect(0,0,W,72,'F');
+  doc.setTextColor(253,252,248);doc.setFont('helvetica','bold');doc.setFontSize(28);doc.text('DEVRATE',32,46);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,75,47);doc.text('FREELANCE ESTIMATE',32,60);
+  doc.setTextColor(176,168,152);doc.setFontSize(9);doc.text(CUR,W-32,38,{align:'right'});doc.text(dt,W-32,52,{align:'right'});
+  y=84;
+  doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(26,26,24);doc.text(title,32,y+14);y+=28;
+  doc.setFillColor(246,243,235);doc.setDrawColor(200,190,175);doc.setLineWidth(0.5);doc.rect(32,y,W-64,50,'FD');
+  doc.setTextColor(140,130,120);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('PROJECT',42,y+12);doc.text('CLIENT',200,y+12);doc.text('DATE',390,y+12);
+  doc.setTextColor(26,26,24);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(pn,42,y+28);doc.text(cl,200,y+28);doc.text(dt,390,y+28);
+  if(notes){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,110,100);doc.text(doc.splitTextToSize('Notes: '+notes,W-80),42,y+42);}
+  y+=62;
+  function sec(t){if(y>760){doc.addPage();doc.setFillColor(253,252,248);doc.rect(0,0,W,842,'F');y=32;}doc.setFillColor(234,228,215);doc.rect(32,y,W-64,18,'F');doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(100,90,80);doc.text(t.toUpperCase(),40,y+12);y+=24;}
+  function row(l,v,b=false){if(y>760){doc.addPage();doc.setFillColor(253,252,248);doc.rect(0,0,W,842,'F');y=32;}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(9);doc.setTextColor(26,26,24);doc.text(l,40,y+10);doc.setFont('helvetica','bold');doc.text(String(v),W-40,y+10,{align:'right'});doc.setDrawColor(220,215,200);doc.setLineWidth(0.3);doc.line(40,y+16,W-40,y+16);y+=20;}
+  sec('Rate Settings');row('Hourly Rate',fC(c.rate));row('Hours/Day',c.hpd+' hrs');row('Base Hours',c.bh+' hrs');y+=6;
+  sec('Selected Features');let hf=false;FEATS.filter(f=>f.on).forEach(f=>{row(f.lbl,f.h+' hrs');hf=true;});if(!hf)row('(none)','—');else row('Feature Total',c.fh+' hrs',true);y+=6;
+  sec('Integrations');let hi=false;INTEG.filter(r=>r.on).forEach(r=>{row(r.lbl+(r.prov?' ('+r.prov+')':''),fC(r.c));hi=true;});if(!hi)row('(none)','—');y+=6;
+  sec('Multipliers');const pm=PLATS.find(p=>p.id===PLAT);row('Platform',pm?pm.lbl+' ×'+pm.m.toFixed(1):'None ×1.0');row('Backend',document.getElementById('back-mult').options[document.getElementById('back-mult').selectedIndex].text);row('UI',document.getElementById('ui-mult').options[document.getElementById('ui-mult').selectedIndex].text);y+=6;
+  sec('Cost Breakdown');row('Base Cost',fC(c.bc));row('Adjusted Dev Cost',fC(c.ac));row('Integration Costs',fC(c.it));row('Infrastructure Costs',fC(c.inf));row('Subtotal',fC(c.sub));row('Risk Buffer ('+Math.round(c.rp*100)+'%)','+'+fC(c.ra));y+=10;
+  doc.setFillColor(200,75,47);doc.rect(32,y,W-64,44,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text('TOTAL PROJECT COST',40,y+14);doc.setFont('helvetica','bold');doc.setFontSize(24);doc.text(fC(c.fin),W-40,y+32,{align:'right'});y+=58;
+  if(bl&&!isNaN(bl)){sec('Budget Analysis');const bu=toUSD(bl),diff=c.fin-bu,dp=bu>0?((c.fin-bu)/bu*100):0;row('Client Budget',fC(bu));row('Your Estimate',fC(c.fin));row('Difference',(diff>0?'+':'')+fC(diff));row('Deviation',dp.toFixed(1)+'%');y+=6;}
+  sec('Timeline');row('Total Hours',c.th+' hrs');row('Work Days',Math.ceil(c.days)+' days');row('Weeks',c.wks.toFixed(1)+' wks');y+=14;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(160,150,140);doc.text('DevRate Freelance Calculator · '+dt,W/2,y,{align:'center'});
+  doc.save(title.replace(/\s+/g,'_')+'_estimate_'+dt+'.pdf');
+}
+
+function dlInvPDF(){
+  renderInv();const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});const W=doc.internal.pageSize.getWidth();
+  let y=0;const c=CC;const g=id=>document.getElementById(id).value;
+  const pn=g('proj-name')||'Project',cl=g('client-name')||'Client',ca=g('client-addr');
+  const yn=g('your-name')||'Freelancer',ye=g('your-email');
+  const id_=g('proj-date'),dd=g('due-date'),inum=g('inv-num')||'INV-0001';
+  const st=g('inv-status').toUpperCase(),tax=parseFloat(g('inv-tax'))||0,disc=parseFloat(g('inv-disc'))||0;
+  const bk=g('inv-bank'),fn=g('inv-foot')||'Thank you!',notes=g('proj-notes');
+  const rate=parseFloat(document.getElementById('hourly-rate').value)||60;
+  doc.setFillColor(255,255,255);doc.rect(0,0,W,842,'F');
+  doc.setFillColor(26,26,24);doc.rect(0,0,W,74,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(22);doc.text(yn,32,44);
+  if(ye){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(176,168,152);doc.text(ye,32,58);}
+  doc.setTextColor(200,75,47);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text(inum,W-32,40,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(176,168,152);doc.text('Issued: '+id_+'   Due: '+dd,W-32,56,{align:'right'});doc.text(st,W-32,68,{align:'right'});
+  y=88;
+  doc.setFillColor(246,243,235);doc.setDrawColor(232,228,218);doc.setLineWidth(0.5);doc.rect(32,y,W-64,56,'FD');
+  doc.setTextColor(176,168,152);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('BILL TO',42,y+12);doc.text('PROJECT',290,y+12);
+  doc.setTextColor(26,26,24);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text(cl,42,y+28);doc.text(pn,290,y+28);
+  if(ca){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(106,98,88);doc.text(ca,42,y+42);}
+  if(notes){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(106,98,88);doc.text(doc.splitTextToSize(notes,200),290,y+42);}
+  y+=70;
+  doc.setFillColor(234,228,215);doc.rect(32,y,W-64,18,'F');
+  doc.setTextColor(176,168,152);doc.setFont('helvetica','bold');doc.setFontSize(8);
+  const cx=[40,W*0.6,W*0.75,W-40];
+  doc.text('DESCRIPTION',cx[0],y+12);doc.text('QTY',cx[1],y+12,{align:'right'});doc.text('UNIT PRICE',cx[2],y+12,{align:'right'});doc.text('AMOUNT',cx[3],y+12,{align:'right'});
+  y+=22;
+  let all=[];
+  all.push({desc:'Development ('+c.th+' hrs, ×'+c.pm.toFixed(1)+'×'+c.bm.toFixed(1)+'×'+c.um.toFixed(1)+')',qty:1,tot:c.ac});
+  INTEG.filter(r=>r.on).forEach(r=>all.push({desc:'Integration: '+r.lbl,qty:1,tot:r.c}));
+  INFRA.filter(i=>ISEL.has(i.id)).forEach(i=>all.push({desc:'Infrastructure: '+i.lbl,qty:1,tot:i.c}));
+  all.push({desc:'Risk Buffer ('+Math.round(c.rp*100)+'%)',qty:1,tot:c.ra});
+  INVL.forEach(l=>all.push({desc:l.desc,qty:l.qty,tot:l.qty*l.price}));
+  all.forEach(l=>{if(y>760){doc.addPage();doc.setFillColor(255,255,255);doc.rect(0,0,W,842,'F');y=32;}doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(26,26,24);const wr=doc.splitTextToSize(l.desc,cx[1]-cx[0]-8);doc.text(wr,cx[0],y+11);doc.text(String(l.qty),cx[1],y+11,{align:'right'});doc.text(fC(l.tot/l.qty),cx[2],y+11,{align:'right'});doc.text(fC(l.tot),cx[3],y+11,{align:'right'});doc.setDrawColor(232,228,218);doc.setLineWidth(0.3);doc.line(40,y+18,W-40,y+18);y+=wr.length>1?wr.length*12+8:22;});
+  y+=10;
+  const sub=all.reduce((a,l)=>a+l.tot,0),d=sub*(disc/100),ad=sub-d,tx=ad*(tax/100),gr=ad+tx;
+  const txX=W-270;
+  function tr(l,v,b=false,col=null){doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(9);if(col)doc.setTextColor(...col);else doc.setTextColor(b?26:100,b?26:90,b?24:80);doc.text(l,txX,y+10);doc.setFont('helvetica','bold');doc.text(String(v),W-40,y+10,{align:'right'});doc.setDrawColor(232,228,218);doc.setLineWidth(0.3);doc.line(txX,y+16,W-40,y+16);y+=20;}
+  tr('Subtotal',fC(sub));if(disc>0)tr('Discount ('+disc+'%)','−'+fC(d),false,[42,107,60]);if(tax>0)tr('Tax ('+tax+'%)',fC(tx));
+  y+=4;doc.setFillColor(26,26,24);doc.rect(txX-8,y,W-txX+48,30,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('TOTAL DUE',txX,y+19);doc.text(fC(gr),W-40,y+19,{align:'right'});y+=42;
+  if(bk){doc.setFillColor(246,243,235);doc.rect(32,y,W-64,36,'F');doc.setTextColor(140,130,120);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text('PAYMENT DETAILS',40,y+12);doc.setFont('helvetica','normal');doc.setTextColor(26,26,24);doc.setFontSize(9);doc.text(bk,40,y+26);y+=46;}
+  doc.setDrawColor(220,215,200);doc.setLineWidth(0.5);doc.line(32,y,W-32,y);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(160,150,140);doc.text(fn,W/2,y+14,{align:'center'});doc.text(CUR+' · '+inum+' · '+id_,W/2,y+26,{align:'center'});
+  doc.save('Invoice_'+inum+'_'+id_+'.pdf');
+}
+
+function getState(){
+  const g=id=>document.getElementById(id).value;
+  return {v:2,at:new Date().toISOString(),
+    meta:{title:g('doc-title'),pn:g('proj-name'),cl:g('client-name'),ca:g('client-addr'),ce:g('client-email'),yn:g('your-name'),ye:g('your-email'),id:g('proj-date'),dd:g('due-date'),notes:g('proj-notes'),cur:CUR,theme:THEME},
+    rates:{rate:g('hourly-rate'),hpd:g('hours-per-day'),bh:g('base-hours')},
+    plat:PLAT,mults:{back:g('back-mult'),ui:g('ui-mult')},risk:g('risk-sl'),
+    feats:FEATS,integ:INTEG,infra:[...ISEL],
+    bud:{val:g('cli-budget'),note:g('bud-note')},
+    inv:{num:g('inv-num'),st:g('inv-status'),tax:g('inv-tax'),disc:g('inv-disc'),bank:g('inv-bank'),foot:g('inv-foot'),lines:INVL}};
+}
+function loadState(s){
+  if(!s)return;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e&&v!==undefined&&v!==null&&v!=='')e.value=v;};
+  if(s.meta){set('doc-title',s.meta.title);set('proj-name',s.meta.pn);set('client-name',s.meta.cl);set('client-addr',s.meta.ca);set('client-email',s.meta.ce);set('your-name',s.meta.yn);set('your-email',s.meta.ye);set('proj-date',s.meta.id);set('due-date',s.meta.dd);set('proj-notes',s.meta.notes);if(s.meta.cur)setCur(s.meta.cur);if(s.meta.theme)setTheme(s.meta.theme);}
+  if(s.rates){set('hourly-rate',s.rates.rate);set('hours-per-day',s.rates.hpd);set('base-hours',s.rates.bh);}
+  if(s.mults){set('back-mult',s.mults.back);set('ui-mult',s.mults.ui);}
+  if(s.risk){set('risk-sl',s.risk);upRisk();}
+  PLAT=s.plat||null;
+  if(s.feats)FEATS=s.feats;if(s.integ)INTEG=s.integ;if(s.infra)ISEL=new Set(s.infra);
+  if(s.bud){set('cli-budget',s.bud.val);set('bud-note',s.bud.note);}
+  if(s.inv){set('inv-num',s.inv.num);set('inv-status',s.inv.st);set('inv-tax',s.inv.tax);set('inv-disc',s.inv.disc);set('inv-bank',s.inv.bank);set('inv-foot',s.inv.foot);if(s.inv.lines)INVL=s.inv.lines;}
+  rPlat();rFeat();rInteg();rInfra();rInvL();calc();
+}
+function dlJSON(){
+  const blob=new Blob([JSON.stringify(getState(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(document.getElementById('proj-name').value||'estimate').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();toast('JSON exported!');
+}
+function dlCSV(){
+  const c=CC;const g=id=>document.getElementById(id).value;
+  const rows=[['Field','Value'],['Title',g('doc-title')],['Project',g('proj-name')],['Client',g('client-name')],['Issue Date',g('proj-date')],['Due Date',g('due-date')],['Currency',CUR],['Hourly Rate',g('hourly-rate')],['Hours/Day',g('hours-per-day')],['Base Hours',g('base-hours')],['Platform',PLAT||'None'],['Platform Mult',c.pm],['Backend Mult',c.bm],['UI Mult',c.um],['Risk %',g('risk-sl')],['',''],['--- FEATURES ---',''],['Feature','Hours'],...FEATS.filter(f=>f.on).map(f=>[f.lbl,f.h]),['Feature Hours Total',c.fh],['',''],['--- INTEGRATIONS ---',''],['Integration','Cost USD'],...INTEG.filter(r=>r.on).map(r=>[r.lbl+' ('+r.prov+')',r.c]),['Integ Total',c.it],['',''],['--- INFRASTRUCTURE ---',''],['Item','Cost USD'],...INFRA.filter(i=>ISEL.has(i.id)).map(i=>[i.lbl,i.c]),['Infra Total',c.inf],['',''],['--- SUMMARY ---',''],['Base Cost USD',c.bc.toFixed(2)],['Adj Dev Cost USD',c.ac.toFixed(2)],['Subtotal USD',c.sub.toFixed(2)],['Risk Amt USD',c.ra.toFixed(2)],['Total USD',c.fin.toFixed(2)],['Total '+CUR,fC(c.fin)],['Total Hours',c.th],['Work Days',Math.ceil(c.days)],['Weeks',c.wks.toFixed(2)],['',''],['Client Budget',g('cli-budget')],['Budget Note',g('bud-note')]];
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=(document.getElementById('proj-name').value||'estimate').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();toast('CSV exported!');
+}
+function doImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    if(f.name.endsWith('.json')){try{loadState(JSON.parse(ev.target.result));toast('JSON imported!');}catch(x){toast('Invalid JSON.');}}
+    else{impCSV(ev.target.result);}
+  };
+  r.readAsText(f);e.target.value='';
+}
+function impCSV(txt){
+  const d={};txt.split('\n').forEach(l=>{const p=l.match(/(".*?"|[^,]+)/g);if(!p||p.length<2)return;d[p[0].replace(/^"|"$/g,'').trim()]=p[1].replace(/^"|"$/g,'').trim();});
+  const s=(id,v)=>{const e=document.getElementById(id);if(e&&v)e.value=v;};
+  s('doc-title',d['Title']);s('proj-name',d['Project']);s('client-name',d['Client']);s('proj-date',d['Issue Date']);s('due-date',d['Due Date']);
+  if(d['Currency'])setCur(d['Currency']);s('hourly-rate',d['Hourly Rate']);s('hours-per-day',d['Hours/Day']);s('base-hours',d['Base Hours']);s('risk-sl',d['Risk %']);if(d['Risk %'])upRisk();s('cli-budget',d['Client Budget']);s('bud-note',d['Budget Note']);
+  calc();toast('CSV imported (basic fields)!');
+}
+function copyLink(){const enc=btoa(unescape(encodeURIComponent(JSON.stringify(getState()))));navigator.clipboard.writeText(location.href.split('?')[0]+'?est='+enc).then(()=>toast('Link copied!'));}
+function shareText(){return `${document.getElementById('doc-title').value} — ${document.getElementById('proj-name').value||'Project'}\nEstimate: ${fC(CC.fin||0)} | ${Math.ceil(CC.days||0)} days`;}
+function shareWA(){window.open('https://wa.me/?text='+encodeURIComponent(shareText()));}
+function shareEM(){window.open('mailto:?subject='+encodeURIComponent(document.getElementById('doc-title').value)+'&body='+encodeURIComponent(shareText()));}
+function shareTG(){window.open('https://t.me/share/url?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(shareText()));}
+function saveLoc(){localStorage.setItem('devrate_v3',JSON.stringify(getState()));toast('Draft saved.');}
+function loadLoc(){const r=localStorage.getItem('devrate_v3');if(!r){toast('No saved draft.');return;}loadState(JSON.parse(r));toast('Draft loaded.');}
+function checkURL(){const enc=new URLSearchParams(location.search).get('est');if(enc){try{loadState(JSON.parse(decodeURIComponent(escape(atob(enc)))));toast('Estimate loaded from link.');}catch(e){}}}
+function eh(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+init();checkURL();
+</script>
+</body>
+</html>
