@@ -92,7 +92,7 @@ let projectData = [];
 async function loadProjects() {
   // 1. manifest.json
   try {
-    const mRes = await fetch("projects/manifest.json");
+    const mRes = await fetch("projects/project.json");
     if (mRes.ok) { await loadFromFolders(await mRes.json()); return; }
   } catch (_) {}
 
