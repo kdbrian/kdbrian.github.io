@@ -1,0 +1,8 @@
+{
+  "slug": "sage",
+  "title": "Sage Documents",
+  "description": "An AI-powered RAG system for personalized document retrieval.",
+  "images": ["/projects/Sage/1.jpeg"],
+  "tags": ["Kotlin", "RAG", "AI"],
+  "featured": true
+}

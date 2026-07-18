@@ -1,0 +1,8 @@
+{
+  "slug": "farm-connect",
+  "title": "Farm Connect",
+  "description": "A marketplace app connecting farmers directly with buyers.",
+  "images": ["/projects/farm-connect/1.jpeg"],
+  "tags": ["Kotlin", "Jetpack Compose", "Firebase"],
+  "featured": false
+}
