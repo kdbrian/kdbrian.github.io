@@ -3,14 +3,21 @@ import { Check, Loader2, Send, Trash2 } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import DraftsPanel from "@/components/admin/DraftsPanel";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
+import TagInput from "@/components/admin/TagInput";
+import SkillPicker from "@/components/admin/SkillPicker";
+import ThemePicker from "@/components/admin/ThemePicker";
 import { api, ApiError } from "@/lib/api";
-import { deleteDraft, getDraft, listDrafts, newDraft, saveDraft, slugify, type Draft } from "@/lib/drafts";
-import { getPostBySlug } from "@/lib/posts";
+import { deleteDraft, listDrafts, newDraft, saveDraft, slugify, type Draft } from "@/lib/drafts";
+import { fetchPostBySlug, fetchPosts } from "@/lib/posts";
+import type { Post, Skill, Theme } from "@/types/content";
 
 export default function PostEditor() {
-  const [drafts, setDrafts] = useState<Draft[]>(listDrafts());
-  const [activeId, setActiveId] = useState<string | null>(drafts[0]?.id ?? null);
-  const [draft, setDraft] = useState<Draft>(() => (activeId ? getDraft(activeId)! : newDraft()));
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [publishedPosts, setPublishedPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>(newDraft());
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [saveState, setSaveState] = useState<"idle" | "saved">("idle");
   const [publishState, setPublishState] = useState<"idle" | "publishing" | "error">("idle");
   const [publishError, setPublishError] = useState<string | null>(null);
@@ -18,13 +25,25 @@ export default function PostEditor() {
   const autosaveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    if (!activeId) {
-      const d = newDraft();
-      setDraft(d);
-      saveDraft(d);
-      setActiveId(d.id);
-      setDrafts(listDrafts());
-    }
+    Promise.all([listDrafts(), fetchPosts()]).then(async ([ds, posts]) => {
+      setDrafts(ds);
+      setPublishedPosts(posts);
+      if (ds[0]) {
+        setActiveId(ds[0].id);
+        setDraft(ds[0]);
+        if (ds[0].publishedSlug) {
+          const p = posts.find((x) => x.slug === ds[0].publishedSlug);
+          setSkills(p?.skills || []);
+        }
+      } else {
+        const d = newDraft();
+        await saveDraft(d);
+        setDrafts([d]);
+        setActiveId(d.id);
+        setDraft(d);
+      }
+      setLoading(false);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -33,32 +52,33 @@ export default function PostEditor() {
     setDraft(updated);
     setSaveState("idle");
     clearTimeout(autosaveTimer.current);
-    autosaveTimer.current = setTimeout(() => {
-      saveDraft(updated);
-      setDrafts(listDrafts());
+    autosaveTimer.current = setTimeout(async () => {
+      await saveDraft(updated);
+      setDrafts(await listDrafts());
       setSaveState("saved");
     }, 600);
   }
 
   function selectDraft(id: string) {
-    const d = getDraft(id);
+    const d = drafts.find((x) => x.id === id);
     if (d) {
       setActiveId(id);
       setDraft(d);
     }
   }
 
-  function createDraft() {
+  async function createDraft() {
     const d = newDraft();
-    saveDraft(d);
-    setDrafts(listDrafts());
+    await saveDraft(d);
+    setDrafts(await listDrafts());
     setActiveId(d.id);
     setDraft(d);
+    setSkills([]);
   }
 
-  function removeDraft(id: string) {
-    deleteDraft(id);
-    const remaining = listDrafts();
+  async function removeDraft(id: string) {
+    await deleteDraft(id);
+    const remaining = await listDrafts();
     setDrafts(remaining);
     if (id === activeId) {
       if (remaining[0]) selectDraft(remaining[0].id);
@@ -66,25 +86,26 @@ export default function PostEditor() {
     }
   }
 
-  function openPublished(slug: string) {
-    const post = getPostBySlug(slug);
+  async function openPublished(slug: string) {
+    const post = await fetchPostBySlug(slug);
     if (!post) return;
     const d: Draft = {
       id: crypto.randomUUID(),
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt || "",
-      tags: (post.tags || []).join(", "),
+      tags: post.tags || [],
       cover: post.cover || "",
       body: post.body,
       format: post.format,
       updatedAt: Date.now(),
       publishedSlug: post.slug,
     };
-    saveDraft(d);
-    setDrafts(listDrafts());
+    await saveDraft(d);
+    setDrafts(await listDrafts());
     setActiveId(d.id);
     setDraft(d);
+    setSkills(post.skills || []);
   }
 
   async function handlePublish() {
@@ -101,16 +122,18 @@ export default function PostEditor() {
         slug,
         title: draft.title,
         body: draft.body,
-        format: "html", // TipTap always outputs HTML
+        format: "html",
         excerpt: draft.excerpt || undefined,
-        tags: draft.tags ? draft.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        tags: draft.tags,
         cover: draft.cover || undefined,
-        isNew: !draft.publishedSlug,
+        theme,
+        skillIds: skills.map((s) => s.id),
       });
       const updated = { ...draft, publishedSlug: slug, slug };
-      saveDraft(updated);
+      await saveDraft(updated);
       setDraft(updated);
-      setDrafts(listDrafts());
+      setDrafts(await listDrafts());
+      setPublishedPosts(await fetchPosts());
       setPublishState("idle");
     } catch (err) {
       setPublishError(err instanceof ApiError ? err.message : "Publish failed.");
@@ -122,13 +145,27 @@ export default function PostEditor() {
     if (!draft.publishedSlug) return;
     await api.deletePost(draft.publishedSlug, deleteMedia);
     setConfirmingDelete(false);
+    setPublishedPosts(await fetchPosts());
     removeDraft(draft.id);
   }
+
+  const [theme, setTheme] = useState<Theme | null>(null);
+  useEffect(() => {
+    if (draft.publishedSlug) {
+      fetchPostBySlug(draft.publishedSlug).then((p) => setTheme(p?.theme || null));
+    } else {
+      setTheme(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft.publishedSlug]);
+
+  if (loading) return <p className="py-8 text-sm text-ink/40">Loading…</p>;
 
   return (
     <div className="flex flex-col gap-6 sm:flex-row">
       <DraftsPanel
         drafts={drafts}
+        publishedPosts={publishedPosts}
         activeId={activeId}
         onSelect={selectDraft}
         onNew={createDraft}
@@ -141,7 +178,7 @@ export default function PostEditor() {
           <p className="flex items-center gap-1.5 text-xs text-ink/40">
             {saveState === "saved" ? (
               <>
-                <Check size={12} /> Saved locally
+                <Check size={12} /> Saved
               </>
             ) : (
               "Editing…"
@@ -192,12 +229,15 @@ export default function PostEditor() {
             placeholder="Short excerpt (optional)"
             className="rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
           />
-          <input
-            value={draft.tags}
-            onChange={(e) => update({ tags: e.target.value })}
-            placeholder="Tags, comma-separated"
-            className="rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-          />
+          <TagInput value={draft.tags} onChange={(tags) => update({ tags })} placeholder="Tags, press Enter to add" />
+        </div>
+
+        <div className="mt-3">
+          <SkillPicker value={skills} onChange={setSkills} />
+        </div>
+
+        <div className="mt-3">
+          <ThemePicker value={theme} onChange={setTheme} />
         </div>
 
         <div className="mt-4">

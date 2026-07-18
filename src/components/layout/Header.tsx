@@ -8,6 +8,7 @@ const LINKS = [
   { to: "/projects", label: "Projects", end: false },
   { to: "/activity", label: "Activity", end: false },
   { to: "/blog", label: "Blog", end: false },
+  { to: "/playground", label: "Playground", end: false },
 ];
 
 export default function Header() {

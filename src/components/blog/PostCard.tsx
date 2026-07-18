@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Post } from "@/types/content";
+import ThemeBanner from "@/components/ThemeBanner";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
@@ -13,12 +14,12 @@ export default function PostCard({ post }: { post: Post }) {
           />
         </div>
       )}
-      <div className="p-5">
-        <p className="text-xs text-ink/40">
+      <ThemeBanner theme={post.theme} className="p-5">
+        <p className="text-xs opacity-60">
           {new Date(post.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
         </p>
         <h3 className="mt-1 font-display font-semibold group-hover:text-accent">{post.title}</h3>
-        {post.excerpt && <p className="mt-1.5 text-sm text-ink/60">{post.excerpt}</p>}
+        {post.excerpt && <p className="mt-1.5 text-sm opacity-70">{post.excerpt}</p>}
         {!!post.tags?.length && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
@@ -28,7 +29,7 @@ export default function PostCard({ post }: { post: Post }) {
             ))}
           </div>
         )}
-      </div>
+      </ThemeBanner>
     </Link>
   );
 }

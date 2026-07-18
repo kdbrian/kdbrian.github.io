@@ -1,9 +1,10 @@
 import { FileText, Globe, Plus, Trash2 } from "lucide-react";
 import type { Draft } from "@/lib/drafts";
-import { allPosts } from "@/lib/posts";
+import type { Post } from "@/types/content";
 
 export default function DraftsPanel({
   drafts,
+  publishedPosts,
   activeId,
   onSelect,
   onNew,
@@ -11,6 +12,7 @@ export default function DraftsPanel({
   onOpenPublished,
 }: {
   drafts: Draft[];
+  publishedPosts: Post[];
   activeId: string | null;
   onSelect: (id: string) => void;
   onNew: () => void;
@@ -18,7 +20,7 @@ export default function DraftsPanel({
   onOpenPublished: (slug: string) => void;
 }) {
   const localSlugs = new Set(drafts.map((d) => d.publishedSlug).filter(Boolean));
-  const otherPublished = allPosts.filter((p) => !localSlugs.has(p.slug));
+  const otherPublished = publishedPosts.filter((p) => !localSlugs.has(p.slug));
 
   return (
     <div className="w-full shrink-0 border-b border-line pb-4 sm:w-64 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-4">
@@ -56,9 +58,7 @@ export default function DraftsPanel({
 
       {otherPublished.length > 0 && (
         <>
-          <p className="mb-2 mt-6 px-2.5 text-xs font-medium uppercase tracking-wide text-ink/30">
-            Published (from last build)
-          </p>
+          <p className="mb-2 mt-6 px-2.5 text-xs font-medium uppercase tracking-wide text-ink/30">Published</p>
           <div className="space-y-1">
             {otherPublished.map((p) => (
               <div

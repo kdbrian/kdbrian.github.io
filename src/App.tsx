@@ -1,11 +1,13 @@
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import Home from "@/pages/Home";
 import ProjectsPage from "@/pages/Projects";
 import ActivityPage from "@/pages/Activity";
 import BlogListPage from "@/pages/BlogList";
 import PostDetailPage from "@/pages/PostDetail";
+import PlaygroundPage from "@/pages/Playground";
 
 const StudioApp = lazy(() => import("@/pages/admin/StudioApp"));
 
@@ -32,12 +34,11 @@ export default function App() {
                 <Route path="/activity" element={<ActivityPage />} />
                 <Route path="/blog" element={<BlogListPage />} />
                 <Route path="/blog/:slug" element={<PostDetailPage />} />
+                <Route path="/playground" element={<PlaygroundPage />} />
                 <Route path="*" element={<Home />} />
               </Routes>
             </main>
-            <footer className="mx-auto max-w-content px-6 py-10 text-sm text-ink/30">
-              © {new Date().getFullYear()} Brian Kidiga
-            </footer>
+            <Footer />
           </div>
         }
       />

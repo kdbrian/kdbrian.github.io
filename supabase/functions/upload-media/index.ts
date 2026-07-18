@@ -1,12 +1,31 @@
-import { corsHeaders, handleOptions, jsonResponse } from "../_shared/cors.ts";
+import { handleOptions, jsonResponse } from "../_shared/cors.ts";
 import { requireAuth } from "../_shared/auth-guard.ts";
-import { putFile } from "../_shared/github.ts";
+import { serviceClient } from "../_shared/supabase.ts";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
-const MAX_BYTES = 15 * 1024 * 1024; // 15MB — Contents API tops out at 100MB but keep it sane
+const MAX_BYTES = 15 * 1024 * 1024; // 15MB
+
+const MIME_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  mov: "video/quicktime",
+};
 
 function sanitizeFilename(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9.\-]/g, "-").replace(/-+/g, "-");
+}
+
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }
 
 Deno.serve(async (req) => {
@@ -28,19 +47,24 @@ Deno.serve(async (req) => {
     if (folder !== "blog-images" && folder !== "projects") {
       return jsonResponse({ error: "folder must be 'blog-images' or 'projects'." }, 400);
     }
-    // Rough size check on the base64 payload (base64 is ~4/3 the byte size).
     if (base64.length * 0.75 > MAX_BYTES) {
       return jsonResponse({ error: "File too large (15MB limit)." }, 400);
     }
 
     const clean = sanitizeFilename(filename);
-    const stamped = `${Date.now()}-${clean}`;
-    const path = `public/${folder}/${slug}/${stamped}`;
+    const ext = clean.split(".").pop() || "";
+    const path = `${folder}/${slug}/${Date.now()}-${clean}`;
+    const bytes = base64ToBytes(base64);
 
-    await putFile(path, base64, `Upload media: ${clean}`, true);
+    const supabase = serviceClient();
+    const { error } = await supabase.storage.from("media").upload(path, bytes, {
+      contentType: MIME_TYPES[ext] || "application/octet-stream",
+      upsert: false,
+    });
+    if (error) throw error;
 
-    // Vite serves everything under public/ from the site root.
-    return jsonResponse({ path, url: `/${folder}/${slug}/${stamped}` });
+    const { data } = supabase.storage.from("media").getPublicUrl(path);
+    return jsonResponse({ path, url: data.publicUrl });
   } catch (err) {
     return jsonResponse({ error: (err as Error).message }, 500);
   }

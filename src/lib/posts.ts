@@ -1,46 +1,47 @@
-import type { Post, PostFormat } from "@/types/content";
-import { parseFrontmatter } from "@/lib/frontmatter";
+import type { Post, PostFormat, Skill, Theme } from "@/types/content";
+import { restGet } from "@/lib/supabase-rest";
 
-// Vite inlines every matched file's raw text at build time — this is the
-// entire "database". No runtime fetch, no server round-trip for readers.
-const modules = import.meta.glob("/src/content/posts/*.{md,html}", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-});
+type SkillRow = { id: string; name: string; date_added: string };
+type PostRow = {
+  slug: string;
+  title: string;
+  body: string;
+  format: PostFormat;
+  excerpt: string | null;
+  cover: string | null;
+  tags: string[];
+  theme: Theme | null;
+  date: string;
+  post_skills: { skill: SkillRow }[];
+};
 
-function detectFormat(path: string, content: string, explicit?: PostFormat): PostFormat {
-  if (explicit) return explicit;
-  if (path.endsWith(".html")) return "html";
-  // Old posts imported as markdown but saved with an .md extension that
-  // actually contains raw HTML — sniff for a leading tag just in case.
-  return /^\s*</.test(content) ? "html" : "markdown";
+const SELECT = "*,post_skills(skill:skills(id,name,date_added))";
+
+function mapSkill(row: SkillRow): Skill {
+  return { id: row.id, name: row.name, dateAdded: row.date_added };
 }
 
-function loadPosts(): Post[] {
-  const posts: Post[] = [];
-
-  for (const [path, raw] of Object.entries(modules)) {
-    const { data, content } = parseFrontmatter(raw as string);
-    const slug = (data.slug as string) || path.split("/").pop()!.replace(/\.(md|html)$/, "");
-
-    posts.push({
-      title: (data.title as string) || slug,
-      slug,
-      date: (data.date as string) || new Date(0).toISOString(),
-      excerpt: data.excerpt as string | undefined,
-      cover: data.cover as string | undefined,
-      tags: (data.tags as string[]) || [],
-      format: detectFormat(path, content, data.format as PostFormat | undefined),
-      body: content,
-    });
-  }
-
-  return posts.sort((a, b) => +new Date(b.date) - +new Date(a.date));
+function mapPost(row: PostRow): Post {
+  return {
+    slug: row.slug,
+    title: row.title,
+    body: row.body,
+    format: row.format,
+    excerpt: row.excerpt ?? undefined,
+    cover: row.cover ?? undefined,
+    tags: row.tags || [],
+    theme: row.theme,
+    date: row.date,
+    skills: (row.post_skills || []).map((ps) => mapSkill(ps.skill)),
+  };
 }
 
-export const allPosts = loadPosts();
+export async function fetchPosts(): Promise<Post[]> {
+  const rows = await restGet<PostRow[]>(`posts?select=${SELECT}&order=date.desc`);
+  return rows.map(mapPost);
+}
 
-export function getPostBySlug(slug: string): Post | undefined {
-  return allPosts.find((p) => p.slug === slug);
+export async function fetchPostBySlug(slug: string): Promise<Post | undefined> {
+  const rows = await restGet<PostRow[]>(`posts?select=${SELECT}&slug=eq.${encodeURIComponent(slug)}`);
+  return rows[0] ? mapPost(rows[0]) : undefined;
 }

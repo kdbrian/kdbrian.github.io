@@ -1,7 +1,12 @@
-import { ExternalLink, Github, Smartphone } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Github, Smartphone, ChevronDown } from "lucide-react";
 import type { Project } from "@/types/content";
+import ThemeBanner from "@/components/ThemeBanner";
+import CommitHistory from "@/components/CommitHistory";
 
 export default function ProjectCard({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div className="card group overflow-hidden transition-shadow hover:shadow-lg hover:shadow-ink/5">
       {project.images?.[0] && (
@@ -13,9 +18,16 @@ export default function ProjectCard({ project }: { project: Project }) {
           />
         </div>
       )}
-      <div className="p-5">
-        <h3 className="font-display font-semibold">{project.title}</h3>
-        <p className="mt-1.5 text-sm text-ink/60">{project.description}</p>
+      <ThemeBanner theme={project.theme} className="p-5">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex w-full items-center justify-between gap-2 text-left"
+        >
+          <h3 className="font-display font-semibold">{project.title}</h3>
+          <ChevronDown size={16} className={`shrink-0 opacity-60 transition-transform ${expanded ? "rotate-180" : ""}`} />
+        </button>
+        <p className={`mt-1.5 text-sm opacity-70 ${expanded ? "" : "line-clamp-2"}`}>{project.description}</p>
 
         {!!project.tags?.length && (
           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -34,7 +46,8 @@ export default function ProjectCard({ project }: { project: Project }) {
                 href={project.repoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-ink/60 hover:text-ink"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 opacity-70 hover:opacity-100"
               >
                 <Github size={14} /> Source
               </a>
@@ -44,14 +57,35 @@ export default function ProjectCard({ project }: { project: Project }) {
                 href={project.playStoreUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-ink/60 hover:text-ink"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 opacity-70 hover:opacity-100"
               >
                 <Smartphone size={14} /> Play Store <ExternalLink size={12} />
               </a>
             )}
           </div>
         )}
-      </div>
+
+        {expanded && (
+          <div className="mt-4 border-t border-line/50 pt-3" onClick={(e) => e.stopPropagation()}>
+            {!!project.skills?.length && (
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {project.skills.map((skill) => (
+                  <span key={skill.id} className="rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent">
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            )}
+            {project.repoUrl && (
+              <>
+                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide opacity-50">Commit history</p>
+                <CommitHistory repoUrl={project.repoUrl} />
+              </>
+            )}
+          </div>
+        )}
+      </ThemeBanner>
     </div>
   );
 }

@@ -1,6 +1,6 @@
-import { corsHeaders, handleOptions, jsonResponse } from "../_shared/cors.ts";
+import { handleOptions, jsonResponse } from "../_shared/cors.ts";
 import { requireAuth } from "../_shared/auth-guard.ts";
-import { deleteFile, deleteDir } from "../_shared/github.ts";
+import { serviceClient } from "../_shared/supabase.ts";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 
@@ -17,10 +17,20 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Invalid slug." }, 400);
     }
 
-    await deleteFile(`src/content/projects/${slug}.json`, `Delete project: ${slug}`);
+    const supabase = serviceClient();
+
+    // project_skills rows for this project are removed automatically (on delete cascade).
+    const { error } = await supabase.from("projects").delete().eq("slug", slug);
+    if (error) throw error;
 
     if (deleteMedia) {
-      await deleteDir(`public/projects/${slug}`, `Delete images for project: ${slug}`);
+      const { data: files, error: listErr } = await supabase.storage.from("media").list(`projects/${slug}`);
+      if (listErr) throw listErr;
+      if (files?.length) {
+        const paths = files.map((f) => `projects/${slug}/${f.name}`);
+        const { error: removeErr } = await supabase.storage.from("media").remove(paths);
+        if (removeErr) throw removeErr;
+      }
     }
 
     return jsonResponse({ ok: true });

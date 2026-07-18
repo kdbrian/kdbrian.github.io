@@ -1,18 +1,27 @@
 export type PostFormat = "html" | "markdown";
 
-export interface PostFrontmatter {
+export type Theme = {
+  type: "color" | "gradient" | "image";
+  value: string; // hex color, CSS gradient() value, or image URL
+};
+
+export interface Skill {
+  id: string;
+  name: string;
+  dateAdded: string; // ISO date
+}
+
+export interface Post {
   title: string;
   slug: string;
   date: string; // ISO date
   excerpt?: string;
   cover?: string;
   tags?: string[];
-  format?: PostFormat; // explicit override; auto-detected if omitted
-}
-
-export interface Post extends PostFrontmatter {
-  body: string;
+  theme?: Theme | null;
   format: PostFormat;
+  body: string;
+  skills?: Skill[];
 }
 
 export interface Project {
@@ -21,9 +30,11 @@ export interface Project {
   description: string;
   images: string[];
   tags?: string[];
-  repoUrl?: string;
+  theme?: Theme | null;
+  repoUrl: string;
   playStoreUrl?: string;
   featured?: boolean;
+  skills?: Skill[];
 }
 
 export interface ActivityEntry {
@@ -32,4 +43,13 @@ export interface ActivityEntry {
   title: string;
   description?: string;
   url?: string;
+  theme?: Theme | null;
+  skills?: Skill[];
+}
+
+export interface SocialLink {
+  id: string;
+  label?: string;
+  url: string;
+  sortOrder: number;
 }

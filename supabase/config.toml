@@ -426,6 +426,22 @@ verify_jwt = false
 verify_jwt = false
 [functions.upload-media]
 verify_jwt = false
+[functions.publish-milestone]
+verify_jwt = false
+[functions.delete-milestone]
+verify_jwt = false
+[functions.drafts-list]
+verify_jwt = false
+[functions.drafts-save]
+verify_jwt = false
+[functions.drafts-delete]
+verify_jwt = false
+[functions.publish-skill]
+verify_jwt = false
+[functions.publish-social-link]
+verify_jwt = false
+[functions.delete-social-link]
+verify_jwt = false
 # Directory under `supabase/` where declarative files are written.
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.

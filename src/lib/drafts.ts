@@ -1,9 +1,11 @@
+import { api } from "@/lib/api";
+
 export interface Draft {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
-  tags: string;
+  tags: string[];
   cover: string;
   body: string;
   format: "html" | "markdown";
@@ -11,39 +13,18 @@ export interface Draft {
   publishedSlug?: string; // set once this draft has been published, for edit-in-place
 }
 
-const STORAGE_KEY = "studio.drafts";
-
-function readAll(): Draft[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
+/** Cross-device: backed by the drafts table via edge functions, not localStorage. */
+export async function listDrafts(): Promise<Draft[]> {
+  const { drafts } = await api.listDrafts();
+  return drafts.sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-function writeAll(drafts: Draft[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
+export async function saveDraft(draft: Draft): Promise<void> {
+  await api.saveDraft(draft);
 }
 
-export function listDrafts(): Draft[] {
-  return readAll().sort((a, b) => b.updatedAt - a.updatedAt);
-}
-
-export function getDraft(id: string): Draft | undefined {
-  return readAll().find((d) => d.id === id);
-}
-
-export function saveDraft(draft: Draft) {
-  const drafts = readAll();
-  const idx = drafts.findIndex((d) => d.id === draft.id);
-  const updated = { ...draft, updatedAt: Date.now() };
-  if (idx >= 0) drafts[idx] = updated;
-  else drafts.push(updated);
-  writeAll(drafts);
-}
-
-export function deleteDraft(id: string) {
-  writeAll(readAll().filter((d) => d.id !== id));
+export async function deleteDraft(id: string): Promise<void> {
+  await api.deleteDraft(id);
 }
 
 export function newDraft(): Draft {
@@ -52,7 +33,7 @@ export function newDraft(): Draft {
     title: "",
     slug: "",
     excerpt: "",
-    tags: "",
+    tags: [],
     cover: "",
     body: "",
     format: "html",

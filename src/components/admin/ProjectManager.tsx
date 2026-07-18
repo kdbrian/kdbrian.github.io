@@ -1,35 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Plus, Send, Trash2, X } from "lucide-react";
 import MediaUploader from "@/components/admin/MediaUploader";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
+import TagInput from "@/components/admin/TagInput";
+import SkillPicker from "@/components/admin/SkillPicker";
+import ThemePicker from "@/components/admin/ThemePicker";
 import { api, ApiError } from "@/lib/api";
-import { allProjects } from "@/lib/projects";
+import { fetchProjects } from "@/lib/projects";
 import { slugify } from "@/lib/drafts";
-import type { Project } from "@/types/content";
+import type { Project, Skill } from "@/types/content";
 
 const EMPTY: Project = {
   slug: "", title: "", description: "", images: [], tags: [], repoUrl: "", playStoreUrl: "", featured: false,
 };
 
 export default function ProjectManager() {
-  const [projects, setProjects] = useState<Project[]>(allProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Project | null>(null);
+  const [editingSkills, setEditingSkills] = useState<Skill[]>([]);
   const [isNew, setIsNew] = useState(true);
-  const [tagsInput, setTagsInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<Project | null>(null);
 
+  useEffect(() => {
+    fetchProjects().then((p) => {
+      setProjects(p);
+      setLoading(false);
+    });
+  }, []);
+
   function startNew() {
     setEditing({ ...EMPTY });
-    setTagsInput("");
+    setEditingSkills([]);
     setIsNew(true);
     setError(null);
   }
 
   function startEdit(p: Project) {
     setEditing({ ...p });
-    setTagsInput((p.tags || []).join(", "));
+    setEditingSkills(p.skills || []);
     setIsNew(false);
     setError(null);
   }
@@ -39,27 +50,17 @@ export default function ProjectManager() {
       setError("Title is required.");
       return;
     }
+    if (!editing.repoUrl.trim()) {
+      setError("A GitHub repo URL is required.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
       const slug = editing.slug || slugify(editing.title);
-      const payload = {
-        ...editing,
-        slug,
-        tags: tagsInput.split(",").map((t) => t.trim()).filter(Boolean),
-        isNew,
-      };
+      const payload = { ...editing, slug, skillIds: editingSkills.map((s) => s.id) };
       await api.publishProject(payload);
-      const saved = { ...payload };
-      setProjects((prev) => {
-        const idx = prev.findIndex((p) => p.slug === slug);
-        if (idx >= 0) {
-          const copy = [...prev];
-          copy[idx] = saved;
-          return copy;
-        }
-        return [saved, ...prev];
-      });
+      setProjects(await fetchProjects());
       setEditing(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Save failed.");
@@ -71,9 +72,11 @@ export default function ProjectManager() {
   async function handleDelete(deleteMedia: boolean) {
     if (!confirmingDelete) return;
     await api.deleteProject(confirmingDelete.slug, deleteMedia);
-    setProjects((prev) => prev.filter((p) => p.slug !== confirmingDelete.slug));
+    setProjects(await fetchProjects());
     setConfirmingDelete(null);
   }
+
+  if (loading) return <p className="py-8 text-sm text-ink/40">Loading…</p>;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -133,16 +136,12 @@ export default function ProjectManager() {
               rows={3}
               className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
             />
-            <input
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="Tags, comma-separated"
-              className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-            />
+            <TagInput value={editing.tags || []} onChange={(tags) => setEditing({ ...editing, tags })} />
+            <SkillPicker value={editingSkills} onChange={setEditingSkills} />
             <input
               value={editing.repoUrl}
               onChange={(e) => setEditing({ ...editing, repoUrl: e.target.value })}
-              placeholder="Repo URL (optional)"
+              placeholder="Repo URL (required) — https://github.com/owner/repo"
               className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
             />
             <input
@@ -160,6 +159,8 @@ export default function ProjectManager() {
               />
               Feature at top of grid
             </label>
+
+            <ThemePicker value={editing.theme ?? null} onChange={(theme) => setEditing({ ...editing, theme })} />
 
             <div className="flex flex-wrap gap-2">
               {editing.images.map((img) => (

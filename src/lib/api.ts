@@ -1,4 +1,6 @@
 import { getValidToken, touchSession } from "@/lib/auth";
+import type { Draft } from "@/lib/drafts";
+import type { Skill, Theme } from "@/types/content";
 
 const FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
 
@@ -41,8 +43,9 @@ export const api = {
     tags?: string[];
     cover?: string;
     date?: string;
-    isNew: boolean;
-  }) => call<{ commitUrl: string }>("publish-blog", post),
+    theme?: Theme | null;
+    skillIds?: string[];
+  }) => call<{ ok: true; slug: string }>("publish-blog", post),
 
   deletePost: (slug: string, deleteMedia: boolean) =>
     call<{ ok: true }>("delete-blog", { slug, deleteMedia }),
@@ -53,15 +56,42 @@ export const api = {
     description: string;
     images: string[];
     tags?: string[];
-    repoUrl?: string;
+    theme?: Theme | null;
+    repoUrl: string;
     playStoreUrl?: string;
     featured?: boolean;
-    isNew: boolean;
-  }) => call<{ commitUrl: string }>("publish-project", project),
+    skillIds?: string[];
+  }) => call<{ ok: true; slug: string }>("publish-project", project),
 
   deleteProject: (slug: string, deleteMedia: boolean) =>
     call<{ ok: true }>("delete-project", { slug, deleteMedia }),
 
   uploadMedia: (filename: string, base64: string, folder: "blog-images" | "projects", slug: string) =>
     call<{ path: string; url: string }>("upload-media", { filename, base64, folder, slug }),
+
+  publishMilestone: (milestone: {
+    id?: string;
+    date?: string;
+    title: string;
+    description?: string;
+    url?: string;
+    theme?: Theme | null;
+    skillIds?: string[];
+  }) => call<{ ok: true; id: string }>("publish-milestone", milestone),
+
+  deleteMilestone: (id: string) => call<{ ok: true }>("delete-milestone", { id }),
+
+  publishSkill: (skill: { name: string; dateAdded?: string }) =>
+    call<{ skill: Skill }>("publish-skill", skill),
+
+  listDrafts: () => call<{ drafts: Draft[] }>("drafts-list", {}),
+
+  saveDraft: (draft: Draft) => call<{ ok: true }>("drafts-save", draft),
+
+  deleteDraft: (id: string) => call<{ ok: true }>("drafts-delete", { id }),
+
+  publishSocialLink: (link: { id?: string; label?: string; url: string; sortOrder?: number }) =>
+    call<{ id: string }>("publish-social-link", link),
+
+  deleteSocialLink: (id: string) => call<{ ok: true }>("delete-social-link", { id }),
 };

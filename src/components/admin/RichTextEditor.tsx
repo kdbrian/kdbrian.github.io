@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { Extension, InputRule } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -7,12 +8,36 @@ import Youtube from "@tiptap/extension-youtube";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   Bold, Italic, Strikethrough, Link as LinkIcon, Heading2, Heading3,
-  List, ListOrdered, Quote, Code, Image as ImageIcon, Film,
+  List, ListOrdered, Quote, Code, Image as ImageIcon, Film, Smile,
 } from "lucide-react";
 import MediaUploader from "@/components/admin/MediaUploader";
 
 const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
 const VIMEO_RE = /vimeo\.com\/(\d+)/;
+
+const EMOJI_MAP: Record<string, string> = {
+  smile: "😄", laughing: "😆", wink: "😉", heart: "❤️", thumbsup: "👍", thumbsdown: "👎",
+  fire: "🔥", rocket: "🚀", tada: "🎉", eyes: "👀", thinking: "🤔", clap: "👏",
+  100: "💯", check: "✅", x: "❌", warning: "⚠️", bug: "🐛", sparkles: "✨",
+  wave: "👋", pray: "🙏", muscle: "💪", star: "⭐", bulb: "💡", coffee: "☕",
+};
+const EMOJI_PICKS = Object.values(EMOJI_MAP);
+
+const EmojiShortcodes = Extension.create({
+  name: "emojiShortcodes",
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /:([a-z0-9_+-]+):$/,
+        handler: ({ state, range, match }) => {
+          const emoji = EMOJI_MAP[match[1]];
+          if (!emoji) return;
+          state.tr.insertText(emoji, range.from, range.to);
+        },
+      }),
+    ];
+  },
+});
 
 export default function RichTextEditor({
   content,
@@ -25,6 +50,7 @@ export default function RichTextEditor({
 }) {
   const [showMedia, setShowMedia] = useState(false);
   const [showEmbed, setShowEmbed] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const [embedUrl, setEmbedUrl] = useState("");
 
   const editor = useEditor({
@@ -33,7 +59,8 @@ export default function RichTextEditor({
       Link.configure({ openOnClick: false }),
       Image,
       Youtube.configure({ nocookie: true }),
-      Placeholder.configure({ placeholder: "Start writing…" }),
+      Placeholder.configure({ placeholder: "Start writing… (try typing :fire:)" }),
+      EmojiShortcodes,
     ],
     content,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -67,7 +94,6 @@ export default function RichTextEditor({
     } else if (embedUrl.trim().startsWith("<iframe")) {
       editor!.chain().focus().insertContent(embedUrl).run();
     } else {
-      // Generic https:// link — wrap in an iframe embed.
       editor!
         .chain()
         .focus()
@@ -82,7 +108,7 @@ export default function RichTextEditor({
     `rounded-lg p-1.5 transition ${active ? "bg-ink text-paper" : "text-ink/60 hover:bg-ink/10"}`;
 
   return (
-    <div className="rounded-xl border border-line bg-white">
+    <div className="rounded-xl border border-line bg-white text-ink">
       {editor && (
         <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
           <div className="flex gap-0.5 rounded-lg border border-line bg-white p-1 shadow-lg">
@@ -135,7 +161,27 @@ export default function RichTextEditor({
         <button onClick={() => setShowEmbed((v) => !v)} className={btn(showEmbed)}>
           <Film size={16} />
         </button>
+        <button onClick={() => setShowEmoji((v) => !v)} className={btn(showEmoji)}>
+          <Smile size={16} />
+        </button>
       </div>
+
+      {showEmoji && (
+        <div className="grid grid-cols-8 gap-1 border-b border-line p-3">
+          {EMOJI_PICKS.map((emoji) => (
+            <button
+              key={emoji}
+              onClick={() => {
+                editor.chain().focus().insertContent(emoji).run();
+                setShowEmoji(false);
+              }}
+              className="rounded-lg p-1.5 text-lg hover:bg-ink/10"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
 
       {showMedia && (
         <div className="border-b border-line p-3">

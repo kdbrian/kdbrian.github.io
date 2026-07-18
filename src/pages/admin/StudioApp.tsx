@@ -3,13 +3,16 @@ import { LogOut } from "lucide-react";
 import Login from "@/pages/admin/Login";
 import PostEditor from "@/components/admin/PostEditor";
 import ProjectManager from "@/components/admin/ProjectManager";
+import MilestonesManager from "@/components/admin/MilestonesManager";
+import SocialLinksManager from "@/components/admin/SocialLinksManager";
 import { clearSession, getValidToken, touchSession, IDLE_TIMEOUT_MS } from "@/lib/auth";
 
 const ACTIVITY_EVENTS = ["mousemove", "keydown", "scroll", "click"] as const;
+const TABS = ["posts", "projects", "milestones", "links"] as const;
 
 export default function StudioApp() {
   const [authed, setAuthed] = useState(() => !!getValidToken());
-  const [tab, setTab] = useState<"posts" | "projects">("posts");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("posts");
 
   // Idle timeout: reset the clock on real user activity, and poll for expiry.
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function StudioApp() {
           <div className="flex items-center gap-3 sm:gap-6">
             <p className="font-display font-semibold">Studio</p>
             <nav className="flex gap-1 rounded-full border border-line bg-paper p-1">
-              {(["posts", "projects"] as const).map((t) => (
+              {TABS.map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
@@ -72,7 +75,10 @@ export default function StudioApp() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {tab === "posts" ? <PostEditor /> : <ProjectManager />}
+        {tab === "posts" && <PostEditor />}
+        {tab === "projects" && <ProjectManager />}
+        {tab === "milestones" && <MilestonesManager />}
+        {tab === "links" && <SocialLinksManager />}
       </main>
     </div>
   );

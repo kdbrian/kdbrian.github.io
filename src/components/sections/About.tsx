@@ -1,10 +1,15 @@
+import { useEffect, useState } from "react";
 import { Github, Linkedin, MapPin } from "lucide-react";
-
-const SKILLS = [
-  "Kotlin", "Jetpack Compose", "MVVM", "Retrofit", "Room DB", "Coroutines", "Firebase", "Git",
-];
+import type { Skill } from "@/types/content";
+import { fetchSkills } from "@/lib/skills";
 
 export default function About() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  useEffect(() => {
+    fetchSkills().then(setSkills).catch(() => {});
+  }, []);
+
   return (
     <section className="animate-fade-up grid gap-10 py-14 sm:grid-cols-[220px_1fr] sm:py-20">
       <div className="flex flex-col items-center gap-4 sm:items-start">
@@ -42,12 +47,12 @@ export default function About() {
           Stack &amp; tools
         </p>
         <div className="flex flex-wrap gap-2">
-          {SKILLS.map((skill) => (
+          {skills.map((skill) => (
             <span
-              key={skill}
+              key={skill.id}
               className="rounded-full border border-line bg-white px-3 py-1 text-sm text-ink/70"
             >
-              {skill}
+              {skill.name}
             </span>
           ))}
         </div>

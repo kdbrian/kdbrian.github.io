@@ -1,6 +1,6 @@
-import { corsHeaders, handleOptions, jsonResponse } from "../_shared/cors.ts";
+import { handleOptions, jsonResponse } from "../_shared/cors.ts";
 import { requireAuth } from "../_shared/auth-guard.ts";
-import { deleteFile, deleteDir } from "../_shared/github.ts";
+import { serviceClient } from "../_shared/supabase.ts";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 
@@ -17,12 +17,22 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Invalid slug." }, 400);
     }
 
-    // Post may have been saved as .md or .html — try both.
-    await deleteFile(`src/content/posts/${slug}.html`, `Delete post: ${slug}`);
-    await deleteFile(`src/content/posts/${slug}.md`, `Delete post: ${slug}`);
+    const supabase = serviceClient();
+
+    // post_skills rows for this post are removed automatically (on delete cascade).
+    const { error } = await supabase.from("posts").delete().eq("slug", slug);
+    if (error) throw error;
 
     if (deleteMedia) {
-      await deleteDir(`public/blog-images/${slug}`, `Delete media for post: ${slug}`);
+      const { data: files, error: listErr } = await supabase.storage
+        .from("media")
+        .list(`blog-images/${slug}`);
+      if (listErr) throw listErr;
+      if (files?.length) {
+        const paths = files.map((f) => `blog-images/${slug}/${f.name}`);
+        const { error: removeErr } = await supabase.storage.from("media").remove(paths);
+        if (removeErr) throw removeErr;
+      }
     }
 
     return jsonResponse({ ok: true });

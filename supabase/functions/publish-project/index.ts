@@ -1,8 +1,9 @@
-import { corsHeaders, handleOptions, jsonResponse } from "../_shared/cors.ts";
+import { handleOptions, jsonResponse } from "../_shared/cors.ts";
 import { requireAuth } from "../_shared/auth-guard.ts";
-import { putFile } from "../_shared/github.ts";
+import { serviceClient } from "../_shared/supabase.ts";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
+const GITHUB_URL_RE = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/i;
 
 Deno.serve(async (req) => {
   const preflight = handleOptions(req);
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
   if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
   try {
-    const { slug, title, description, images, tags, repoUrl, playStoreUrl, featured, isNew } =
+    const { slug, title, description, images, tags, theme, repoUrl, playStoreUrl, featured, skillIds } =
       await req.json();
 
     if (!slug || !SLUG_RE.test(slug)) {
@@ -21,25 +22,41 @@ Deno.serve(async (req) => {
     if (!title) {
       return jsonResponse({ error: "Title is required." }, 400);
     }
+    if (!repoUrl || !GITHUB_URL_RE.test(repoUrl)) {
+      return jsonResponse(
+        { error: "A GitHub repo URL is required, e.g. https://github.com/owner/repo" },
+        400
+      );
+    }
 
-    const project = {
-      slug,
-      title,
-      description: description || "",
-      images: images || [],
-      tags: tags || [],
-      repoUrl: repoUrl || undefined,
-      playStoreUrl: playStoreUrl || undefined,
-      featured: !!featured,
-    };
+    const supabase = serviceClient();
 
-    const { commitUrl } = await putFile(
-      `src/content/projects/${slug}.json`,
-      JSON.stringify(project, null, 2),
-      `${isNew ? "Add" : "Update"} project: ${title}`
+    const { error } = await supabase.from("projects").upsert(
+      {
+        slug,
+        title,
+        description: description || "",
+        images: images || [],
+        tags: tags || [],
+        theme: theme || null,
+        repo_url: repoUrl,
+        play_store_url: playStoreUrl || null,
+        featured: !!featured,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "slug" }
     );
+    if (error) throw error;
 
-    return jsonResponse({ commitUrl });
+    await supabase.from("project_skills").delete().eq("project_slug", slug);
+    if (Array.isArray(skillIds) && skillIds.length > 0) {
+      const { error: skillErr } = await supabase
+        .from("project_skills")
+        .insert(skillIds.map((skill_id: string) => ({ project_slug: slug, skill_id })));
+      if (skillErr) throw skillErr;
+    }
+
+    return jsonResponse({ ok: true, slug });
   } catch (err) {
     return jsonResponse({ error: (err as Error).message }, 500);
   }

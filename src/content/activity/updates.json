@@ -1,8 +1,0 @@
-[
-  {
-    "id": "2026-07-18-relaunch",
-    "date": "2026-07-18",
-    "title": "Relaunched this site with a self-hosted blog & project CMS",
-    "description": "Vite + React, publishing straight to GitHub via Supabase Edge Functions."
-  }
-]

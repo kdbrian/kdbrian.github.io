@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { GitCommit, GitFork, Star, Rocket, Loader2, AlertCircle } from "lucide-react";
 import { fetchGithubActivity, type GithubEvent } from "@/lib/github-activity";
-import { manualActivity } from "@/lib/activity";
+import { fetchMilestones } from "@/lib/activity";
+import type { ActivityEntry } from "@/types/content";
+import ThemeBanner from "@/components/ThemeBanner";
 
 const GITHUB_USERNAME = import.meta.env.VITE_GITHUB_USERNAME || "kdbrian";
 
@@ -23,6 +25,8 @@ function timeAgo(iso: string) {
 export default function ActivityPage() {
   const [events, setEvents] = useState<GithubEvent[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [milestones, setMilestones] = useState<ActivityEntry[] | null>(null);
+  const [milestoneError, setMilestoneError] = useState(false);
 
   useEffect(() => {
     fetchGithubActivity(GITHUB_USERNAME)
@@ -31,6 +35,8 @@ export default function ActivityPage() {
         setStatus("ready");
       })
       .catch(() => setStatus("error"));
+
+    fetchMilestones().then(setMilestones).catch(() => setMilestoneError(true));
   }, []);
 
   return (
@@ -39,23 +45,40 @@ export default function ActivityPage() {
       <p className="mt-2 max-w-xl text-ink/60">What I've been building — live from GitHub, plus milestones I've called out myself.</p>
 
       <div className="mt-10 grid gap-10 sm:grid-cols-2">
-        {/* Manual milestones */}
         <div>
           <h2 className="mb-4 text-xs font-medium uppercase tracking-wide text-ink/40">Milestones</h2>
-          <ol className="space-y-4 border-l border-line pl-5">
-            {manualActivity.map((entry) => (
-              <li key={entry.id} className="relative">
-                <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-accent" />
-                <p className="font-medium">{entry.title}</p>
-                {entry.description && <p className="text-sm text-ink/60">{entry.description}</p>}
-                <p className="mt-0.5 text-xs text-ink/40">{timeAgo(entry.date)}</p>
-              </li>
-            ))}
-            {manualActivity.length === 0 && <p className="text-sm text-ink/40">Nothing logged yet.</p>}
-          </ol>
+          {milestoneError && <p className="text-sm text-red-600">Couldn't load milestones.</p>}
+          {!milestoneError && !milestones && (
+            <p className="flex items-center gap-2 text-sm text-ink/40">
+              <Loader2 size={14} className="animate-spin" /> Loading…
+            </p>
+          )}
+          {milestones && (
+            <ol className="space-y-4 border-l border-line pl-5">
+              {milestones.map((entry) => (
+                <li key={entry.id} className="relative">
+                  <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-accent" />
+                  <ThemeBanner theme={entry.theme} className={entry.theme?.value ? "rounded-xl p-3" : ""}>
+                    <p className="font-medium">{entry.title}</p>
+                    {entry.description && <p className="text-sm opacity-70">{entry.description}</p>}
+                    <p className="mt-0.5 text-xs opacity-50">{timeAgo(entry.date)}</p>
+                    {!!entry.skills?.length && (
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {entry.skills.map((skill) => (
+                          <span key={skill.id} className="rounded-full bg-teal-soft px-2 py-0.5 text-xs text-teal">
+                            {skill.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </ThemeBanner>
+                </li>
+              ))}
+              {milestones.length === 0 && <p className="text-sm text-ink/40">Nothing logged yet.</p>}
+            </ol>
+          )}
         </div>
 
-        {/* Live GitHub feed */}
         <div>
           <h2 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-ink/40">
             Live from GitHub
