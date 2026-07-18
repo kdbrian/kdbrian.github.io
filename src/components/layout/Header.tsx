@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
 const LINKS = [
   { to: "/", label: "About", end: true },
@@ -9,13 +11,16 @@ const LINKS = [
 ];
 
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-paper/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-content items-center justify-between px-4 py-4 sm:px-6">
         <a href="/" className="font-display text-lg font-semibold tracking-tight">
           Brian<span className="text-accent">.</span>
         </a>
-        <nav className="flex items-center gap-1 rounded-full border border-line bg-white/60 px-1.5 py-1">
+
+        <nav className="hidden items-center gap-1 rounded-full border border-line bg-white/60 px-1.5 py-1 md:flex">
           {LINKS.map((link) => (
             <NavLink
               key={link.label}
@@ -27,15 +32,56 @@ export default function Header() {
             </NavLink>
           ))}
         </nav>
+
         <a
           href="https://github.com/kdbrian"
           target="_blank"
           rel="noreferrer"
-          className="hidden text-sm font-medium text-ink/60 hover:text-ink sm:block"
+          className="hidden text-sm font-medium text-ink/60 hover:text-ink md:block"
         >
           GitHub ↗
         </a>
+
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          className="flex items-center justify-center rounded-lg p-1.5 text-ink/70 hover:bg-ink/5 md:hidden"
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      {open && (
+        <nav className="border-t border-line bg-paper px-4 py-3 md:hidden">
+          <div className="flex flex-col gap-1">
+            {LINKS.map((link) => (
+              <NavLink
+                key={link.label}
+                to={link.to}
+                end={link.end}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `rounded-lg px-3 py-2 text-sm font-medium ${
+                    isActive ? "bg-ink/5 text-ink" : "text-ink/60 hover:bg-ink/5 hover:text-ink"
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+            <a
+              href="https://github.com/kdbrian"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-ink/60 hover:bg-ink/5 hover:text-ink"
+            >
+              GitHub ↗
+            </a>
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

@@ -126,7 +126,7 @@ export default function PostEditor() {
   }
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col gap-6 sm:flex-row">
       <DraftsPanel
         drafts={drafts}
         activeId={activeId}
@@ -137,7 +137,7 @@ export default function PostEditor() {
       />
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="flex items-center gap-1.5 text-xs text-ink/40">
             {saveState === "saved" ? (
               <>

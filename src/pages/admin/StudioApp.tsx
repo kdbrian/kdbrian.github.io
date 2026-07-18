@@ -40,8 +40,8 @@ export default function StudioApp() {
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-line bg-white/70 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             <p className="font-display font-semibold">Studio</p>
             <nav className="flex gap-1 rounded-full border border-line bg-paper p-1">
               {(["posts", "projects"] as const).map((t) => (
@@ -58,7 +58,7 @@ export default function StudioApp() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <p className="text-xs text-ink/40">
+            <p className="hidden text-xs text-ink/40 lg:block">
               Auto-signed-out after {Math.round(IDLE_TIMEOUT_MS / 60000)}m idle
             </p>
             <button
@@ -71,7 +71,7 @@ export default function StudioApp() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {tab === "posts" ? <PostEditor /> : <ProjectManager />}
       </main>
     </div>

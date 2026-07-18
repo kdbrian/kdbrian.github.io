@@ -21,7 +21,7 @@ export default function DraftsPanel({
   const otherPublished = allPosts.filter((p) => !localSlugs.has(p.slug));
 
   return (
-    <div className="w-64 shrink-0 border-r border-line pr-4">
+    <div className="w-full shrink-0 border-b border-line pb-4 sm:w-64 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-4">
       <button
         onClick={onNew}
         className="mb-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-2 text-sm text-ink/60 hover:border-ink/30 hover:text-ink"
