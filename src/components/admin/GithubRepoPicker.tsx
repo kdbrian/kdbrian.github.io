@@ -45,7 +45,7 @@ export default function GithubRepoPicker({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="Repo URL — https://github.com/owner/repo"
+          placeholder="Repo URL (optional — leave blank for a private project)"
           className="min-w-0 flex-1 border-none bg-transparent text-sm outline-none"
         />
         <button

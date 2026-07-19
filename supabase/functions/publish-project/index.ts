@@ -22,9 +22,9 @@ Deno.serve(async (req) => {
     if (!title) {
       return jsonResponse({ error: "Title is required." }, 400);
     }
-    if (!repoUrl || !GITHUB_URL_RE.test(repoUrl)) {
+    if (repoUrl && !GITHUB_URL_RE.test(repoUrl)) {
       return jsonResponse(
-        { error: "A GitHub repo URL is required, e.g. https://github.com/owner/repo" },
+        { error: "Repo URL must look like https://github.com/owner/repo, or leave it blank for a private project." },
         400
       );
     }
@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
         images: images || [],
         tags: tags || [],
         theme: theme || null,
-        repo_url: repoUrl,
+        repo_url: repoUrl || null,
         play_store_url: playStoreUrl || null,
         featured: !!featured,
         updated_at: new Date().toISOString(),
