@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import { Extension, InputRule } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
@@ -16,6 +15,9 @@ import {
   Subscript as SubscriptIcon, Superscript as SuperscriptIcon, Palette,
 } from "lucide-react";
 import MediaUploader from "@/components/admin/MediaUploader";
+import ColorWheel from "@/components/admin/ColorWheel";
+import ResizableImage from "@/lib/tiptap-resizable-image";
+import { api } from "@/lib/api";
 
 const TEXT_COLORS = [
   { label: "Default", value: "" },
@@ -54,13 +56,24 @@ const EmojiShortcodes = Extension.create({
   },
 });
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function RichTextEditor({
   content,
   slug,
+  folder = "blog-images",
   onChange,
 }: {
   content: string;
   slug: string;
+  folder?: "blog-images" | "projects";
   onChange: (html: string) => void;
 }) {
   const [showMedia, setShowMedia] = useState(false);
@@ -69,11 +82,18 @@ export default function RichTextEditor({
   const [showColors, setShowColors] = useState(false);
   const [embedUrl, setEmbedUrl] = useState("");
 
+  const uploadFnRef = useRef<(file: File) => Promise<string>>();
+  uploadFnRef.current = async (file: File) => {
+    const base64 = await fileToBase64(file);
+    const { url } = await api.uploadMedia(file.name, base64, folder, slug);
+    return url;
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit,
       Link.configure({ openOnClick: false }),
-      Image,
+      ResizableImage.configure({ uploadFn: (file) => uploadFnRef.current!(file) }),
       Youtube.configure({ nocookie: true }),
       Placeholder.configure({ placeholder: "Start writing… (try typing :fire:)" }),
       EmojiShortcodes,
@@ -180,20 +200,26 @@ export default function RichTextEditor({
                 <Palette size={14} />
               </button>
               {showColors && (
-                <div className="absolute left-1/2 top-full z-10 mt-1.5 flex -translate-x-1/2 gap-1 rounded-lg border border-line bg-white p-1.5 shadow-lg">
-                  {TEXT_COLORS.map((c) => (
-                    <button
-                      key={c.label}
-                      title={c.label}
-                      onClick={() => {
-                        if (c.value) editor.chain().focus().setColor(c.value).run();
-                        else editor.chain().focus().unsetColor().run();
-                        setShowColors(false);
-                      }}
-                      className="h-5 w-5 rounded-full ring-1 ring-inset ring-line"
-                      style={{ backgroundColor: c.value || "#FAFAF9" }}
-                    />
-                  ))}
+                <div className="absolute left-1/2 top-full z-10 mt-1.5 w-max -translate-x-1/2 rounded-lg border border-line bg-white p-2 shadow-lg">
+                  <ColorWheel
+                    value={editor.getAttributes("textStyle").color}
+                    onChange={(hex) => editor.chain().focus().setColor(hex).run()}
+                  />
+                  <div className="mt-1.5 flex justify-center gap-1 border-t border-line pt-1.5">
+                    {TEXT_COLORS.map((c) => (
+                      <button
+                        key={c.label}
+                        title={c.label}
+                        onClick={() => {
+                          if (c.value) editor.chain().focus().setColor(c.value).run();
+                          else editor.chain().focus().unsetColor().run();
+                          setShowColors(false);
+                        }}
+                        className="h-5 w-5 rounded-full ring-1 ring-inset ring-line"
+                        style={{ backgroundColor: c.value || "#FAFAF9" }}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -250,7 +276,7 @@ export default function RichTextEditor({
       {showMedia && (
         <div className="border-b border-line p-3">
           <MediaUploader
-            folder="blog-images"
+            folder={folder}
             slug={slug}
             onUploaded={(url) => {
               editor.chain().focus().setImage({ src: url }).run();
