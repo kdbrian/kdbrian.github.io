@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.github
+v1
+v1.zip
+*.log
+.env
+.env.*
+supabase
+README.md
