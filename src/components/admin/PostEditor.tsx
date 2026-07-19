@@ -223,10 +223,11 @@ export default function PostEditor() {
         />
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <input
+          <textarea
             value={draft.excerpt}
             onChange={(e) => update({ excerpt: e.target.value })}
             placeholder="Short excerpt (optional)"
+            rows={2}
             className="rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
           />
           <TagInput value={draft.tags} onChange={(tags) => update({ tags })} placeholder="Tags, press Enter to add" />

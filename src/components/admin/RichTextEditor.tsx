@@ -6,11 +6,26 @@ import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
 import Placeholder from "@tiptap/extension-placeholder";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
 import {
   Bold, Italic, Strikethrough, Link as LinkIcon, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Image as ImageIcon, Film, Smile,
+  Subscript as SubscriptIcon, Superscript as SuperscriptIcon, Palette,
 } from "lucide-react";
 import MediaUploader from "@/components/admin/MediaUploader";
+
+const TEXT_COLORS = [
+  { label: "Default", value: "" },
+  { label: "Orange", value: "#EA580C" },
+  { label: "Teal", value: "#0F766E" },
+  { label: "Red", value: "#DC2626" },
+  { label: "Blue", value: "#2563EB" },
+  { label: "Purple", value: "#7C3AED" },
+  { label: "Gray", value: "#78716C" },
+];
 
 const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
 const VIMEO_RE = /vimeo\.com\/(\d+)/;
@@ -51,6 +66,7 @@ export default function RichTextEditor({
   const [showMedia, setShowMedia] = useState(false);
   const [showEmbed, setShowEmbed] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [showColors, setShowColors] = useState(false);
   const [embedUrl, setEmbedUrl] = useState("");
 
   const editor = useEditor({
@@ -61,6 +77,10 @@ export default function RichTextEditor({
       Youtube.configure({ nocookie: true }),
       Placeholder.configure({ placeholder: "Start writing… (try typing :fire:)" }),
       EmojiShortcodes,
+      Subscript,
+      Superscript,
+      TextStyle,
+      Color,
     ],
     content,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -110,7 +130,11 @@ export default function RichTextEditor({
   return (
     <div className="rounded-xl border border-line bg-white text-ink">
       {editor && (
-        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{ duration: 100, onHidden: () => setShowColors(false) }}
+          shouldShow={({ from, to }) => from !== to}
+        >
           <div className="flex gap-0.5 rounded-lg border border-line bg-white p-1 shadow-lg">
             <button onClick={() => editor.chain().focus().toggleBold().run()} className={btn(editor.isActive("bold"))}>
               <Bold size={14} />
@@ -120,6 +144,20 @@ export default function RichTextEditor({
             </button>
             <button onClick={() => editor.chain().focus().toggleStrike().run()} className={btn(editor.isActive("strike"))}>
               <Strikethrough size={14} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleSubscript().run()}
+              className={btn(editor.isActive("subscript"))}
+              aria-label="Subscript"
+            >
+              <SubscriptIcon size={14} />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              className={btn(editor.isActive("superscript"))}
+              aria-label="Superscript"
+            >
+              <SuperscriptIcon size={14} />
             </button>
             <button
               onClick={() => {
@@ -133,6 +171,32 @@ export default function RichTextEditor({
             <button onClick={() => editor.chain().focus().toggleCode().run()} className={btn(editor.isActive("code"))}>
               <Code size={14} />
             </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowColors((v) => !v)}
+                className={btn(showColors || !!editor.getAttributes("textStyle").color)}
+                aria-label="Text color"
+              >
+                <Palette size={14} />
+              </button>
+              {showColors && (
+                <div className="absolute left-1/2 top-full z-10 mt-1.5 flex -translate-x-1/2 gap-1 rounded-lg border border-line bg-white p-1.5 shadow-lg">
+                  {TEXT_COLORS.map((c) => (
+                    <button
+                      key={c.label}
+                      title={c.label}
+                      onClick={() => {
+                        if (c.value) editor.chain().focus().setColor(c.value).run();
+                        else editor.chain().focus().unsetColor().run();
+                        setShowColors(false);
+                      }}
+                      className="h-5 w-5 rounded-full ring-1 ring-inset ring-line"
+                      style={{ backgroundColor: c.value || "#FAFAF9" }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </BubbleMenu>
       )}
@@ -211,7 +275,7 @@ export default function RichTextEditor({
         </div>
       )}
 
-      <EditorContent editor={editor} className="prose-post min-h-[320px] px-4 py-3" />
+      <EditorContent editor={editor} className="prose-post min-h-[320px] px-4 py-3 outline-none [&_.ProseMirror]:outline-none" />
     </div>
   );
 }
