@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
   try {
-    const { slug, title, description, images, tags, theme, repoUrl, playStoreUrl, featured, skillIds } =
+    const { slug, title, description, notes, images, tags, theme, repoUrl, playStoreUrl, featured, skillIds } =
       await req.json();
 
     if (!slug || !SLUG_RE.test(slug)) {
@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
         slug,
         title,
         description: description || "",
+        notes: notes || "",
         images: images || [],
         tags: tags || [],
         theme: theme || null,

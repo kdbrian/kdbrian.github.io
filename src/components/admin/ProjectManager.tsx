@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
-import { Loader2, Plus, Send, Trash2, X } from "lucide-react";
-import MediaUploader from "@/components/admin/MediaUploader";
+import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
+import ProjectForm from "@/components/admin/ProjectForm";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
-import TagInput from "@/components/admin/TagInput";
-import SkillPicker from "@/components/admin/SkillPicker";
-import ThemePicker from "@/components/admin/ThemePicker";
 import { api, ApiError } from "@/lib/api";
 import { fetchProjects } from "@/lib/projects";
 import { slugify } from "@/lib/drafts";
 import type { Project, Skill } from "@/types/content";
 
 const EMPTY: Project = {
-  slug: "", title: "", description: "", images: [], tags: [], repoUrl: "", playStoreUrl: "", featured: false,
+  slug: "", title: "", description: "", notes: "", images: [], tags: [], repoUrl: "", playStoreUrl: "", featured: false,
 };
 
 export default function ProjectManager() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"list" | "new">("list");
+  const [newProject, setNewProject] = useState<Project>({ ...EMPTY });
+  const [newSkills, setNewSkills] = useState<Skill[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
   const [editingSkills, setEditingSkills] = useState<Skill[]>([]);
-  const [isNew, setIsNew] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<Project | null>(null);
@@ -32,36 +31,35 @@ export default function ProjectManager() {
   }, []);
 
   function startNew() {
-    setEditing({ ...EMPTY });
-    setEditingSkills([]);
-    setIsNew(true);
+    setNewProject({ ...EMPTY });
+    setNewSkills([]);
     setError(null);
+    setView("new");
   }
 
   function startEdit(p: Project) {
     setEditing({ ...p });
     setEditingSkills(p.skills || []);
-    setIsNew(false);
     setError(null);
   }
 
-  async function handleSave() {
-    if (!editing || !editing.title.trim()) {
+  async function save(project: Project, skills: Skill[], onDone: () => void) {
+    if (!project.title.trim()) {
       setError("Title is required.");
       return;
     }
-    if (!editing.repoUrl.trim()) {
+    if (!project.repoUrl.trim()) {
       setError("A GitHub repo URL is required.");
       return;
     }
     setSaving(true);
     setError(null);
     try {
-      const slug = editing.slug || slugify(editing.title);
-      const payload = { ...editing, slug, skillIds: editingSkills.map((s) => s.id) };
+      const slug = project.slug || slugify(project.title);
+      const payload = { ...project, slug, skillIds: skills.map((s) => s.id) };
       await api.publishProject(payload);
       setProjects(await fetchProjects());
-      setEditing(null);
+      onDone();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Save failed.");
     } finally {
@@ -77,6 +75,30 @@ export default function ProjectManager() {
   }
 
   if (loading) return <p className="py-8 text-sm text-ink/40">Loading…</p>;
+
+  if (view === "new") {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <button
+          onClick={() => setView("list")}
+          className="mb-4 flex items-center gap-1.5 text-sm text-ink/60 hover:text-ink"
+        >
+          <ArrowLeft size={14} /> Back to projects
+        </button>
+        <h2 className="mb-4 font-display text-lg font-semibold">New project</h2>
+        <ProjectForm
+          value={newProject}
+          onChange={(patch) => setNewProject((prev) => ({ ...prev, ...patch }))}
+          skills={newSkills}
+          onSkillsChange={setNewSkills}
+          saving={saving}
+          error={error}
+          submitLabel="Publish project"
+          onSave={() => save(newProject, newSkills, () => setView("list"))}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -116,82 +138,21 @@ export default function ProjectManager() {
       {editing && (
         <div className="card h-fit p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-medium">{isNew ? "New project" : "Edit project"}</h3>
+            <h3 className="font-medium">Edit project</h3>
             <button onClick={() => setEditing(null)} className="text-ink/30 hover:text-ink">
               <X size={16} />
             </button>
           </div>
-
-          <div className="space-y-3">
-            <input
-              value={editing.title}
-              onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-              placeholder="Title"
-              className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-            />
-            <textarea
-              value={editing.description}
-              onChange={(e) => setEditing({ ...editing, description: e.target.value })}
-              placeholder="Description"
-              rows={3}
-              className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-            />
-            <TagInput value={editing.tags || []} onChange={(tags) => setEditing({ ...editing, tags })} />
-            <SkillPicker value={editingSkills} onChange={setEditingSkills} />
-            <input
-              value={editing.repoUrl}
-              onChange={(e) => setEditing({ ...editing, repoUrl: e.target.value })}
-              placeholder="Repo URL (required) — https://github.com/owner/repo"
-              className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-            />
-            <input
-              value={editing.playStoreUrl}
-              onChange={(e) => setEditing({ ...editing, playStoreUrl: e.target.value })}
-              placeholder="Play Store URL (optional)"
-              className="w-full rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
-            />
-
-            <label className="flex items-center gap-2 text-sm text-ink/70">
-              <input
-                type="checkbox"
-                checked={!!editing.featured}
-                onChange={(e) => setEditing({ ...editing, featured: e.target.checked })}
-              />
-              Feature at top of grid
-            </label>
-
-            <ThemePicker value={editing.theme ?? null} onChange={(theme) => setEditing({ ...editing, theme })} />
-
-            <div className="flex flex-wrap gap-2">
-              {editing.images.map((img) => (
-                <div key={img} className="relative h-16 w-16 overflow-hidden rounded-lg">
-                  <img src={img} alt="" className="h-full w-full object-cover" />
-                  <button
-                    onClick={() => setEditing({ ...editing, images: editing.images.filter((i) => i !== img) })}
-                    className="absolute right-0.5 top-0.5 rounded-full bg-ink/70 p-0.5 text-paper"
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <MediaUploader
-              folder="projects"
-              slug={editing.slug || slugify(editing.title)}
-              onUploaded={(url) => setEditing((prev) => prev && { ...prev, images: [...prev.images, url] })}
-            />
-
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-paper hover:opacity-90 disabled:opacity-50"
-            >
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-              {isNew ? "Publish project" : "Save changes"}
-            </button>
-          </div>
+          <ProjectForm
+            value={editing}
+            onChange={(patch) => setEditing((prev) => prev && { ...prev, ...patch })}
+            skills={editingSkills}
+            onSkillsChange={setEditingSkills}
+            saving={saving}
+            error={error}
+            submitLabel="Save changes"
+            onSave={() => save(editing, editingSkills, () => setEditing(null))}
+          />
         </div>
       )}
 

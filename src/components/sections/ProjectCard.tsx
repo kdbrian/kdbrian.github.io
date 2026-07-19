@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ExternalLink, Github, Smartphone, ChevronDown } from "lucide-react";
 import type { Project } from "@/types/content";
 import ThemeBanner from "@/components/ThemeBanner";
 import CommitHistory from "@/components/CommitHistory";
+import { sanitizeContentHtml } from "@/lib/sanitize-html";
 
 export default function ProjectCard({ project }: { project: Project }) {
   const [expanded, setExpanded] = useState(false);
+  const notesHtml = useMemo(
+    () => (project.notes ? sanitizeContentHtml(project.notes) : ""),
+    [project.notes]
+  );
 
   return (
     <div className="card group overflow-hidden transition-shadow hover:shadow-lg hover:shadow-ink/5">
@@ -68,6 +73,9 @@ export default function ProjectCard({ project }: { project: Project }) {
 
         {expanded && (
           <div className="mt-4 border-t border-line/50 pt-3" onClick={(e) => e.stopPropagation()}>
+            {notesHtml && (
+              <div className="prose-post mb-4 text-sm" dangerouslySetInnerHTML={{ __html: notesHtml }} />
+            )}
             {!!project.skills?.length && (
               <div className="mb-3 flex flex-wrap gap-1.5">
                 {project.skills.map((skill) => (

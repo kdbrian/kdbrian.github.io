@@ -6,6 +6,7 @@ type ProjectRow = {
   slug: string;
   title: string;
   description: string;
+  notes: string | null;
   images: string[];
   tags: string[];
   theme: Theme | null;
@@ -26,6 +27,7 @@ function mapProject(row: ProjectRow): Project {
     slug: row.slug,
     title: row.title,
     description: row.description,
+    notes: row.notes || "",
     images: row.images || [],
     tags: row.tags || [],
     theme: row.theme,

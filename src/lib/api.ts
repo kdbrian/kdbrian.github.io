@@ -54,6 +54,7 @@ export const api = {
     slug: string;
     title: string;
     description: string;
+    notes?: string;
     images: string[];
     tags?: string[];
     theme?: Theme | null;
