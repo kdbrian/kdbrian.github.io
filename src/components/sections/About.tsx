@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Github, Linkedin, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { Skill } from "@/types/content";
 import { fetchSkills } from "@/lib/skills";
+import SocialIcons from "@/components/layout/SocialIcons";
 
 export default function About() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -18,14 +19,7 @@ export default function About() {
           alt="Brian Kidiga"
           className="h-32 w-32 rounded-2xl object-cover ring-1 ring-line sm:h-40 sm:w-40"
         />
-        <div className="flex gap-3 text-ink/50">
-          <a href="https://github.com/kdbrian" target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-ink">
-            <Github size={18} />
-          </a>
-          <a href="#" aria-label="LinkedIn" className="hover:text-ink">
-            <Linkedin size={18} />
-          </a>
-        </div>
+        <SocialIcons />
       </div>
 
       <div>

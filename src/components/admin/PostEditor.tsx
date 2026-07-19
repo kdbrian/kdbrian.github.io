@@ -226,7 +226,7 @@ export default function PostEditor() {
           <textarea
             value={draft.excerpt}
             onChange={(e) => update({ excerpt: e.target.value })}
-            placeholder="Short excerpt (optional)"
+            placeholder="Short excerpt (optional, markdown supported)"
             rows={2}
             className="rounded-xl border border-line px-3.5 py-2 text-sm outline-none focus:border-accent"
           />

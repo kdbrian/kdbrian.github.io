@@ -1,8 +1,16 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { marked } from "marked";
 import type { Post } from "@/types/content";
 import ThemeBanner from "@/components/ThemeBanner";
+import { sanitizeContentHtml } from "@/lib/sanitize-html";
 
 export default function PostCard({ post }: { post: Post }) {
+  const excerptHtml = useMemo(
+    () => (post.excerpt ? sanitizeContentHtml(marked.parseInline(post.excerpt) as string) : ""),
+    [post.excerpt]
+  );
+
   return (
     <Link to={`/blog/${post.slug}`} className="card group block overflow-hidden hover:border-ink/20">
       {post.cover && (
@@ -19,7 +27,9 @@ export default function PostCard({ post }: { post: Post }) {
           {new Date(post.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
         </p>
         <h3 className="mt-1 font-display font-semibold group-hover:text-accent">{post.title}</h3>
-        {post.excerpt && <p className="mt-1.5 text-sm opacity-70">{post.excerpt}</p>}
+        {excerptHtml && (
+          <p className="mt-1.5 text-sm opacity-70" dangerouslySetInnerHTML={{ __html: excerptHtml }} />
+        )}
         {!!post.tags?.length && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
