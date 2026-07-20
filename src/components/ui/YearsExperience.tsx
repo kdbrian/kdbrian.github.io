@@ -93,13 +93,13 @@ export default function YearsExperience() {
           ))}
         </span>
         <span className="sr-only">
-          {formatted} years of experience, tallied from every day coded so far
+          {formatted} years of experience.
         </span>
         <span
           role="tooltip"
           className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-max max-w-[200px] -translate-x-1/2 translate-y-1 rounded-lg bg-ink px-2.5 py-1.5 text-[11px] leading-snug text-white opacity-0 shadow-lg transition-[opacity,transform] duration-200 ease-out group-hover/tooltip:translate-y-0 group-hover/tooltip:opacity-100"
         >
-          Every day tallied since I started coding, rounded up
+          .
         </span>
       </span>
     </div>
