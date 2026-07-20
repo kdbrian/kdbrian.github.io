@@ -54,3 +54,18 @@ export interface SocialLink {
   url: string;
   sortOrder: number;
 }
+
+export interface BlobShape {
+  seed: number;
+  points: number;
+  irregularity: number;
+}
+
+export interface Profile {
+  headline: string;
+  tagline: string;
+  bio: string;
+  location: string;
+  imageUrl?: string;
+  shape: BlobShape;
+}

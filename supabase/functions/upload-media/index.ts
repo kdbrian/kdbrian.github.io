@@ -44,8 +44,8 @@ Deno.serve(async (req) => {
     if (!SLUG_RE.test(slug)) {
       return jsonResponse({ error: "Invalid slug." }, 400);
     }
-    if (folder !== "blog-images" && folder !== "projects") {
-      return jsonResponse({ error: "folder must be 'blog-images' or 'projects'." }, 400);
+    if (folder !== "blog-images" && folder !== "projects" && folder !== "profile") {
+      return jsonResponse({ error: "folder must be 'blog-images', 'projects', or 'profile'." }, 400);
     }
     if (base64.length * 0.75 > MAX_BYTES) {
       return jsonResponse({ error: "File too large (15MB limit)." }, 400);

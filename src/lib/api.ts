@@ -67,7 +67,7 @@ export const api = {
   deleteProject: (slug: string, deleteMedia: boolean) =>
     call<{ ok: true }>("delete-project", { slug, deleteMedia }),
 
-  uploadMedia: (filename: string, base64: string, folder: "blog-images" | "projects", slug: string) =>
+  uploadMedia: (filename: string, base64: string, folder: "blog-images" | "projects" | "profile", slug: string) =>
     call<{ path: string; url: string }>("upload-media", { filename, base64, folder, slug }),
 
   publishMilestone: (milestone: {
@@ -95,4 +95,15 @@ export const api = {
     call<{ id: string }>("publish-social-link", link),
 
   deleteSocialLink: (id: string) => call<{ ok: true }>("delete-social-link", { id }),
+
+  publishProfile: (profile: {
+    headline: string;
+    tagline: string;
+    bio: string;
+    location: string;
+    imageUrl?: string;
+    shapeSeed: number;
+    shapePoints: number;
+    shapeIrregularity: number;
+  }) => call<{ ok: true }>("publish-profile", profile),
 };

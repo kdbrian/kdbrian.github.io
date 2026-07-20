@@ -17,11 +17,14 @@ export default function ImageCropModal({
   uploadFn,
   onCancel,
   onApply,
+  aspect,
 }: {
   src: string;
   uploadFn: (file: File) => Promise<string>;
   onCancel: () => void;
   onApply: (url: string) => void;
+  /** Optional width/height ratio (e.g. 1 for square) to lock the crop rect to. Free-form when omitted. */
+  aspect?: number;
 }) {
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   const [displaySize, setDisplaySize] = useState<{ w: number; h: number } | null>(null);
@@ -39,6 +42,18 @@ export default function ImageCropModal({
     };
     img.src = src;
   }, [src]);
+
+  useEffect(() => {
+    if (!displaySize || !aspect) return;
+    const k = (aspect * displaySize.h) / displaySize.w; // desired pct-width / pct-height
+    let h = 80;
+    let w = k * h;
+    if (w > 90) {
+      w = 90;
+      h = w / k;
+    }
+    setRect({ x: (100 - w) / 2, y: (100 - h) / 2, w, h });
+  }, [displaySize, aspect]);
 
   function startDrag(mode: DragMode) {
     return (e: React.PointerEvent) => {
@@ -70,6 +85,38 @@ export default function ImageCropModal({
         const newY = clamp(r0.y + dyPct, 0, r0.y + r0.h - 5);
         next.h = r0.h + (r0.y - newY);
         next.y = newY;
+      }
+
+      if (aspect) {
+        const k = (aspect * displaySize.h) / displaySize.w;
+        const anchorX = mode.includes("w") ? r0.x + r0.w : r0.x;
+        const anchorY = mode.includes("n") ? r0.y + r0.h : r0.y;
+        let h = clamp(next.h, 5, 100);
+        let w = k * h;
+        let x = mode.includes("w") ? anchorX - w : anchorX;
+        let y = mode.includes("n") ? anchorY - h : anchorY;
+        if (x < 0) {
+          w += x;
+          x = 0;
+          h = w / k;
+        }
+        if (x + w > 100) {
+          w = 100 - x;
+          h = w / k;
+        }
+        if (y < 0) {
+          h += y;
+          y = 0;
+          w = k * h;
+        }
+        if (y + h > 100) {
+          h = 100 - y;
+          w = k * h;
+        }
+        next.x = x;
+        next.y = y;
+        next.w = w;
+        next.h = h;
       }
     }
     setRect(next);

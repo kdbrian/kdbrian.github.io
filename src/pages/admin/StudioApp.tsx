@@ -5,10 +5,11 @@ import PostEditor from "@/components/admin/PostEditor";
 import ProjectManager from "@/components/admin/ProjectManager";
 import MilestonesManager from "@/components/admin/MilestonesManager";
 import SocialLinksManager from "@/components/admin/SocialLinksManager";
+import ProfileManager from "@/components/admin/ProfileManager";
 import { clearSession, getValidToken, touchSession, IDLE_TIMEOUT_MS } from "@/lib/auth";
 
 const ACTIVITY_EVENTS = ["mousemove", "keydown", "scroll", "click"] as const;
-const TABS = ["posts", "projects", "milestones", "links"] as const;
+const TABS = ["posts", "projects", "milestones", "links", "profile"] as const;
 
 export default function StudioApp() {
   const [authed, setAuthed] = useState(() => !!getValidToken());
@@ -79,6 +80,7 @@ export default function StudioApp() {
         {tab === "projects" && <ProjectManager />}
         {tab === "milestones" && <MilestonesManager />}
         {tab === "links" && <SocialLinksManager />}
+        {tab === "profile" && <ProfileManager />}
       </main>
     </div>
   );

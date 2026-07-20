@@ -1,42 +1,50 @@
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
-import type { Skill } from "@/types/content";
+import type { Profile, Skill } from "@/types/content";
 import { fetchSkills } from "@/lib/skills";
+import { fetchProfile } from "@/lib/profile";
 import SocialIcons from "@/components/layout/SocialIcons";
 import YearsExperience from "@/components/ui/YearsExperience";
+import BlobImage from "@/components/ui/BlobImage";
+
+const FALLBACK_PROFILE: Profile = {
+  headline: "Hey, I'm Brian 👋",
+  tagline:
+    "A passionate Android developer crafting smooth, elegant mobile experiences — from pixel-perfect UIs to rock-solid architecture.",
+  bio: "I live and breathe Kotlin, Jetpack Compose, and the Android ecosystem. When I'm not pushing commits, I'm exploring AI integrations, tinkering with backends, or making apps a little more delightful.",
+  location: "Earth 🌍",
+  imageUrl: "/profile.jpg",
+  shape: { seed: 1, points: 7, irregularity: 0.35 },
+};
 
 export default function About() {
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [profile, setProfile] = useState<Profile>(FALLBACK_PROFILE);
 
   useEffect(() => {
     fetchSkills().then(setSkills).catch(() => {});
+    fetchProfile().then((p) => p && setProfile(p)).catch(() => {});
   }, []);
 
   return (
     <section className="animate-fade-up grid gap-10 py-14 sm:grid-cols-[220px_1fr] sm:py-20">
       <div className="flex flex-col items-center gap-4 sm:items-start">
-        <img
-          src="/profile.jpg"
-          alt="Brian Kidiga"
-          className="h-32 w-32 rounded-2xl object-cover ring-1 ring-line sm:h-40 sm:w-40"
+        <BlobImage
+          src={profile.imageUrl || "/profile.jpg"}
+          alt="Profile photo"
+          shape={profile.shape}
+          className="h-32 w-32 sm:h-40 sm:w-40"
         />
         <SocialIcons />
       </div>
 
       <div>
         <p className="mb-2 flex items-center gap-1.5 text-sm text-ink/50">
-          <MapPin size={14} /> Earth 🌍
+          <MapPin size={14} /> {profile.location}
         </p>
-        <h1 className="text-3xl font-semibold sm:text-4xl">Hey, I'm Brian 👋</h1>
-        <p className="mt-4 max-w-xl text-lg text-ink/70">
-          A passionate <span className="font-medium text-accent">Android developer</span> crafting
-          smooth, elegant mobile experiences — from pixel-perfect UIs to rock-solid architecture.
-        </p>
-        <p className="mt-3 max-w-xl text-ink/60">
-          I live and breathe Kotlin, Jetpack Compose, and the Android ecosystem. When I'm not
-          pushing commits, I'm exploring AI integrations, tinkering with backends, or making apps
-          a little more delightful.
-        </p>
+        <h1 className="text-3xl font-semibold sm:text-4xl">{profile.headline}</h1>
+        <p className="mt-4 max-w-xl text-lg text-ink/70">{profile.tagline}</p>
+        <p className="mt-3 max-w-xl text-ink/60">{profile.bio}</p>
 
         <p className="mb-2 mt-8 text-xs font-medium uppercase tracking-wide text-ink/40">
           Stack &amp; tools
