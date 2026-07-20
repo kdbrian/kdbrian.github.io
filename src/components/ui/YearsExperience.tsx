@@ -76,7 +76,7 @@ export default function YearsExperience() {
   return (
     <div
       ref={ref}
-      className={`mt-8 inline-flex flex-col gap-1 rounded-2xl border border-line bg-white px-5 py-3 transition-opacity duration-500 ${
+      className={`mt-8 inline-flex flex-col gap-1 rounded-2xl border border-line bg-white px-5 py-3 transition-[opacity,transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.03] hover:border-accent/40 hover:shadow-lg hover:shadow-accent/10 ${
         revealed ? "opacity-100" : "opacity-0"
       }`}
     >
