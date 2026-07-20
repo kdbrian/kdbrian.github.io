@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import type { Skill } from "@/types/content";
 import { fetchSkills } from "@/lib/skills";
 import SocialIcons from "@/components/layout/SocialIcons";
+import YearsExperience from "@/components/ui/YearsExperience";
 
 export default function About() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -51,10 +52,7 @@ export default function About() {
           ))}
         </div>
 
-        <div className="mt-8 inline-flex items-baseline gap-2 rounded-2xl border border-line bg-white px-5 py-3">
-          <span className="font-display text-2xl font-semibold text-accent">3+</span>
-          <span className="text-sm text-ink/50">years experience</span>
-        </div>
+        <YearsExperience />
       </div>
     </section>
   );
