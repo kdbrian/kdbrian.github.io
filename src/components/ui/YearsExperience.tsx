@@ -83,20 +83,25 @@ export default function YearsExperience() {
       <p className="text-[11px] font-medium uppercase tracking-wide text-ink/40">
         Years coding
       </p>
-      <span
-        aria-hidden="true"
-        className="font-display flex text-2xl font-semibold tabular-nums text-accent"
-      >
-        {formatted.split("").map((char, i) => (
-          <OdometerDigit key={i} char={char} />
-        ))}
+      <span className="group/tooltip relative inline-block w-fit">
+        <span
+          aria-hidden="true"
+          className="font-display flex text-2xl font-semibold tabular-nums text-accent"
+        >
+          {formatted.split("").map((char, i) => (
+            <OdometerDigit key={i} char={char} />
+          ))}
+        </span>
+        <span className="sr-only">
+          {formatted} years of experience, tallied from every day coded so far
+        </span>
+        <span
+          role="tooltip"
+          className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-max max-w-[200px] -translate-x-1/2 translate-y-1 rounded-lg bg-ink px-2.5 py-1.5 text-[11px] leading-snug text-white opacity-0 shadow-lg transition-[opacity,transform] duration-200 ease-out group-hover/tooltip:translate-y-0 group-hover/tooltip:opacity-100"
+        >
+          Every day tallied since I started coding, rounded up
+        </span>
       </span>
-      <span className="sr-only">
-        {formatted} years of experience, calculated from days elapsed since my first commit
-      </span>
-      <p className="text-[11px] leading-snug text-ink/40">
-        every day tallied since my first commit &middot; Jan 30, 2022, rounded up
-      </p>
     </div>
   );
 }
