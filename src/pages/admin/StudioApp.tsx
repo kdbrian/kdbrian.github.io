@@ -6,10 +6,12 @@ import ProjectManager from "@/components/admin/ProjectManager";
 import MilestonesManager from "@/components/admin/MilestonesManager";
 import SocialLinksManager from "@/components/admin/SocialLinksManager";
 import ProfileManager from "@/components/admin/ProfileManager";
+import HistoryManager from "@/components/admin/HistoryManager";
+import Logo from "@/components/layout/Logo";
 import { clearSession, getValidToken, touchSession, IDLE_TIMEOUT_MS } from "@/lib/auth";
 
 const ACTIVITY_EVENTS = ["mousemove", "keydown", "scroll", "click"] as const;
-const TABS = ["posts", "projects", "milestones", "links", "profile"] as const;
+const TABS = ["posts", "projects", "milestones", "links", "profile", "education", "experience"] as const;
 
 export default function StudioApp() {
   const [authed, setAuthed] = useState(() => !!getValidToken());
@@ -46,7 +48,7 @@ export default function StudioApp() {
       <header className="border-b border-line bg-white/70 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3 sm:gap-6">
-            <p className="font-display font-semibold">Studio</p>
+            <Logo text="Studio" />
             <nav className="flex gap-1 rounded-full border border-line bg-paper p-1">
               {TABS.map((t) => (
                 <button
@@ -81,6 +83,8 @@ export default function StudioApp() {
         {tab === "milestones" && <MilestonesManager />}
         {tab === "links" && <SocialLinksManager />}
         {tab === "profile" && <ProfileManager />}
+        {tab === "education" && <HistoryManager kind="education" label="Education" orgLabel="School" />}
+        {tab === "experience" && <HistoryManager kind="experience" label="Experience" orgLabel="Company" />}
       </main>
     </div>
   );

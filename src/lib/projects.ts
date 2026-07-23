@@ -1,10 +1,11 @@
-import type { Project, Skill, Theme } from "@/types/content";
+import type { Project, ProjectLink, Skill, Theme } from "@/types/content";
 import { restGet } from "@/lib/supabase-rest";
 
 type SkillRow = { id: string; name: string; date_added: string };
 type ProjectRow = {
   slug: string;
   title: string;
+  summary: string | null;
   description: string;
   notes: string | null;
   images: string[];
@@ -12,6 +13,7 @@ type ProjectRow = {
   theme: Theme | null;
   repo_url: string | null;
   play_store_url: string | null;
+  links: ProjectLink[] | null;
   featured: boolean;
   project_skills: { skill: SkillRow }[];
 };
@@ -26,6 +28,7 @@ function mapProject(row: ProjectRow): Project {
   return {
     slug: row.slug,
     title: row.title,
+    summary: row.summary || undefined,
     description: row.description,
     notes: row.notes || "",
     images: row.images || [],
@@ -33,6 +36,7 @@ function mapProject(row: ProjectRow): Project {
     theme: row.theme,
     repoUrl: row.repo_url || "",
     playStoreUrl: row.play_store_url ?? undefined,
+    links: row.links || [],
     featured: row.featured,
     skills: (row.project_skills || []).map((ps) => mapSkill(ps.skill)),
   };

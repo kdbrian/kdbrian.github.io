@@ -8,8 +8,20 @@ import { fetchProjects } from "@/lib/projects";
 import { slugify } from "@/lib/drafts";
 import type { Project, Skill } from "@/types/content";
 
+const SLUG_RE = /^[a-z0-9-]+$/;
+
 const EMPTY: Project = {
-  slug: "", title: "", description: "", notes: "", images: [], tags: [], repoUrl: "", playStoreUrl: "", featured: false,
+  slug: "",
+  title: "",
+  summary: "",
+  description: "",
+  notes: "",
+  images: [],
+  tags: [],
+  repoUrl: "",
+  playStoreUrl: "",
+  links: [],
+  featured: false,
 };
 
 type Screen = "list" | "view" | "new" | "edit";
@@ -24,6 +36,7 @@ export default function ProjectManager() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<Project | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     fetchProjects().then((p) => {
@@ -41,6 +54,7 @@ export default function ProjectManager() {
     setDraft({ ...EMPTY });
     setDraftSkills([]);
     setError(null);
+    setDirty(false);
     setScreen("new");
   }
 
@@ -49,12 +63,35 @@ export default function ProjectManager() {
     setDraftSkills(p.skills || []);
     setActiveProject(p);
     setError(null);
+    setDirty(false);
     setScreen("edit");
   }
 
+  function handleFormChange(patch: Partial<Project>) {
+    setDraft((prev) => {
+      const next = { ...prev, ...patch };
+      // Auto-fill the slug from the title exactly once, while it's still
+      // empty — this pins it for the rest of editing so uploads (which are
+      // keyed by slug) don't drift into a different folder as the title
+      // keeps changing.
+      if (patch.title !== undefined && !prev.slug) {
+        next.slug = slugify(patch.title);
+      }
+      return next;
+    });
+    setDirty(true);
+  }
+
   function backToList() {
+    if (dirty && !window.confirm("Discard unsaved changes?")) return;
     setScreen("list");
     setActiveProject(null);
+  }
+
+  function backFromEdit() {
+    if (dirty && !window.confirm("Discard unsaved changes?")) return;
+    if (activeProject) openView(activeProject);
+    else backToList();
   }
 
   async function save(onDone: () => void) {
@@ -62,16 +99,34 @@ export default function ProjectManager() {
       setError("Title is required.");
       return;
     }
+    if (!draft.slug || !SLUG_RE.test(draft.slug)) {
+      setError("Slug must be lowercase letters, numbers, and hyphens only.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
-      const slug = draft.slug || slugify(draft.title);
-      const payload = { ...draft, slug, skillIds: draftSkills.map((s) => s.id) };
+      const payload = {
+        slug: draft.slug,
+        title: draft.title,
+        summary: draft.summary,
+        description: draft.description,
+        notes: draft.notes,
+        images: draft.images,
+        tags: draft.tags,
+        theme: draft.theme,
+        repoUrl: draft.repoUrl,
+        playStoreUrl: draft.playStoreUrl,
+        links: draft.links,
+        featured: draft.featured,
+        skillIds: draftSkills.map((s) => s.id),
+      };
       await api.publishProject(payload);
       const updated = await fetchProjects();
       setProjects(updated);
-      const saved = updated.find((p) => p.slug === slug) || null;
+      const saved = updated.find((p) => p.slug === draft.slug) || null;
       setActiveProject(saved);
+      setDirty(false);
       onDone();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Save failed.");
@@ -94,7 +149,7 @@ export default function ProjectManager() {
     return (
       <div className="mx-auto max-w-2xl">
         <button
-          onClick={() => (screen === "edit" && activeProject ? openView(activeProject) : backToList())}
+          onClick={() => (screen === "edit" ? backFromEdit() : backToList())}
           className="mb-4 flex items-center gap-1.5 text-sm text-ink/60 hover:text-ink"
         >
           <ArrowLeft size={14} /> {screen === "edit" ? "Back to project" : "Back to projects"}
@@ -102,7 +157,7 @@ export default function ProjectManager() {
         <h2 className="mb-4 font-display text-lg font-semibold">{screen === "edit" ? "Edit project" : "New project"}</h2>
         <ProjectForm
           value={draft}
-          onChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+          onChange={handleFormChange}
           skills={draftSkills}
           onSkillsChange={setDraftSkills}
           saving={saving}
@@ -172,7 +227,7 @@ export default function ProjectManager() {
             {p.images?.[0] && <img src={p.images[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />}
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{p.title}</p>
-              <p className="truncate text-sm text-ink/50">{p.description}</p>
+              <p className="truncate text-sm text-ink/50">{p.summary || p.description}</p>
             </div>
           </button>
         ))}

@@ -9,12 +9,15 @@ publish. Media (images/video) lives in Supabase Storage.
 ## Project layout
 
 ```
-src/lib/                 async fetchers (posts, projects, activity, skills, social, profile) against Supabase's PostgREST API
+src/lib/                 async fetchers (posts, projects, activity, skills, social, profile, history) against Supabase's PostgREST API
 src/components/admin/    Studio editors: PostEditor, ProjectManager, MilestonesManager, SocialLinksManager,
-                          ProfileManager, TagInput, SkillPicker, ThemePicker, RichTextEditor
-supabase/migrations/      schema: posts, projects, milestones, drafts, skills (+ junction tables), social_links, profile
+                          ProfileManager, HistoryManager (education & experience), LinksEditor, TagInput,
+                          SkillPicker, ThemePicker, RichTextEditor
+supabase/migrations/      schema: posts, projects, milestones, drafts, skills (+ junction tables), social_links,
+                          profile, history_entries (education & experience)
 supabase/functions/       edge functions: auth, publish/delete for posts, projects, milestones, skills, social links,
-                          profile, drafts CRUD, media upload — all write paths, gated by a custom password + JWT (auth-guard.ts)
+                          profile, history entries, drafts CRUD, media upload — all write paths, gated by a custom
+                          password + JWT (auth-guard.ts)
 .github/workflows/        builds with Vite, deploys the static SPA to GitHub Pages
 ```
 
@@ -45,7 +48,8 @@ npm run dev
    npx supabase db push
    npx supabase functions deploy auth publish-blog delete-blog publish-project delete-project \
      upload-media publish-milestone delete-milestone publish-skill publish-social-link \
-     delete-social-link publish-profile drafts-list drafts-save drafts-delete
+     delete-social-link publish-profile publish-history-entry delete-history-entry \
+     drafts-list drafts-save drafts-delete
    ```
    No local Supabase install or Docker needed — this only talks to your cloud
    project (`supabase start`/local dev emulation is unrelated and unused).

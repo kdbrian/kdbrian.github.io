@@ -13,8 +13,21 @@ Deno.serve(async (req) => {
   if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
   try {
-    const { slug, title, description, notes, images, tags, theme, repoUrl, playStoreUrl, featured, skillIds } =
-      await req.json();
+    const {
+      slug,
+      title,
+      summary,
+      description,
+      notes,
+      images,
+      tags,
+      theme,
+      repoUrl,
+      playStoreUrl,
+      links,
+      featured,
+      skillIds,
+    } = await req.json();
 
     if (!slug || !SLUG_RE.test(slug)) {
       return jsonResponse({ error: "Slug must be lowercase letters, numbers, and hyphens only." }, 400);
@@ -35,6 +48,7 @@ Deno.serve(async (req) => {
       {
         slug,
         title,
+        summary: summary || "",
         description: description || "",
         notes: notes || "",
         images: images || [],
@@ -42,6 +56,7 @@ Deno.serve(async (req) => {
         theme: theme || null,
         repo_url: repoUrl || null,
         play_store_url: playStoreUrl || null,
+        links: Array.isArray(links) ? links.filter((l) => l && l.url) : [],
         featured: !!featured,
         updated_at: new Date().toISOString(),
       },

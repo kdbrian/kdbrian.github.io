@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import Logo from "@/components/layout/Logo";
 
 const LINKS = [
   { to: "/", label: "About", end: true },
@@ -17,9 +18,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-content items-center justify-between px-4 py-4 sm:px-6">
-        <a href="/" className="font-display text-lg font-semibold tracking-tight">
-          Brian<span className="text-accent">.</span>
-        </a>
+        <Logo />
 
         <nav className="hidden items-center gap-1 rounded-full border border-line bg-white/60 px-1.5 py-1 md:flex">
           {LINKS.map((link) => (

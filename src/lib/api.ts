@@ -1,6 +1,6 @@
 import { getValidToken, touchSession } from "@/lib/auth";
 import type { Draft } from "@/lib/drafts";
-import type { Skill, Theme } from "@/types/content";
+import type { HistoryKind, ProjectLink, Skill, Theme } from "@/types/content";
 
 const FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
 
@@ -53,6 +53,7 @@ export const api = {
   publishProject: (project: {
     slug: string;
     title: string;
+    summary?: string;
     description: string;
     notes?: string;
     images: string[];
@@ -60,6 +61,7 @@ export const api = {
     theme?: Theme | null;
     repoUrl: string;
     playStoreUrl?: string;
+    links?: ProjectLink[];
     featured?: boolean;
     skillIds?: string[];
   }) => call<{ ok: true; slug: string }>("publish-project", project),
@@ -106,4 +108,18 @@ export const api = {
     shapePoints: number;
     shapeIrregularity: number;
   }) => call<{ ok: true }>("publish-profile", profile),
+
+  publishHistoryEntry: (entry: {
+    id?: string;
+    kind: HistoryKind;
+    title: string;
+    org?: string;
+    startDate: string;
+    endDate?: string | null;
+    description?: string;
+    url?: string;
+    sortOrder?: number;
+  }) => call<{ id: string }>("publish-history-entry", entry),
+
+  deleteHistoryEntry: (id: string) => call<{ ok: true }>("delete-history-entry", { id }),
 };

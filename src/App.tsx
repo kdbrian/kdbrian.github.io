@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Home from "@/pages/Home";
 import ProjectsPage from "@/pages/Projects";
+import ProjectDetailPage from "@/pages/ProjectDetail";
 import ActivityPage from "@/pages/Activity";
 import BlogListPage from "@/pages/BlogList";
 import PostDetailPage from "@/pages/PostDetail";
@@ -31,6 +32,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:slug" element={<ProjectDetailPage />} />
                 <Route path="/activity" element={<ActivityPage />} />
                 <Route path="/blog" element={<BlogListPage />} />
                 <Route path="/blog/:slug" element={<PostDetailPage />} />
