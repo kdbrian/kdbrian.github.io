@@ -7,9 +7,6 @@ const LINKS = [
   { to: "/", label: "About", end: true },
   { to: "/#education", label: "Education", end: false },
   { to: "/projects", label: "Projects", end: false },
-  { to: "/activity", label: "Activity", end: false },
-  { to: "/blog", label: "Blog", end: false },
-  { to: "/playground", label: "Playground", end: false },
 ];
 
 export default function Header() {
@@ -31,6 +28,9 @@ export default function Header() {
               {link.label}
             </NavLink>
           ))}
+          <a href="https://kdbrian.github.io/blog" target="_blank" rel="noreferrer" className="nav-link">
+            Blog
+          </a>
         </nav>
 
         <a
@@ -70,6 +70,15 @@ export default function Header() {
                 {link.label}
               </NavLink>
             ))}
+            <a
+              href="https://kdbrian.github.io/blog"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-ink/60 hover:bg-ink/5 hover:text-ink"
+            >
+              Blog ↗
+            </a>
             <a
               href="https://github.com/kdbrian"
               target="_blank"

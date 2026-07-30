@@ -15,8 +15,7 @@ export default defineConfig({
       manifest: {
         name: "Brian Kidiga — Android Developer",
         short_name: "Brian Kidiga",
-        description:
-          "Android developer building Kotlin & Jetpack Compose apps. Projects, activity, and writing.",
+        description: "Android developer building Kotlin & Jetpack Compose apps. Projects, skills, and experience.",
         start_url: "/",
         scope: "/",
         display: "standalone",
