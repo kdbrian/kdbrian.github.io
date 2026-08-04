@@ -34,7 +34,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        navigateFallbackDenylist: [/^\/404\.html$/],
+        // /blog is a separate project Pages site (its own repo + service worker)
+        // living under this domain. Without this, our SW's scope ("/") swallows
+        // navigations to /blog/*, serving this app's cached shell instead of
+        // ever letting the request reach the blog deployment.
+        navigateFallbackDenylist: [/^\/404\.html$/, /^\/blog\//],
       },
     }),
   ],
