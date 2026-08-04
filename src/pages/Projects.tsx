@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import type { Project } from "@/types/content";
 import { fetchProjects } from "@/lib/projects";
 import ProjectCard from "@/components/sections/ProjectCard";
+import RecentArticles from "@/components/sections/RecentArticles";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[] | null>(null);
@@ -33,6 +34,8 @@ export default function ProjectsPage() {
           ))}
         </div>
       )}
+
+      <RecentArticles />
     </section>
   );
 }

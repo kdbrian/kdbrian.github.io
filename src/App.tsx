@@ -3,7 +3,6 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Home from "@/pages/Home";
 import ProjectsPage from "@/pages/Projects";
-import ProjectDetailPage from "@/pages/ProjectDetail";
 
 export default function App() {
   return (
@@ -13,7 +12,6 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

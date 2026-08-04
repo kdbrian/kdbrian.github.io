@@ -1,8 +1,8 @@
 # kdbrian.github.io — portfolio
 
 Vite + React + Tailwind portfolio: About/skills, education & experience, and
-projects. Read-only — all authoring (blog posts, milestones, project/profile
-editing) happens in the separate
+a projects overview. Read-only — all authoring (blog posts, milestones,
+project/profile editing) happens in the separate
 [`blog`](https://github.com/kdbrian/blog) repo, deployed at
 `kdbrian.github.io/blog`.
 
@@ -13,12 +13,20 @@ Supabase's PostgREST API with the anon key, gated by RLS (`select` policies
 only; writes require the service-role key and a custom JWT, which this repo
 has no access to).
 
+This site stays intentionally shallow: it's the resume — an overview of
+every project plus a "recent articles" strip, both of which hand off to the
+blog for anything long-form. Clicking a project card opens its full case
+study (screenshots, write-up, commit history) at
+`kdbrian.github.io/blog/projects/:slug`; clicking a recent article opens the
+full post at `kdbrian.github.io/blog/:slug`. Neither of those pages exists
+in this repo on purpose — the blog owns all long-form reading experiences.
+
 ## Project layout
 
 ```
-src/pages/               Home (About/Education), Projects, ProjectDetail
-src/lib/                 async fetchers (projects, skills, social, profile, history) against Supabase's PostgREST API
-.github/workflows/       builds with Vite, deploys the static SPA to GitHub Pages
+src/pages/               Home (About/Education), Projects (overview grid + recent articles, both link out to the blog)
+src/lib/                 async fetchers (projects, recent posts, skills, social, profile, history) against Supabase's PostgREST API
+.github/workflows/       builds with Vite, deploys the static SPA to GitHub Pages; also publishes a Docker image to ghcr.io
 ```
 
 ## Local setup
@@ -29,6 +37,27 @@ cp .env.example .env.local   # fill in the two VITE_ vars below — same
                               # Supabase project as the blog repo
 npm run dev
 ```
+
+## Docker
+
+This repo's `Dockerfile`/`nginx.conf` build and serve the static SPA on
+their own — no dependency on the blog repo or anything outside this
+directory:
+
+```bash
+docker build -t kdbrian-portfolio \
+  --build-arg VITE_SUPABASE_URL=https://<ref>.supabase.co \
+  --build-arg VITE_SUPABASE_ANON_KEY=<anon-key> .
+docker run -p 8080:80 kdbrian-portfolio
+```
+
+If you're also running the blog locally and want both up against the same
+Supabase project at once, there's a `docker-compose.yml` one level up (in
+the parent directory that holds both repo checkouts, not inside either
+repo — each service still owns its standalone Dockerfile and `.env.example`
+here, so this repo keeps building correctly entirely on its own, e.g. in
+CI). It builds both from a single shared `.env`. That compose file is local
+tooling only and isn't tracked by this repo.
 
 ## Deploying
 

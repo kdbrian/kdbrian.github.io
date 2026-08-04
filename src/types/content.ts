@@ -3,10 +3,25 @@ export type Theme = {
   value: string; // hex color, CSS gradient() value, or image URL
 };
 
+export type PostFormat = "html" | "markdown";
+
 export interface Skill {
   id: string;
   name: string;
   dateAdded: string; // ISO date
+}
+
+export interface Post {
+  title: string;
+  slug: string;
+  date: string; // ISO date
+  excerpt?: string;
+  cover?: string;
+  tags?: string[];
+  theme?: Theme | null;
+  format: PostFormat;
+  body: string;
+  skills?: Skill[];
 }
 
 export interface ProjectLink {

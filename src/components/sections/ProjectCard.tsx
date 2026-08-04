@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
 import { ExternalLink, Github, Link2, Smartphone } from "lucide-react";
 import type { Project } from "@/types/content";
 import ThemeBanner from "@/components/ThemeBanner";
+import { blogProjectUrl } from "@/lib/blog-links";
 
 const MAX_TAGS = 4;
 const MAX_SKILLS = 4;
@@ -17,7 +17,7 @@ export default function ProjectCard({ project }: { project: Project }) {
 
   return (
     <div className="card group overflow-hidden transition-shadow hover:shadow-lg hover:shadow-ink/5">
-      <Link to={`/projects/${project.slug}`}>
+      <a href={blogProjectUrl(project.slug)} target="_blank" rel="noreferrer">
         {project.images?.[0] && (
           <div className="aspect-[4/3] overflow-hidden bg-ink/5">
             <img
@@ -30,8 +30,11 @@ export default function ProjectCard({ project }: { project: Project }) {
         <ThemeBanner theme={project.theme} className="p-4">
           <h3 className="font-display font-semibold">{project.title}</h3>
           <p className="mt-1 line-clamp-2 text-sm opacity-70">{project.summary || project.description}</p>
+          <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent">
+            Full case study <ExternalLink size={11} />
+          </p>
         </ThemeBanner>
-      </Link>
+      </a>
 
       <div className="px-4 pb-4">
         {!!tags.length && (
