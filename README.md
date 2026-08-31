@@ -13,6 +13,11 @@ Supabase's PostgREST API with the anon key, gated by RLS (`select` policies
 only; writes require the service-role key and a custom JWT, which this repo
 has no access to).
 
+When a frontend change needs a table or column that isn't in the shared
+database yet, the SQL to add it (idempotent, anon `select` RLS) goes in
+`docs/supabase/` — run it once in the Supabase SQL editor, or fold it into
+the blog repo's migrations.
+
 This site stays intentionally shallow: it's the resume — an overview of
 every project plus a "recent articles" strip, both of which hand off to the
 blog for anything long-form. Clicking a project card opens its full case
